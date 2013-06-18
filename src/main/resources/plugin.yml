@@ -1,0 +1,45 @@
+name: ${project.name}
+main: ${project.groupId}.${project.artifactId}.${project.name}
+version: ${project.version}
+description: ${project.description}
+
+commands:
+  menu:
+    description: The base for all menu actions
+    usage: /menu [create|edit|delete|list|open|script|reload] [parameters...]
+    aliases: [m]
+    permissions: createyourownmenus.commands.menu
+  
+permissions:
+  createyourownmenus.commands.menu.*:
+    description: Allows use of all menu commands
+    default: op
+    children:
+      createyourownmenus.commands.menu.create: true
+      createyourownmenus.commands.menu.edit: true
+      createyourownmenus.commands.menu.delete: true
+      createyourownmenus.commands.menu.list: true
+      createyourownmenus.commands.menu.open: true
+      createyourownmenus.commands.menu.script: true
+      createyourownmenus.commands.menu.reload: true
+  createyourownmenus.commands.menu.create:
+    description: Allows creating of new menus
+    default: op
+  createyourownmenus.commands.menu.edit:
+    description: Allows editing of existing menus
+    default: op
+  createyourownmenus.commands.menu.delete:
+    description: Allows removing of existing menus
+    default: op
+  createyourownmenus.commands.menu.list:
+    description: Allows listing of all menus
+    default: op
+  createyourownmenus.commands.menu.open:
+    description: Allows opening of menus for other players
+    default: op
+  createyourownmenus.commands.menu.script:
+    description: Allows scripting of menu items
+    default: op
+  createyourownmenus.commands.menu.reload:
+    description: Allows reloading of menus from disk
+    default: op
