@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -243,8 +244,16 @@ public class Menu implements InventoryHolder {
             ItemMeta meta = menuItem.getItemMeta();
             if (meta.hasLore()) {
                 List<String> commands = meta.getLore();
-                ConsoleCommandSender sender = plugin.getServer().getConsoleSender();
+                ConsoleCommandSender consoleSender = plugin.getServer().getConsoleSender();
                 for (String command : commands) {
+
+                    // If a command is prefixed with @p then execute it as the player not the console
+                    CommandSender sender = consoleSender;
+                    if (command.startsWith("@p")) {
+                        sender = player;
+                        command = command.substring(2);
+                    }
+
                     // Only pay attention to commands
                     if (command.startsWith("/")) {
                         // Replace @p with the clicking player's name
