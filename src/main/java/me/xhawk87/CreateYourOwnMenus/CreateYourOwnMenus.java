@@ -11,6 +11,8 @@ import java.util.Map;
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import org.bukkit.command.CommandSender;
+import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -47,6 +49,12 @@ public class CreateYourOwnMenus extends JavaPlugin {
     public Menu createMenu(String id, String title, int rows) {
         Menu menu = new Menu(this, id, title, rows);
         menus.put(id, menu);
+        
+        // Register the specific-opening permission for the new menu
+        getServer().getPluginManager().addPermission(
+                new Permission("cyom.menu." + id,
+                "Allows the given player to use the /menu open command for the "
+                + id + " menu", PermissionDefault.FALSE));
         return menu;
     }
 
@@ -69,17 +77,28 @@ public class CreateYourOwnMenus extends JavaPlugin {
      */
     protected void deleteMenu(Menu menu) {
         menus.remove(menu.getId());
+        // De-register the specific-opening permission for the deleted menu
+        getServer().getPluginManager().removePermission("cyom.menus." + menu.getId());
     }
 
     /**
      * Load or reload all menus from their .yml files
      */
     public void reloadMenus() {
+        // De-register the specific-opening permission for all menus
+        for (Menu menu : menus.values()) {
+            getServer().getPluginManager().removePermission("cyom.menus." + menu.getId());
+        }
+        
+        // Delete all menus
         menus.clear();
+        
+        // Ensure that the plugin folder has been created
         File pluginFolder = getDataFolder();
         if (!pluginFolder.exists()) {
-            pluginFolder.mkdirs(); // Ensure that the plugin folder has been created
+            pluginFolder.mkdirs(); 
         }
+        
         // Load all .yml files in the plugin folder as menus
         // This may need to change if a config.yml is added
         for (File file : pluginFolder.listFiles(new FileFilter() {
@@ -92,6 +111,12 @@ public class CreateYourOwnMenus extends JavaPlugin {
             Menu menu = new Menu(this, id);
             menu.load();
             menus.put(id, menu);
+            
+            // Register the specific-opening permission for the loaded menu
+            getServer().getPluginManager().addPermission(
+                    new Permission("cyom.menu." + id,
+                    "Allows the given player to use the /menu open command for the "
+                    + id + " menu", PermissionDefault.FALSE));
         }
     }
 

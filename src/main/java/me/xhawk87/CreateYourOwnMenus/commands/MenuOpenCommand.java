@@ -42,11 +42,24 @@ public class MenuOpenCommand implements IMenuCommand {
             // No player provided, target the sender
             if (sender instanceof Player) {
                 target = (Player) sender;
+                
+                // If the command is self-targetted, also check specific-menu permissions
+                if (!sender.hasPermission("cyom.commands.menu.open")
+                        && !sender.hasPermission("cyom.menu." + args[0])) {
+                    sender.sendMessage("You do not have permission to open this menu");
+                    return true;
+                }
             } else {
                 sender.sendMessage("You need to be in-game to open a menu");
                 return true;
             }
         } else {
+            // You must have full permissions to target another player
+            if (!sender.hasPermission("cyom.commands.menu.open")) {
+                sender.sendMessage("You do not have permission to use this command");
+                return true;
+            }
+            
             // Player is provided, so target the named player
             String playerName = args[i++];
             target = plugin.getServer().getPlayerExact(playerName);
@@ -63,7 +76,7 @@ public class MenuOpenCommand implements IMenuCommand {
             sender.sendMessage("There is no menu with id " + id);
             return true;
         }
-        
+
         // Open the menu for the target
         menu.open(target);
         return true;
@@ -76,6 +89,6 @@ public class MenuOpenCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "cyom.commands.menu.open";
+        return null; // Allow all through in order to check specific-menu permissions
     }
 }
