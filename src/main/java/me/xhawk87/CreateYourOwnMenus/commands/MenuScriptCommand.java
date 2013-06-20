@@ -37,11 +37,14 @@ public class MenuScriptCommand implements IMenuCommand {
         }
 
         // Expecting one or more parameters that make up the command or comment to add
-        StringBuilder sb = new StringBuilder(args[0]);
-        for (int i = 1; i < args.length; i++) {
-            sb.append(" ").append(args[i]);
+        String commandString;
+        {
+            StringBuilder sb = new StringBuilder(args[0]);
+            for (int i = 1; i < args.length; i++) {
+                sb.append(" ").append(args[i]);
+            }
+            commandString = sb.toString();
         }
-        String commandString = sb.toString();
 
         // Only players can hold items
         if (sender instanceof Player) {
@@ -53,7 +56,7 @@ public class MenuScriptCommand implements IMenuCommand {
                 player.sendMessage("You must be holding a menu item");
                 return true;
             }
-            
+
             // Get or create the lore
             ItemMeta meta = held.getItemMeta();
             List<String> loreStrings;
@@ -67,6 +70,26 @@ public class MenuScriptCommand implements IMenuCommand {
             if (commandString.equalsIgnoreCase("clear")) {
                 loreStrings.clear();
                 sender.sendMessage("The command list for this menu item has been cleared");
+            } else if (commandString.equalsIgnoreCase("show")) {
+                // Strip all color chars used to hide the command
+                for (int i = 0; i < loreStrings.size(); i++) {
+                    String loreString = loreStrings.get(i);
+                    if (loreString.startsWith(ChatColor.COLOR_CHAR + "/")) {
+                        loreStrings.set(i, ChatColor.stripColor(loreString));
+                    }
+                }
+            } else if (commandString.equalsIgnoreCase("hide")) {
+                // Place a color char in front of each char in order to hide the commands
+                for (int i = 0; i < loreStrings.size(); i++) {
+                    String loreString = loreStrings.get(i);
+                    if (loreString.startsWith(ChatColor.COLOR_CHAR + "/")) {
+                        StringBuilder sb = new StringBuilder();
+                        for (char c : loreString.toCharArray()) {
+                            sb.append(ChatColor.COLOR_CHAR).append(c);
+                        }
+                        loreStrings.set(i, sb.toString());
+                    }
+                }
             } else {
                 // Otherwise append this to the lore
                 loreStrings.add(commandString);
@@ -76,7 +99,7 @@ public class MenuScriptCommand implements IMenuCommand {
                 }
                 sender.sendMessage(commandString + " was added to the command list of this menu item");
             }
-            
+
             // Update the item
             meta.setLore(loreStrings);
             held.setItemMeta(meta);

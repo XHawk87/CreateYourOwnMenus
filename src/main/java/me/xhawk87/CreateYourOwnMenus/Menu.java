@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -254,6 +255,11 @@ public class Menu implements InventoryHolder {
                         command = command.substring(2);
                     }
 
+                    // Check if the command is hidden
+                    if (command.startsWith(ChatColor.COLOR_CHAR + "/")) {
+                        command = ChatColor.stripColor(command);
+                    }
+                    
                     // Only pay attention to commands
                     if (command.startsWith("/")) {
                         // Replace @p with the clicking player's name
