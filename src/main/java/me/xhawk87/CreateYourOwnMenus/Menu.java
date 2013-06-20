@@ -280,9 +280,13 @@ public class Menu implements InventoryHolder {
                 // Handle the special menu script commands
                 String[] args = command.split(" ");
                 String specialCommand = args[0];
+                if (!plugin.isValidMenuScriptCommand(specialCommand)) {
+                    player.sendMessage("Error in menu script line (command is not allowed): " + command);
+                    return;
+                }
                 if (specialCommand.equalsIgnoreCase("/requirepermission")) {
                     if (args.length != 2) {
-                        player.sendMessage("Error in menu script line: " + command);
+                        player.sendMessage("Error in menu script line (expected permission node): " + command);
                         return;
                     }
                     String permission = args[1];
@@ -292,13 +296,13 @@ public class Menu implements InventoryHolder {
                     }
                 } else if (specialCommand.equalsIgnoreCase("/close")) {
                     if (args.length != 1) {
-                        player.sendMessage("Error in menu script line: " + command);
+                        player.sendMessage("Error in menu script line (expected no arguments): " + command);
                         return;
                     }
                     player.closeInventory();
                 } else if (specialCommand.equalsIgnoreCase("/delay")) {
                     if (args.length != 2) {
-                        player.sendMessage("Error in menu script line: " + command);
+                        player.sendMessage("Error in menu script line (expected delay in ticks): " + command);
                         return;
                     }
                     try {
@@ -311,14 +315,14 @@ public class Menu implements InventoryHolder {
                         }.runTaskLater(plugin, delay);
                         return;
                     } catch (NumberFormatException ex) {
-                        player.sendMessage("Error in menu script line: " + command);
+                        player.sendMessage("Error in menu script line (delay must be a whole number of ticks): " + command);
                         return;
                     }
                 } else {
                     // Otherwise, parse it as a normal command. 
                     // The dispatchCommand method expects there to be no forward slash
                     if (!plugin.getServer().dispatchCommand(sender, command.substring(1))) {
-                        player.sendMessage("Error in menu script line: " + command);
+                        player.sendMessage("Error in menu script line (unknown command): " + command);
                         return;
                     }
                 }
