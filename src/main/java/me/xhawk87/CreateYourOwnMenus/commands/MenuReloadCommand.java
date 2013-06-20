@@ -39,6 +39,6 @@ public class MenuReloadCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "createyourownmenus.commands.menu.reload";
+        return "cyom.commands.menu.reload";
     }
 }

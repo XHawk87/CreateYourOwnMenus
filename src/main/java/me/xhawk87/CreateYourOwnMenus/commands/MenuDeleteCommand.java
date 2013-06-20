@@ -57,6 +57,6 @@ public class MenuDeleteCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "createyourownmenus.commands.menu.delete";
+        return "cyom.commands.menu.delete";
     }
 }

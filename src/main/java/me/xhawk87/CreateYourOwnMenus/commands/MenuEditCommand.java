@@ -61,6 +61,6 @@ public class MenuEditCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "createyourownmenus.commands.menu.edit";
+        return "cyom.commands.menu.edit";
     }
 }

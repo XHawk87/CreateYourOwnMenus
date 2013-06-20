@@ -38,6 +38,6 @@ public class MenuListCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "createyourownmenus.commands.menu.list";
+        return "cyom.commands.menu.list";
     }
 }

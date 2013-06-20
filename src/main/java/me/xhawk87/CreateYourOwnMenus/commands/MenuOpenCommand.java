@@ -76,6 +76,6 @@ public class MenuOpenCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "createyourownmenus.commands.menu.open";
+        return "cyom.commands.menu.open";
     }
 }

@@ -94,6 +94,6 @@ public class MenuScriptCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "createyourownmenus.commands.menu.script";
+        return "cyom.commands.menu.script";
     }
 }

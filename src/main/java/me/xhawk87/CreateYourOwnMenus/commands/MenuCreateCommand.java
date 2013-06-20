@@ -72,6 +72,6 @@ public class MenuCreateCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "createyourownmenus.commands.menu.create";
+        return "cyom.commands.menu.create";
     }
 }
