@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
@@ -245,60 +246,83 @@ public class Menu implements InventoryHolder {
             ItemMeta meta = menuItem.getItemMeta();
             if (meta.hasLore()) {
                 List<String> commands = meta.getLore();
-                ConsoleCommandSender consoleSender = plugin.getServer().getConsoleSender();
-                for (String command : commands) {
-
-                    // If a command is prefixed with @p then execute it as the player not the console
-                    CommandSender sender = consoleSender;
-                    if (command.startsWith("@p")) {
-                        sender = player;
-                        command = command.substring(2);
-                    }
-
-                    // Check if the command is hidden
-                    if (command.startsWith(ChatColor.COLOR_CHAR + "/")) {
-                        command = ChatColor.stripColor(command);
-                    }
-                    
-                    // Only pay attention to commands
-                    if (command.startsWith("/")) {
-                        // Replace @p with the clicking player's name
-                        command = command.replaceAll("@p", player.getName());
-
-                        // Handle the special menu script commands
-                        String[] args = command.split(" ");
-                        String specialCommand = args[0];
-                        if (specialCommand.equalsIgnoreCase("/requirepermission")) {
-                            if (args.length != 2) {
-                                player.sendMessage("Error in menu script line: " + command);
-                                return;
-                            }
-                            String permission = args[1];
-                            if (!player.hasPermission(permission)) {
-                                player.sendMessage("You do not have permission to use this menu item");
-                                return;
-                            }
-                        } else if (specialCommand.equalsIgnoreCase("/close")) {
-                            if (args.length != 1) {
-                                player.sendMessage("Error in menu script line: " + command);
-                                return;
-                            }
-                            player.closeInventory();
-                        } else {
-                            // Otherwise, parse it as a normal command. 
-                            // The dispatchCommand method expects there to be no forward slash
-                            if (!plugin.getServer().dispatchCommand(sender, command.substring(1))) {
-                                player.sendMessage("Error in menu script line: " + command);
-                                return;
-                            }
-                        }
-                    }
-                }
+                parseCommands(commands.iterator(), player);
                 return;
             }
         }
         // The item doesn't have metadata or lore
         player.sendMessage("This is not a valid menu item");
+    }
+
+    private void parseCommands(final Iterator<String> commands, final Player player) {
+        ConsoleCommandSender consoleSender = plugin.getServer().getConsoleSender();
+        while (commands.hasNext()) {
+            String command = commands.next();
+
+            // If a command is prefixed with @p then execute it as the player not the console
+            CommandSender sender = consoleSender;
+            if (command.startsWith("@p")) {
+                sender = player;
+                command = command.substring(2);
+            }
+
+            // Check if the command is hidden
+            if (command.startsWith(ChatColor.COLOR_CHAR + "/")) {
+                command = ChatColor.stripColor(command);
+            }
+
+            // Only pay attention to commands
+            if (command.startsWith("/")) {
+                // Replace @p with the clicking player's name
+                command = command.replaceAll("@p", player.getName());
+
+                // Handle the special menu script commands
+                String[] args = command.split(" ");
+                String specialCommand = args[0];
+                if (specialCommand.equalsIgnoreCase("/requirepermission")) {
+                    if (args.length != 2) {
+                        player.sendMessage("Error in menu script line: " + command);
+                        return;
+                    }
+                    String permission = args[1];
+                    if (!player.hasPermission(permission)) {
+                        player.sendMessage("You do not have permission to use this menu item");
+                        return;
+                    }
+                } else if (specialCommand.equalsIgnoreCase("/close")) {
+                    if (args.length != 1) {
+                        player.sendMessage("Error in menu script line: " + command);
+                        return;
+                    }
+                    player.closeInventory();
+                } else if (specialCommand.equalsIgnoreCase("/delay")) {
+                    if (args.length != 2) {
+                        player.sendMessage("Error in menu script line: " + command);
+                        return;
+                    }
+                    try {
+                        int delay = Integer.parseInt(args[1]);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                parseCommands(commands, player);
+                            }
+                        }.runTaskLater(plugin, delay);
+                        return;
+                    } catch (NumberFormatException ex) {
+                        player.sendMessage("Error in menu script line: " + command);
+                        return;
+                    }
+                } else {
+                    // Otherwise, parse it as a normal command. 
+                    // The dispatchCommand method expects there to be no forward slash
+                    if (!plugin.getServer().dispatchCommand(sender, command.substring(1))) {
+                        player.sendMessage("Error in menu script line: " + command);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     /**
