@@ -52,7 +52,8 @@ public class Menu implements InventoryHolder {
     public Menu(CreateYourOwnMenus plugin, String id, String title, int rows) {
         this.plugin = plugin;
         this.id = id;
-        this.file = new File(plugin.getDataFolder(), id + ".yml");
+        File menusFolder = new File(plugin.getDataFolder(), "menus");
+        this.file = new File(menusFolder, id + ".yml");
         this.inventory = plugin.getServer().createInventory(this, rows * 9, title);
     }
 

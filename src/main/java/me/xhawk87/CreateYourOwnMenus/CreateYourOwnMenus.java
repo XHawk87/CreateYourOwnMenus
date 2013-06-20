@@ -94,14 +94,14 @@ public class CreateYourOwnMenus extends JavaPlugin {
         menus.clear();
         
         // Ensure that the plugin folder has been created
-        File pluginFolder = getDataFolder();
-        if (!pluginFolder.exists()) {
-            pluginFolder.mkdirs(); 
+       File menusFolder = new File(getDataFolder(), "menus");
+        if (!menusFolder.exists()) {
+            menusFolder.mkdirs(); 
         }
         
         // Load all .yml files in the plugin folder as menus
         // This may need to change if a config.yml is added
-        for (File file : pluginFolder.listFiles(new FileFilter() {
+        for (File file : menusFolder.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
                 return pathname.getName().toLowerCase().endsWith(".yml");
