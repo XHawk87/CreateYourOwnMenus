@@ -83,7 +83,7 @@ public class MenuScriptCommand implements IMenuCommand {
                 // Place a color char in front of each char in order to hide the commands
                 for (int i = 0; i < loreStrings.size(); i++) {
                     String loreString = loreStrings.get(i);
-                    if (loreString.startsWith(ChatColor.COLOR_CHAR + "/")) {
+                    if (loreString.startsWith("/")) {
                         StringBuilder sb = new StringBuilder();
                         for (char c : loreString.toCharArray()) {
                             sb.append(ChatColor.COLOR_CHAR).append(c);
