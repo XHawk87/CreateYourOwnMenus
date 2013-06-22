@@ -15,6 +15,7 @@ import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -105,9 +106,10 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * Load or reload all menus from their .yml files
      */
     public void reloadMenus() {
+        PluginManager mgr = getServer().getPluginManager();
         // De-register the specific-opening permission for all menus
         for (Menu menu : menus.values()) {
-            getServer().getPluginManager().removePermission("cyom.menus." + menu.getId());
+            mgr.removePermission("cyom.menus." + menu.getId());
         }
 
         // Delete all menus
@@ -133,10 +135,12 @@ public class CreateYourOwnMenus extends JavaPlugin {
             menus.put(id, menu);
 
             // Register the specific-opening permission for the loaded menu
-            getServer().getPluginManager().addPermission(
-                    new Permission("cyom.menu." + id,
-                    "Allows the given player to use the /menu open command for the "
-                    + id + " menu", PermissionDefault.FALSE));
+            if (mgr.getPermission("cyom.menu." + id) == null) {
+                mgr.addPermission(
+                        new Permission("cyom.menu." + id,
+                        "Allows the given player to use the /menu open command for the "
+                        + id + " menu", PermissionDefault.FALSE));
+            }
         }
     }
 
