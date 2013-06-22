@@ -34,20 +34,6 @@ public class CreateYourOwnMenus extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
-        // Load in blacklisted and whitelisted commands from config
-        for (String commandName : getConfig().getStringList("blacklist-commands")) {
-            if (commandName.startsWith("/")) {
-                commandName = commandName.substring(1);
-            }
-            commandBlacklist.add(commandName.toLowerCase());
-        }
-        for (String commandName : getConfig().getStringList("whitelist-commands")) {
-            if (commandName.startsWith("/")) {
-                commandName = commandName.substring(1);
-            }
-            commandWhitelist.add(commandName.toLowerCase());
-        }
-
         // Load menus
         reloadMenus();
 
@@ -106,8 +92,22 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * Load or reload all menus from their .yml files
      */
     public void reloadMenus() {
-        PluginManager mgr = getServer().getPluginManager();
+        // Load in blacklisted and whitelisted commands from config
+        for (String commandName : getConfig().getStringList("blacklist-commands")) {
+            if (commandName.startsWith("/")) {
+                commandName = commandName.substring(1);
+            }
+            commandBlacklist.add(commandName.toLowerCase());
+        }
+        for (String commandName : getConfig().getStringList("whitelist-commands")) {
+            if (commandName.startsWith("/")) {
+                commandName = commandName.substring(1);
+            }
+            commandWhitelist.add(commandName.toLowerCase());
+        }
+
         // De-register the specific-opening permission for all menus
+        PluginManager mgr = getServer().getPluginManager();
         for (Menu menu : menus.values()) {
             mgr.removePermission("cyom.menus." + menu.getId());
         }
