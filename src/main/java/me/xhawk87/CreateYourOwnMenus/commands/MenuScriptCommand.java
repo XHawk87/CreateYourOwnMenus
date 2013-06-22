@@ -78,6 +78,7 @@ public class MenuScriptCommand implements IMenuCommand {
                         loreStrings.set(i, ChatColor.stripColor(loreString));
                     }
                 }
+                sender.sendMessage("All commands on this menu item should now be visible");
             } else if (commandString.equalsIgnoreCase("hide")) {
                 // Place a color char in front of each char in order to hide the commands
                 for (int i = 0; i < loreStrings.size(); i++) {
@@ -90,6 +91,7 @@ public class MenuScriptCommand implements IMenuCommand {
                         loreStrings.set(i, sb.toString());
                     }
                 }
+                sender.sendMessage("All commands on this menu item should now be hidden");
             } else {
                 // Otherwise append this to the lore
                 loreStrings.add(commandString);
