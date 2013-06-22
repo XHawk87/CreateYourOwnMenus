@@ -258,16 +258,22 @@ public class Menu implements InventoryHolder {
         while (commands.hasNext()) {
             String command = commands.next();
 
+            // Check if the command is hidden
+            if (command.startsWith(ChatColor.COLOR_CHAR + "/")) {
+                StringBuilder sb = new StringBuilder();
+                for (char c : command.toCharArray()) {
+                    if (c != ChatColor.COLOR_CHAR) {
+                        sb.append(c);
+                    }
+                }
+                command = sb.toString();
+            }
+
             // If a command is prefixed with @p then execute it as the player not the console
             CommandSender sender = consoleSender;
             if (command.startsWith("@p")) {
                 sender = player;
                 command = command.substring(2);
-            }
-
-            // Check if the command is hidden
-            if (command.startsWith(ChatColor.COLOR_CHAR + "/")) {
-                command = ChatColor.stripColor(command);
             }
 
             // Only pay attention to commands
