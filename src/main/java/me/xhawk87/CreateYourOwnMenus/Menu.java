@@ -50,10 +50,7 @@ public class Menu implements InventoryHolder {
      * @param rows The number of rows for the menu inventory
      */
     public Menu(CreateYourOwnMenus plugin, String id, String title, int rows) {
-        this.plugin = plugin;
-        this.id = id;
-        File menusFolder = new File(plugin.getDataFolder(), "menus");
-        this.file = new File(menusFolder, id + ".yml");
+        this(plugin, id);
         this.inventory = plugin.getServer().createInventory(this, rows * 9, title);
     }
 
@@ -67,7 +64,8 @@ public class Menu implements InventoryHolder {
     public Menu(CreateYourOwnMenus plugin, String id) {
         this.plugin = plugin;
         this.id = id;
-        this.file = new File(plugin.getDataFolder(), id + ".yml");
+        File menusFolder = new File(plugin.getDataFolder(), "menus");
+        this.file = new File(menusFolder, id + ".yml");
     }
 
     /**
