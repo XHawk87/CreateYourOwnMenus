@@ -93,6 +93,8 @@ public class CreateYourOwnMenus extends JavaPlugin {
      */
     public void reloadMenus() {
         // Load in blacklisted and whitelisted commands from config
+        commandBlacklist.clear();
+        commandWhitelist.clear();
         for (String commandName : getConfig().getStringList("blacklist-commands")) {
             if (commandName.startsWith("/")) {
                 commandName = commandName.substring(1);
