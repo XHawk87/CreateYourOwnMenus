@@ -20,6 +20,9 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class MenuScriptCommand implements IMenuCommand {
 
+    private static final String hiddenCommand = ChatColor.COLOR_CHAR + "/";
+    private static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "/"
+            + ChatColor.COLOR_CHAR + "@" + ChatColor.COLOR_CHAR + "p";
     private CreateYourOwnMenus plugin;
 
     public MenuScriptCommand(CreateYourOwnMenus plugin) {
@@ -74,8 +77,15 @@ public class MenuScriptCommand implements IMenuCommand {
                 // Strip all color chars used to hide the command
                 for (int i = 0; i < loreStrings.size(); i++) {
                     String loreString = loreStrings.get(i);
-                    if (loreString.startsWith(ChatColor.COLOR_CHAR + "/")) {
-                        loreStrings.set(i, ChatColor.stripColor(loreString));
+                    if (loreString.startsWith(hiddenCommand)
+                            || loreString.startsWith(hiddenPlayerCommand)) {
+                        StringBuilder sb = new StringBuilder();
+                        for (char c : loreString.toCharArray()) {
+                            if (c != ChatColor.COLOR_CHAR) {
+                                sb.append(c);
+                            }
+                        }
+                        loreStrings.set(i, sb.toString());
                     }
                 }
                 sender.sendMessage("All commands on this menu item should now be visible");
@@ -83,7 +93,7 @@ public class MenuScriptCommand implements IMenuCommand {
                 // Place a color char in front of each char in order to hide the commands
                 for (int i = 0; i < loreStrings.size(); i++) {
                     String loreString = loreStrings.get(i);
-                    if (loreString.startsWith("/")) {
+                    if (loreString.startsWith("/") || loreString.startsWith("@p/")) {
                         StringBuilder sb = new StringBuilder();
                         for (char c : loreString.toCharArray()) {
                             sb.append(ChatColor.COLOR_CHAR).append(c);
