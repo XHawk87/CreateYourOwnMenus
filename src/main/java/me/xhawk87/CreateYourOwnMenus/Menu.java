@@ -34,10 +34,10 @@ import org.bukkit.scheduler.BukkitRunnable;
  * @author XHawk87
  */
 public class Menu implements InventoryHolder {
-    
+
     private static final String hiddenCommand = ChatColor.COLOR_CHAR + "/";
-    private static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "/"
-            + ChatColor.COLOR_CHAR + "@" + ChatColor.COLOR_CHAR + "p";
+    private static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "@"
+            + ChatColor.COLOR_CHAR + "p" + ChatColor.COLOR_CHAR + "/";
     private CreateYourOwnMenus plugin;
     private String id;
     private Inventory inventory;
@@ -78,7 +78,7 @@ public class Menu implements InventoryHolder {
     public String getId() {
         return id;
     }
-    
+
     @Override
     public Inventory getInventory() {
         return inventory;
@@ -262,7 +262,7 @@ public class Menu implements InventoryHolder {
         // The item doesn't have metadata or lore
         player.sendMessage("This is not a valid menu item");
     }
-    
+
     private void parseCommands(final Iterator<String> commands, final Player player) {
         ConsoleCommandSender consoleSender = plugin.getServer().getConsoleSender();
         while (commands.hasNext()) {

@@ -21,8 +21,8 @@ import org.bukkit.inventory.meta.ItemMeta;
 public class MenuScriptCommand implements IMenuCommand {
 
     private static final String hiddenCommand = ChatColor.COLOR_CHAR + "/";
-    private static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "/"
-            + ChatColor.COLOR_CHAR + "@" + ChatColor.COLOR_CHAR + "p";
+    private static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "@"
+            + ChatColor.COLOR_CHAR + "p" + ChatColor.COLOR_CHAR + "/";
     private CreateYourOwnMenus plugin;
 
     public MenuScriptCommand(CreateYourOwnMenus plugin) {
