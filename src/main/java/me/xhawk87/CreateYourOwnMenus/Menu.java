@@ -40,6 +40,7 @@ public class Menu implements InventoryHolder {
     private Inventory inventory;
     private Set<String> editing = new HashSet<>();
     private File file;
+    private long saveCount = 0;
 
     /**
      * Create a new menu with the given id, title and number of rows.
@@ -95,17 +96,23 @@ public class Menu implements InventoryHolder {
             }
         }
         final String toWrite = data.saveToString();
+        saveCount++;
+        final long currentSave = saveCount;
         new BukkitRunnable() {
             @Override
             public void run() {
                 // Putting a lock on the file to ensure no other async thread 
                 // can work on it at the same time
                 synchronized (file) {
-                    // Try-with-resources, automatically cleans up after we're done
-                    try (BufferedWriter out = new BufferedWriter(new FileWriter(file))) {
-                        out.write(toWrite);
-                    } catch (IOException ex) {
-                        plugin.getLogger().log(Level.SEVERE, "Failed to write to " + file.getPath(), ex);
+                    // If multiple updates are made at the same time, only allow 
+                    // the most recent to be saved
+                    if (saveCount == currentSave) {
+                        // Try-with-resources, automatically cleans up after we're done
+                        try (BufferedWriter out = new BufferedWriter(new FileWriter(file))) {
+                            out.write(toWrite);
+                        } catch (IOException ex) {
+                            plugin.getLogger().log(Level.SEVERE, "Failed to write to " + file.getPath(), ex);
+                        }
                     }
                 }
             }
