@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +22,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.MessagePrompt;
+import org.bukkit.conversations.Prompt;
+import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -281,10 +287,12 @@ public class Menu implements InventoryHolder {
             }
 
             // If a command is prefixed with @p then execute it as the player not the console
-            CommandSender sender = consoleSender;
+            final CommandSender sender;
             if (command.startsWith("@p")) {
                 sender = player;
                 command = command.substring(2);
+            } else {
+                sender = consoleSender;
             }
 
             // Only pay attention to commands
@@ -335,14 +343,93 @@ public class Menu implements InventoryHolder {
                     }
                 } else {
                     // Otherwise, parse it as a normal command. 
-                    // The dispatchCommand method expects there to be no forward slash
-                    if (!plugin.getServer().dispatchCommand(sender, command.substring(1))) {
-                        player.sendMessage("Error in menu script line (unknown command): " + command);
+
+                    if (command.contains("{")) {
+                        // Parse for {dynamic arguments}
+                        StringBuilder commandString = new StringBuilder();
+                        StringBuilder promptString = null;
+                        final List<String> parts = new ArrayList<>();
+                        // The dispatchCommand method expects there to be no forward slash
+                        for (int i = 1; i < command.length(); i++) {
+                            char c = command.charAt(i);
+                            if (c == '{' && promptString == null) {
+                                parts.add(commandString.toString());
+                                promptString = new StringBuilder();
+                            } else if (c == '}' && promptString != null) {
+                                parts.add(promptString.toString());
+                                promptString = null;
+                                commandString = new StringBuilder();
+                            } else if (promptString == null) {
+                                commandString.append(c);
+                            } else {
+                                promptString.append(c);
+                            }
+                        }
+                        final StringBuilder parsedCommand = new StringBuilder();
+                        player.beginConversation(
+                                new Conversation(plugin, player,
+                                parseDynamicArgs(parsedCommand,
+                                parts.iterator(), player, new MessagePrompt() {
+                            @Override
+                            protected Prompt getNextPrompt(ConversationContext context) {
+                                String command = parsedCommand.toString();
+                                if (!plugin.getServer().dispatchCommand(sender,
+                                        command)) {
+                                    player.sendMessage("Error in menu script line (unknown command): " + command);
+                                } else {
+                                    new BukkitRunnable() {
+                                        @Override
+                                        public void run() {
+                                            parseCommands(commands, player);
+                                        }
+                                    }.runTask(plugin);
+                                }
+                                return END_OF_CONVERSATION;
+                            }
+
+                            @Override
+                            public String getPromptText(ConversationContext context) {
+                                return parsedCommand.toString();
+                            }
+                        })));
                         return;
+                    } else {
+                        if (!plugin.getServer().dispatchCommand(sender,
+                                command.substring(1))) {
+                            player.sendMessage("Error in menu script line (unknown command): " + command);
+                            return;
+                        }
                     }
                 }
             }
         }
+    }
+
+    private Prompt parseDynamicArgs(final StringBuilder parsedCommand,
+            final Iterator<String> parts, final Player player, final Prompt message) {
+        if (!parts.hasNext()) {
+            return message;
+        }
+        String commandPart = parts.next();
+        parsedCommand.append(commandPart);
+
+        if (!parts.hasNext()) {
+            return message;
+        }
+        final String promptPart = parts.next();
+
+        return new StringPrompt() {
+            @Override
+            public String getPromptText(ConversationContext context) {
+                return "Please enter " + promptPart + ":";
+            }
+
+            @Override
+            public Prompt acceptInput(ConversationContext context, String input) {
+                parsedCommand.append(input);
+                return parseDynamicArgs(parsedCommand, parts, player, message);
+            }
+        };
     }
 
     /**
