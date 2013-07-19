@@ -10,13 +10,16 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -27,6 +30,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 public class MenuListener implements Listener {
 
     private CreateYourOwnMenus plugin;
+    /**
+     * A dummy menu to be used for in-inventory and in-hand menu item clicks
+     */
+    private Menu defaultMenu;
 
     /**
      * Register all events in this listener for the plugin
@@ -35,6 +42,7 @@ public class MenuListener implements Listener {
      */
     public void registerEvents(CreateYourOwnMenus plugin) {
         this.plugin = plugin;
+        defaultMenu = new Menu(plugin, "dummy");
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -79,6 +87,47 @@ public class MenuListener implements Listener {
                                 }
                             }.runTask(plugin);
                         }
+                    }
+                }
+            } else {
+                // Menu items can still be activated if right-clicked in inventory
+                if (event.getClick() == ClickType.RIGHT) {
+                    final ItemStack selected = event.getCurrentItem();
+                    if (selected != null) {
+                        // only bother messaging if its an item with lore
+                        if (selected.hasItemMeta()) {
+                            ItemMeta meta = selected.getItemMeta();
+                            if (meta.hasLore()) {
+                                defaultMenu.select(player, selected);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Fired when a player left or right clicks the air, or a block, or steps on
+     * an interactive block such as a pressure plate or redstone ore.
+     *
+     * Also note, the event defaults to cancelled when right-clicking the air so
+     * it is vital not to ignoreCancelled.
+     *
+     * @param event The interact event
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+    public void onRightClickHeldMenuItem(PlayerInteractEvent event) {
+        if (event.getAction() == Action.RIGHT_CLICK_AIR
+                || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            if (event.hasItem()) {
+                Player player = event.getPlayer();
+                ItemStack item = event.getItem();
+                // only bother messaging if its an item with lore
+                if (item.hasItemMeta()) {
+                    ItemMeta meta = item.getItemMeta();
+                    if (meta.hasLore()) {
+                        defaultMenu.select(player, item);
                     }
                 }
             }
@@ -130,7 +179,7 @@ public class MenuListener implements Listener {
 
     /**
      * Fired when a player quits
-     * 
+     *
      * @param event The player quitting event
      */
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -140,7 +189,7 @@ public class MenuListener implements Listener {
         if (inventory != null) {
             if (inventory.getHolder() instanceof Menu) {
                 Menu menu = (Menu) inventory.getHolder();
-                
+
                 // Just to be sure that changes are saved if a player quit's 
                 // while they are editing a menu
                 menu.doneEditing(player);
