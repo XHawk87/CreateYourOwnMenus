@@ -73,7 +73,7 @@ public class Menu implements InventoryHolder {
      */
     public Menu(CreateYourOwnMenus plugin, String id) {
         this.plugin = plugin;
-        this.id = id;
+        this.id = id.toLowerCase();
         File menusFolder = new File(plugin.getDataFolder(), "menus");
         this.file = new File(menusFolder, id + ".yml");
     }
@@ -303,7 +303,8 @@ public class Menu implements InventoryHolder {
                 // Handle the special menu script commands
                 String[] args = command.split(" ");
                 String specialCommand = args[0];
-                if (!plugin.isValidMenuScriptCommand(specialCommand)) {
+                if (!plugin.isValidMenuScriptCommand(specialCommand)
+                        && !player.hasPermission("cyom.script.command." + specialCommand.toLowerCase())) {
                     player.sendMessage("Error in menu script line (command is not allowed): " + command);
                     return;
                 }

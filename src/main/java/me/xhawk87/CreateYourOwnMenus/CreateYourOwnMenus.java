@@ -55,7 +55,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
      */
     public Menu createMenu(String id, String title, int rows) {
         Menu menu = new Menu(this, id, title, rows);
-        menus.put(id, menu);
+        menus.put(id.toLowerCase(), menu);
 
         // Register the specific-opening permission for the new menu
         getServer().getPluginManager().addPermission(
@@ -72,7 +72,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * @return The menu, or null if no menu by this id exists
      */
     public Menu getMenu(String id) {
-        return menus.get(id);
+        return menus.get(id.toLowerCase());
     }
 
     /**
@@ -131,7 +131,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
                 return pathname.getName().toLowerCase().endsWith(".yml");
             }
         })) {
-            String id = file.getName().substring(0, file.getName().length() - ".yml".length());
+            String id = file.getName().substring(0, file.getName().length() - ".yml".length()).toLowerCase();
             Menu menu = new Menu(this, id);
             menu.load();
             menus.put(id, menu);
