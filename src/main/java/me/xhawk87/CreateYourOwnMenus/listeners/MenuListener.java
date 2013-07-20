@@ -6,6 +6,7 @@ package me.xhawk87.CreateYourOwnMenus.listeners;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
+import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -18,6 +19,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -68,6 +70,17 @@ public class MenuListener implements Listener {
 
                 // Check that the player is using and not editing the menu
                 if (!menu.isEditing(player)) {
+
+                    // Prevent creative players from duping menu items
+                    if (player.getGameMode() == GameMode.CREATIVE) {
+                        final InventoryView view = event.getView();
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                view.setCursor(null);
+                            }
+                        }.runTask(plugin);
+                    }
 
                     // Prevent them from making any changes
                     event.setCancelled(true);
