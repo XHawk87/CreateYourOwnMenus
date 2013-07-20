@@ -98,7 +98,15 @@ public class MenuListener implements Listener {
                         if (selected.hasItemMeta()) {
                             ItemMeta meta = selected.getItemMeta();
                             if (meta.hasLore()) {
-                                defaultMenu.select(player, selected);
+                                // To prevent glitches, its safer to wait one tick
+                                // before executing any commands that might affect
+                                // the menu
+                                new BukkitRunnable() {
+                                    @Override
+                                    public void run() {
+                                        defaultMenu.select(player, selected);
+                                    }
+                                }.runTask(plugin);
                             }
                         }
                     }
