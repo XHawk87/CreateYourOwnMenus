@@ -107,6 +107,7 @@ public class MenuListener implements Listener {
                                         defaultMenu.select(player, selected);
                                     }
                                 }.runTask(plugin);
+                                event.setCancelled(true);
                             }
                         }
                     }
