@@ -128,6 +128,7 @@ public class MenuListener implements Listener {
                     ItemMeta meta = item.getItemMeta();
                     if (meta.hasLore()) {
                         defaultMenu.select(player, item);
+                        event.setCancelled(true);
                     }
                 }
             }
