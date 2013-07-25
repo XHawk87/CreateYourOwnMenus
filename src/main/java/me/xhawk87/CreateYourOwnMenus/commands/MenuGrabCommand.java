@@ -71,7 +71,7 @@ public class MenuGrabCommand implements IMenuCommand {
         List<ItemStack> items = new ArrayList<>();
         for (ItemStack item : menu.getInventory().getContents()) {
             if (item != null && item.getTypeId() != 0) {
-                items.add(item);
+                items.add(item.clone());
             }
         }
         HashMap<Integer, ItemStack> toDrop = inv.addItem(items.toArray(new ItemStack[items.size()]));
