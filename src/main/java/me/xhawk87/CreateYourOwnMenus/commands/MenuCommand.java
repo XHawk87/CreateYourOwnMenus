@@ -32,6 +32,7 @@ public class MenuCommand implements CommandExecutor {
         subCommands.put("open", new MenuOpenCommand(plugin));
         subCommands.put("script", new MenuScriptCommand(plugin));
         subCommands.put("reload", new MenuReloadCommand(plugin));
+        subCommands.put("grab", new MenuGrabCommand(plugin));
     }
 
     @Override

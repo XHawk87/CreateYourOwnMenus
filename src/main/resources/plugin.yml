@@ -6,7 +6,7 @@ description: ${project.description}
 commands:
   menu:
     description: The base for all menu actions
-    usage: /menu [create|edit|delete|list|open|script|reload] [parameters...]
+    usage: /menu [create|edit|delete|list|open|script|reload|grab|copy] [parameters...]
     aliases: [m]
     permissions: cyom.commands.menu
   
@@ -22,6 +22,7 @@ permissions:
       cyom.commands.menu.open: true
       cyom.commands.menu.script: true
       cyom.commands.menu.reload: true
+      cyom.commands.menu.grab: true
   cyom.commands.menu.create:
     description: Allows creating of new menus
     default: op
@@ -42,4 +43,7 @@ permissions:
     default: op
   cyom.commands.menu.reload:
     description: Allows reloading of menus from disk
+    default: op
+  cyom.commands.menu.grab:
+    description: Allows grabbing copies of items from a menu
     default: op
