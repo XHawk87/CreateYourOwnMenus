@@ -10,12 +10,15 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
@@ -26,6 +29,7 @@ import org.bukkit.conversations.Conversation;
 import org.bukkit.conversations.ConversationContext;
 import org.bukkit.conversations.MessagePrompt;
 import org.bukkit.conversations.Prompt;
+import static org.bukkit.conversations.Prompt.END_OF_CONVERSATION;
 import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -300,110 +304,180 @@ public class Menu implements InventoryHolder {
                 // Replace @p with the clicking player's name
                 command = command.replaceAll("@p", player.getName());
 
-                // Handle the special menu script commands
-                String[] args = command.split(" ");
-                String specialCommand = args[0];
-                if (!plugin.isValidMenuScriptCommand(specialCommand)
-                        && !player.hasPermission("cyom.script.command." + specialCommand.toLowerCase())) {
-                    player.sendMessage("Error in menu script line (command is not allowed): " + command);
-                    return;
-                }
-                if (specialCommand.equalsIgnoreCase("/requirepermission")) {
-                    if (args.length != 2) {
-                        player.sendMessage("Error in menu script line (expected permission node): " + command);
-                        return;
-                    }
-                    String permission = args[1];
-                    if (!player.hasPermission(permission)) {
-                        player.sendMessage("You do not have permission to use this menu item");
-                        return;
-                    }
-                } else if (specialCommand.equalsIgnoreCase("/close")) {
-                    if (args.length != 1) {
-                        player.sendMessage("Error in menu script line (expected no arguments): " + command);
-                        return;
-                    }
-                    player.closeInventory();
-                } else if (specialCommand.equalsIgnoreCase("/delay")) {
-                    if (args.length != 2) {
-                        player.sendMessage("Error in menu script line (expected delay in ticks): " + command);
-                        return;
-                    }
-                    try {
-                        int delay = Integer.parseInt(args[1]);
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                parseCommands(commands, player);
-                            }
-                        }.runTaskLater(plugin, delay);
-                        return;
-                    } catch (NumberFormatException ex) {
-                        player.sendMessage("Error in menu script line (delay must be a whole number of ticks): " + command);
-                        return;
-                    }
-                } else {
-                    // Otherwise, parse it as a normal command. 
+                if (command.contains("@a") || command.contains("@w")) {
+                    int range = -1;
+                    World world = null;
+                    Location from = player.getLocation();
 
-                    if (command.contains("{")) {
-                        // Parse for {dynamic arguments}
-                        StringBuilder commandString = new StringBuilder();
-                        StringBuilder promptString = null;
-                        final List<String> parts = new ArrayList<>();
-                        // The dispatchCommand method expects there to be no forward slash
-                        for (int i = 1; i < command.length(); i++) {
-                            char c = command.charAt(i);
-                            if (c == '{' && promptString == null) {
-                                parts.add(commandString.toString());
-                                promptString = new StringBuilder();
-                            } else if (c == '}' && promptString != null) {
-                                parts.add(promptString.toString());
-                                promptString = null;
-                                commandString = new StringBuilder();
-                            } else if (promptString == null) {
-                                commandString.append(c);
-                            } else {
-                                promptString.append(c);
+                    StringBuilder sb = null;
+                    for (int i = 0; i < command.length(); i++) {
+                        char c = command.charAt(i);
+                        if (c == '@') {
+                            sb = new StringBuilder();
+                            sb.append(c);
+                        } else if (c == ' ') {
+                            String targetString = sb.toString();
+                            boolean match = false;
+                            if (targetString.equalsIgnoreCase("@a")) {
+                                match = true;
+                            } else if (targetString.equalsIgnoreCase("@w")) {
+                                world = player.getWorld();
+                                match = true;
+                            } else if (targetString.startsWith("@a:")) {
+                                try {
+                                    range = Integer.parseInt(targetString.substring(3));
+                                } catch (NumberFormatException ex) {
+                                    player.sendMessage("Error in menu script line (expected @a:range as an integer number): " + command);
+                                    return;
+                                }
+                                match = true;
+                            } else if (targetString.startsWith("@w:")) {
+                                String worldName = targetString.substring(3);
+                                world = plugin.getServer().getWorld(worldName);
+                                if (world == null) {
+                                    player.sendMessage("Error in menu script line (@w:" + worldName + " unknown world): " + command);
+                                    return;
+                                }
+                                match = true;
+                            }
+                            if (match) {
+                                command = command.replaceFirst(targetString, "@t");
+                                i -= targetString.length();
+                                i += 2;
+                            }
+                            sb = null;
+                        } else if (sb != null) {
+                            sb.append(c);
+                        }
+                    }
+
+                    for (Player target : plugin.getServer().getOnlinePlayers()) {
+                        if (range != -1) {
+                            if (from.distanceSquared(target.getLocation()) > range * range) {
+                                continue;
                             }
                         }
-                        final StringBuilder parsedCommand = new StringBuilder();
-                        player.beginConversation(
-                                new Conversation(plugin, player,
-                                parseDynamicArgs(parsedCommand,
-                                parts.iterator(), player, new MessagePrompt() {
-                            @Override
-                            protected Prompt getNextPrompt(ConversationContext context) {
-                                String command = parsedCommand.toString();
-                                if (!plugin.getServer().dispatchCommand(sender,
-                                        command)) {
-                                    player.sendMessage("Error in menu script line (unknown command): " + command);
-                                } else {
-                                    new BukkitRunnable() {
-                                        @Override
-                                        public void run() {
-                                            parseCommands(commands, player);
-                                        }
-                                    }.runTask(plugin);
-                                }
-                                return END_OF_CONVERSATION;
-                            }
-
-                            @Override
-                            public String getPromptText(ConversationContext context) {
-                                return parsedCommand.toString();
-                            }
-                        })));
-                        return;
-                    } else {
-                        if (!plugin.getServer().dispatchCommand(sender,
-                                command.substring(1))) {
-                            player.sendMessage("Error in menu script line (unknown command): " + command);
+                        if (world != null && !target.getWorld().equals(world)) {
+                            continue;
+                        }
+                        String targettedCommand = command.replaceAll("@t", target.getName());
+                        if (!parseCommand(sender, player, targettedCommand, commands)) {
                             return;
                         }
+                    }
+                } else {
+                    if (!parseCommand(sender, player, command, commands)) {
+                        return;
                     }
                 }
             }
         }
+    }
+
+    private boolean parseCommand(final CommandSender sender, final Player player, String command, final Iterator<String> commands) {
+        // Handle the special menu script commands
+        String[] args = command.split(" ");
+        String specialCommand = args[0];
+        if (!plugin.isValidMenuScriptCommand(specialCommand)
+                && !player.hasPermission("cyom.script.command." + specialCommand.toLowerCase())) {
+            player.sendMessage("Error in menu script line (command is not allowed): " + command);
+            return false;
+        }
+        if (specialCommand.equalsIgnoreCase("/requirepermission")) {
+            if (args.length != 2) {
+                player.sendMessage("Error in menu script line (expected permission node): " + command);
+                return false;
+            }
+            String permission = args[1];
+            if (!player.hasPermission(permission)) {
+                player.sendMessage("You do not have permission to use this menu item");
+                return false;
+            }
+        } else if (specialCommand.equalsIgnoreCase("/close")) {
+            if (args.length != 1) {
+                player.sendMessage("Error in menu script line (expected no arguments): " + command);
+                return false;
+            }
+            player.closeInventory();
+        } else if (specialCommand.equalsIgnoreCase("/delay")) {
+            if (args.length != 2) {
+                player.sendMessage("Error in menu script line (expected delay in ticks): " + command);
+                return false;
+            }
+            try {
+                int delay = Integer.parseInt(args[1]);
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        parseCommands(commands, player);
+                    }
+                }.runTaskLater(plugin, delay);
+                return false;
+            } catch (NumberFormatException ex) {
+                player.sendMessage("Error in menu script line (delay must be a whole number of ticks): " + command);
+                return false;
+            }
+        } else {
+            // Otherwise, parse it as a normal command. 
+
+            if (command.contains("{")) {
+                // Parse for {dynamic arguments}
+                StringBuilder commandString = new StringBuilder();
+                StringBuilder promptString = null;
+                final List<String> parts = new ArrayList<>();
+                // The dispatchCommand method expects there to be no forward slash
+                for (int i = 1; i < command.length(); i++) {
+                    char c = command.charAt(i);
+                    if (c == '{' && promptString == null) {
+                        parts.add(commandString.toString());
+                        promptString = new StringBuilder();
+                    } else if (c == '}' && promptString != null) {
+                        parts.add(promptString.toString());
+                        promptString = null;
+                        commandString = new StringBuilder();
+                    } else if (promptString == null) {
+                        commandString.append(c);
+                    } else {
+                        promptString.append(c);
+                    }
+                }
+                final StringBuilder parsedCommand = new StringBuilder();
+                player.beginConversation(
+                        new Conversation(plugin, player,
+                        parseDynamicArgs(parsedCommand,
+                        parts.iterator(), player, new MessagePrompt() {
+                    @Override
+                    protected Prompt getNextPrompt(ConversationContext context) {
+                        String command = parsedCommand.toString();
+                        if (!plugin.getServer().dispatchCommand(sender,
+                                command)) {
+                            player.sendMessage("Error in menu script line (unknown command): " + command);
+                        } else {
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    parseCommands(commands, player);
+                                }
+                            }.runTask(plugin);
+                        }
+                        return END_OF_CONVERSATION;
+                    }
+
+                    @Override
+                    public String getPromptText(ConversationContext context) {
+                        return parsedCommand.toString();
+                    }
+                })));
+                return false;
+            } else {
+                if (!plugin.getServer().dispatchCommand(sender,
+                        command.substring(1))) {
+                    player.sendMessage("Error in menu script line (unknown command): " + command);
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private Prompt parseDynamicArgs(final StringBuilder parsedCommand,
