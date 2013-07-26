@@ -219,7 +219,7 @@ public class MenuListener implements Listener {
             if (inventory.getHolder() instanceof Menu) {
                 Menu menu = (Menu) inventory.getHolder();
 
-                // Just to be sure that changes are saved if a player quit's 
+                // Just to be sure that changes are saved if a player quits 
                 // while they are editing a menu
                 menu.doneEditing(player);
             }

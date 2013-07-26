@@ -78,11 +78,11 @@ public class MenuCopyCommand implements IMenuCommand {
 
     @Override
     public String getUsage() {
-        return "/menu create [id] [rows] [title] - Create a new menu with the given id, title and size";
+        return "/menu copy [old menu id] [new menu id] [new title] - Create a new menu with the same size and contents as the given menu but with a new id and title";
     }
 
     @Override
     public String getPermission() {
-        return "cyom.commands.menu.create";
+        return "cyom.commands.menu.copy";
     }
 }
