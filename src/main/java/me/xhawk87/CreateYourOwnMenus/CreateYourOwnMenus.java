@@ -54,17 +54,22 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * @return The menu created
      */
     public Menu createMenu(String id, String title, int rows) {
+        id = id.toLowerCase();
         if (title.length() > 32) {
             throw new IllegalArgumentException("Titles are limited to 32 characters (including colours)");
         }
         Menu menu = new Menu(this, id, title, rows);
-        menus.put(id.toLowerCase(), menu);
+        menus.put(id, menu);
 
         // Register the specific-opening permission for the new menu
-        getServer().getPluginManager().addPermission(
-                new Permission("cyom.menu." + id,
-                "Allows the given player to use the /menu open command for the "
-                + id + " menu", PermissionDefault.FALSE));
+        String permissionNode = "cyom.menu." + id;
+        PluginManager mgr = getServer().getPluginManager();
+        if (mgr.getPermission(permissionNode) == null) {
+            mgr.addPermission(
+                    new Permission(permissionNode,
+                    "Allows the given player to use the /menu open command for the "
+                    + id + " menu", PermissionDefault.FALSE));
+        }
         return menu;
     }
 
