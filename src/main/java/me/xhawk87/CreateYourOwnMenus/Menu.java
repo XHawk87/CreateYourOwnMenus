@@ -315,7 +315,7 @@ public class Menu implements InventoryHolder {
                             sb = new StringBuilder();
                             sb.append(c);
                         } else if (sb != null) {
-                            if (c == ' ') {
+                            if (c == ' ' || i == command.length() - 1) {
                                 String targetString = sb.toString();
                                 boolean match = false;
                                 if (targetString.equalsIgnoreCase("@a")) {
