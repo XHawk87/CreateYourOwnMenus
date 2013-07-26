@@ -54,6 +54,10 @@ public class MenuCopyCommand implements IMenuCommand {
             sb.append(" ").append(args[i].replace('&', ChatColor.COLOR_CHAR));
         }
         String title = sb.toString();
+        if (title.length() > 32) {
+            sender.sendMessage("Titles are limited to 32 characters (including colours)");
+            return true;
+        }
         
         // Check that the id is unique
         if (plugin.getMenu(newMenuId) != null) {

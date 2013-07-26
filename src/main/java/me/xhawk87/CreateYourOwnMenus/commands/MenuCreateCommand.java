@@ -36,7 +36,7 @@ public class MenuCreateCommand implements IMenuCommand {
         }
 
         String id = args[0];
-        
+
         // Parse the number of rows as an integer
         int rows;
         try {
@@ -45,14 +45,18 @@ public class MenuCreateCommand implements IMenuCommand {
             sender.sendMessage("The number of rows must be a whole number: " + args[1]);
             return true;
         }
-        
+
         // Build the title
         StringBuilder sb = new StringBuilder(args[2].replace('&', ChatColor.COLOR_CHAR));
         for (int i = 3; i < args.length; i++) {
             sb.append(" ").append(args[i].replace('&', ChatColor.COLOR_CHAR));
         }
         String title = sb.toString();
-        
+        if (title.length() > 32) {
+            sender.sendMessage("Titles are limited to 32 characters (including colours)");
+            return true;
+        }
+
         // Check that the id is unique
         if (plugin.getMenu(id) != null) {
             sender.sendMessage("A menu with id " + id + " already exists");

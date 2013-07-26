@@ -54,6 +54,9 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * @return The menu created
      */
     public Menu createMenu(String id, String title, int rows) {
+        if (title.length() > 32) {
+            throw new IllegalArgumentException("Titles are limited to 32 characters (including colours)");
+        }
         Menu menu = new Menu(this, id, title, rows);
         menus.put(id.toLowerCase(), menu);
 
