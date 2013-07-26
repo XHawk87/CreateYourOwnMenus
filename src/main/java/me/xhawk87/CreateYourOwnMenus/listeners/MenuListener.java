@@ -143,13 +143,19 @@ public class MenuListener implements Listener {
         if (event.getAction() == Action.RIGHT_CLICK_AIR
                 || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             if (event.hasItem()) {
-                Player player = event.getPlayer();
-                ItemStack item = event.getItem();
+                final Player player = event.getPlayer();
+                final ItemStack item = event.getItem();
                 // only bother messaging if its an item with lore
                 if (item.hasItemMeta()) {
                     ItemMeta meta = item.getItemMeta();
                     if (meta.hasLore()) {
-                        defaultMenu.select(player, item);
+                        // Schedule it for the next tick to avoid conflicts with the event action
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                defaultMenu.select(player, item);
+                            }
+                        }.runTask(plugin);
                         event.setCancelled(true);
                     }
                 }
