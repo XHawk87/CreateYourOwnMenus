@@ -62,7 +62,7 @@ public class MenuCopyCommand implements IMenuCommand {
         }
 
         // Create the menu
-        Menu newMenu = plugin.createMenu(oldMenuId, title, rows);
+        Menu newMenu = plugin.createMenu(newMenuId, title, rows);
         Inventory inv = newMenu.getInventory();
         ItemStack[] contents = oldMenu.getInventory().getContents();
         for (int i = 0; i < contents.length; i++) {
