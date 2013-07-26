@@ -10,7 +10,6 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -315,39 +314,41 @@ public class Menu implements InventoryHolder {
                         if (c == '@') {
                             sb = new StringBuilder();
                             sb.append(c);
-                        } else if (c == ' ') {
-                            String targetString = sb.toString();
-                            boolean match = false;
-                            if (targetString.equalsIgnoreCase("@a")) {
-                                match = true;
-                            } else if (targetString.equalsIgnoreCase("@w")) {
-                                world = player.getWorld();
-                                match = true;
-                            } else if (targetString.startsWith("@a:")) {
-                                try {
-                                    range = Integer.parseInt(targetString.substring(3));
-                                } catch (NumberFormatException ex) {
-                                    player.sendMessage("Error in menu script line (expected @a:range as an integer number): " + command);
-                                    return;
-                                }
-                                match = true;
-                            } else if (targetString.startsWith("@w:")) {
-                                String worldName = targetString.substring(3);
-                                world = plugin.getServer().getWorld(worldName);
-                                if (world == null) {
-                                    player.sendMessage("Error in menu script line (@w:" + worldName + " unknown world): " + command);
-                                    return;
-                                }
-                                match = true;
-                            }
-                            if (match) {
-                                command = command.replaceFirst(targetString, "@t");
-                                i -= targetString.length();
-                                i += 2;
-                            }
-                            sb = null;
                         } else if (sb != null) {
-                            sb.append(c);
+                            if (c == ' ') {
+                                String targetString = sb.toString();
+                                boolean match = false;
+                                if (targetString.equalsIgnoreCase("@a")) {
+                                    match = true;
+                                } else if (targetString.equalsIgnoreCase("@w")) {
+                                    world = player.getWorld();
+                                    match = true;
+                                } else if (targetString.startsWith("@a:")) {
+                                    try {
+                                        range = Integer.parseInt(targetString.substring(3));
+                                    } catch (NumberFormatException ex) {
+                                        player.sendMessage("Error in menu script line (expected @a:range as an integer number): " + command);
+                                        return;
+                                    }
+                                    match = true;
+                                } else if (targetString.startsWith("@w:")) {
+                                    String worldName = targetString.substring(3);
+                                    world = plugin.getServer().getWorld(worldName);
+                                    if (world == null) {
+                                        player.sendMessage("Error in menu script line (@w:" + worldName + " unknown world): " + command);
+                                        return;
+                                    }
+                                    match = true;
+                                }
+                                if (match) {
+                                    command = command.replaceFirst(targetString, "@t");
+                                    i -= targetString.length();
+                                    i += 2;
+                                }
+                                sb = null;
+                            } else {
+                                sb.append(c);
+                            }
                         }
                     }
 
