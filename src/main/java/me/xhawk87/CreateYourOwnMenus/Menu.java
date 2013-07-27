@@ -144,17 +144,17 @@ public class Menu implements InventoryHolder {
                     final FileConfiguration data = new YamlConfiguration();
                     try {
                         data.load(file);
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                onLoad(data);
+                            }
+                        }.runTask(plugin);
                     } catch (FileNotFoundException ex) {
                         plugin.getLogger().warning(file.getPath() + " no longer exists");
                     } catch (IOException | InvalidConfigurationException ex) {
                         plugin.getLogger().log(Level.WARNING, "Error reading " + file.getPath(), ex);
                     }
-                    new BukkitRunnable() {
-                        @Override
-                        public void run() {
-                            onLoad(data);
-                        }
-                    }.runTask(plugin);
                 }
             }
         }.runTaskAsynchronously(plugin);
