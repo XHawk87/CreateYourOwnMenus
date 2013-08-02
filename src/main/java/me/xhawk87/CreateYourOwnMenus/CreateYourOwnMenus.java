@@ -13,6 +13,8 @@ import java.util.Set;
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
@@ -190,5 +192,23 @@ public class CreateYourOwnMenus extends JavaPlugin {
         } else {
             return commandWhitelist.contains(commandName.toLowerCase());
         }
+    }
+
+    public boolean isValidMenuItem(ItemStack item) {
+        if (item.hasItemMeta()) {
+            ItemMeta meta = item.getItemMeta();
+            if (meta.hasLore()) {
+                // Check that the lore contains at least one scripted command
+                for (String loreString : meta.getLore()) {
+                    if (loreString.startsWith(Menu.command)
+                            || loreString.startsWith(Menu.playerCommand)
+                            || loreString.startsWith(Menu.hiddenCommand)
+                            || loreString.startsWith(Menu.hiddenPlayerCommand)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

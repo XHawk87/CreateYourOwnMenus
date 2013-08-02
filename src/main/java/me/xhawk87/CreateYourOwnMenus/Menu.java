@@ -44,8 +44,10 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class Menu implements InventoryHolder {
 
-    private static final String hiddenCommand = ChatColor.COLOR_CHAR + "/";
-    private static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "@"
+    public static final String command = "/";
+    public static final String playerCommand = "@p/";
+    public static final String hiddenCommand = ChatColor.COLOR_CHAR + "/";
+    public static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "@"
             + ChatColor.COLOR_CHAR + "p" + ChatColor.COLOR_CHAR + "/";
     private CreateYourOwnMenus plugin;
     private String id;

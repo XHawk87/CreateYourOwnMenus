@@ -146,18 +146,15 @@ public class MenuListener implements Listener {
                 final Player player = event.getPlayer();
                 final ItemStack item = event.getItem();
                 // only bother messaging if its an item with lore
-                if (item.hasItemMeta()) {
-                    ItemMeta meta = item.getItemMeta();
-                    if (meta.hasLore()) {
-                        // Schedule it for the next tick to avoid conflicts with the event action
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                defaultMenu.select(player, item);
-                            }
-                        }.runTask(plugin);
-                        event.setCancelled(true);
-                    }
+                if (plugin.isValidMenuItem(item)) {
+                    // Schedule it for the next tick to avoid conflicts with the event action
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            defaultMenu.select(player, item);
+                        }
+                    }.runTask(plugin);
+                    event.setCancelled(true);
                 }
             }
         }
