@@ -12,12 +12,14 @@ import java.util.Map;
 import java.util.Set;
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 /**
@@ -31,10 +33,13 @@ public class CreateYourOwnMenus extends JavaPlugin {
     private Map<String, Menu> menus = new HashMap<>();
     private Set<String> commandBlacklist = new HashSet<>();
     private Set<String> commandWhitelist = new HashSet<>();
+    private EconomyWrapper economy = null;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+
+        setupEconomy();
 
         // Load menus
         reloadMenus();
@@ -44,6 +49,21 @@ public class CreateYourOwnMenus extends JavaPlugin {
 
         // Register listeners
         new MenuListener().registerEvents(this);
+    }
+
+    private void setupEconomy() {
+        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+            return;
+        }
+        RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
+        if (rsp == null) {
+            return;
+        }
+        economy = new EconomyWrapper(rsp.getProvider());
+    }
+
+    public EconomyWrapper getEconomy() {
+        return economy;
     }
 
     /**
