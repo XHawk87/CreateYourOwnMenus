@@ -17,4 +17,12 @@ public class EconomyWrapper {
     public EconomyWrapper(Economy economy) {
         this.economy = economy;
     }
+    
+    public double getBalance(String playerName) {
+        return economy.getBalance(playerName);
+    }
+
+    public String format(double amount) {
+        return economy.format(amount);
+    }
 }

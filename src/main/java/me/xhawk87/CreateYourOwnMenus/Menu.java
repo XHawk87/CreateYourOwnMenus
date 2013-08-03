@@ -44,7 +44,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class Menu implements InventoryHolder {
 
-    public static final String command = "/";
+    public static final String commandStart = "/";
     public static final String playerCommand = "@p/";
     public static final String hiddenCommand = ChatColor.COLOR_CHAR + "/";
     public static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "@"
@@ -418,6 +418,27 @@ public class Menu implements InventoryHolder {
                 return false;
             } catch (NumberFormatException ex) {
                 player.sendMessage("Error in menu script line (delay must be a whole number of ticks): " + command);
+                return false;
+            }
+        } else if (specialCommand.equalsIgnoreCase("/requirecurrency")) {
+            EconomyWrapper economy = plugin.getEconomy();
+            if (economy == null) {
+                player.sendMessage("The /requirecurrency special command requires Vault to work");
+                return false;
+            }
+            if (args.length != 2) {
+                player.sendMessage("Error in menu script line (expected currency amount): " + command);
+                return false;
+            }
+            String amountString = args[1];
+            try {
+                double amount = Double.parseDouble(amountString);
+                if (economy.getBalance(player.getName()) < amount) {
+                    player.sendMessage("You must have at least " + economy.format(amount) + " to do this");
+                    return false;
+                }
+            } catch(NumberFormatException ex) {
+                player.sendMessage("Error in menu script line (expected currency amount): " + command);
                 return false;
             }
         } else {

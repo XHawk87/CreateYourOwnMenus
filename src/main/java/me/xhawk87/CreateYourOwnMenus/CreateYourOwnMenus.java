@@ -220,7 +220,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
             if (meta.hasLore()) {
                 // Check that the lore contains at least one scripted command
                 for (String loreString : meta.getLore()) {
-                    if (loreString.startsWith(Menu.command)
+                    if (loreString.startsWith(Menu.commandStart)
                             || loreString.startsWith(Menu.playerCommand)
                             || loreString.startsWith(Menu.hiddenCommand)
                             || loreString.startsWith(Menu.hiddenPlayerCommand)) {
