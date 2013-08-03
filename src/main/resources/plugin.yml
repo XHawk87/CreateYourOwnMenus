@@ -17,6 +17,7 @@ permissions:
     default: op
     children:
       cyom.commands.menu.create: true
+      cyom.commands.menu.copy: true
       cyom.commands.menu.edit: true
       cyom.commands.menu.delete: true
       cyom.commands.menu.list: true
@@ -26,6 +27,9 @@ permissions:
       cyom.commands.menu.grab: true
   cyom.commands.menu.create:
     description: Allows creating of new menus
+    default: op
+  cyom.commands.menu.copy:
+    description: Allows copying of existing menus
     default: op
   cyom.commands.menu.edit:
     description: Allows editing of existing menus
