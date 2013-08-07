@@ -52,7 +52,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
     }
 
     private void setupEconomy() {
-        if (getServer().getPluginManager().getPlugin("Vault") != null) {
+        if (getServer().getPluginManager().getPlugin("Vault") == null) {
             return;
         }
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
