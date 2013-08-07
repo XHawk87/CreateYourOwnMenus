@@ -34,6 +34,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -266,7 +267,7 @@ public class Menu implements InventoryHolder {
             ItemMeta meta = menuItem.getItemMeta();
             if (meta.hasLore()) {
                 List<String> commands = meta.getLore();
-                parseCommands(commands.iterator(), player);
+                parseCommands(commands.iterator(), player, menuItem);
                 return;
             }
         }
@@ -274,7 +275,7 @@ public class Menu implements InventoryHolder {
         player.sendMessage("This is not a valid menu item");
     }
 
-    private void parseCommands(final Iterator<String> commands, final Player player) {
+    private void parseCommands(final Iterator<String> commands, final Player player, final ItemStack menuItem) {
         ConsoleCommandSender consoleSender = plugin.getServer().getConsoleSender();
         while (commands.hasNext()) {
             String command = commands.next();
@@ -364,12 +365,12 @@ public class Menu implements InventoryHolder {
                             continue;
                         }
                         String targettedCommand = command.replaceAll("@t", target.getName());
-                        if (!parseCommand(sender, player, targettedCommand, commands)) {
+                        if (!parseCommand(sender, player, targettedCommand, commands, menuItem)) {
                             return;
                         }
                     }
                 } else {
-                    if (!parseCommand(sender, player, command, commands)) {
+                    if (!parseCommand(sender, player, command, commands, menuItem)) {
                         return;
                     }
                 }
@@ -377,7 +378,7 @@ public class Menu implements InventoryHolder {
         }
     }
 
-    private boolean parseCommand(final CommandSender sender, final Player player, String command, final Iterator<String> commands) {
+    private boolean parseCommand(final CommandSender sender, final Player player, String command, final Iterator<String> commands, final ItemStack menuItem) {
         // Handle the special menu script commands
         String[] args = command.split(" ");
         String specialCommand = args[0];
@@ -402,6 +403,25 @@ public class Menu implements InventoryHolder {
                 return false;
             }
             player.closeInventory();
+        } else if (specialCommand.equalsIgnoreCase("/consume")) {
+            if (args.length != 1) {
+                player.sendMessage("Error in menu script line (expected no arguments): " + command);
+                return false;
+            }
+            int amount = menuItem.getAmount() - 1;
+            if (amount > 0) {
+                menuItem.setAmount(amount);
+            } else {
+                PlayerInventory inv = player.getInventory();
+                ItemStack held = inv.getItemInHand();
+                if (held.equals(menuItem)) {
+                    inv.clear(inv.getHeldItemSlot());
+                } else {
+                    player.sendMessage("Cannot locate menu item to remove it. Was it moved?");
+                    return false;
+                }
+            }
+            player.updateInventory();
         } else if (specialCommand.equalsIgnoreCase("/delay")) {
             if (args.length != 2) {
                 player.sendMessage("Error in menu script line (expected delay in ticks): " + command);
@@ -412,7 +432,7 @@ public class Menu implements InventoryHolder {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        parseCommands(commands, player);
+                        parseCommands(commands, player, menuItem);
                     }
                 }.runTaskLater(plugin, delay);
                 return false;
@@ -437,7 +457,7 @@ public class Menu implements InventoryHolder {
                     player.sendMessage("You must have at least " + economy.format(amount) + " to do this");
                     return false;
                 }
-            } catch(NumberFormatException ex) {
+            } catch (NumberFormatException ex) {
                 player.sendMessage("Error in menu script line (expected currency amount): " + command);
                 return false;
             }
@@ -480,7 +500,7 @@ public class Menu implements InventoryHolder {
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    parseCommands(commands, player);
+                                    parseCommands(commands, player, menuItem);
                                 }
                             }.runTask(plugin);
                         }
