@@ -103,12 +103,12 @@ public class MenuScriptCommand implements IMenuCommand {
                 }
                 sender.sendMessage("All commands on this menu item should now be hidden");
             } else {
-                // Otherwise append this to the lore
-                loreStrings.add(commandString);
                 if (!commandString.startsWith("/")) {
                     // Support for colour codes in non-commands
                     commandString = commandString.replace('&', ChatColor.COLOR_CHAR);
                 }
+                // Otherwise append this to the lore
+                loreStrings.add(commandString);
                 sender.sendMessage(commandString + " was added to the command list of this menu item");
             }
 
