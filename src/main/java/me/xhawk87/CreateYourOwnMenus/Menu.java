@@ -454,7 +454,7 @@ public class Menu implements InventoryHolder {
             try {
                 double amount = Double.parseDouble(amountString);
                 if (economy.getBalance(player.getName()) < amount) {
-                    player.sendMessage("You must have at least " + economy.format(amount) + " to do this");
+                    player.sendMessage("You must have at least " + economy.format(amount) + ChatColor.RESET + " to do this");
                     return false;
                 }
             } catch (NumberFormatException ex) {
