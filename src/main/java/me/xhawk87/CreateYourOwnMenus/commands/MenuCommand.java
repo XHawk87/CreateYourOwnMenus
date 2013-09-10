@@ -4,6 +4,15 @@
  */
 package me.xhawk87.CreateYourOwnMenus.commands;
 
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuReloadCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuOpenCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuListCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuGrabCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuEditCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuDeleteCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuCreateCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuCopyCommand;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -58,7 +67,7 @@ public class MenuCommand implements CommandExecutor {
         // Handle the permissions check
         String permission = menuCommand.getPermission();
         if (permission != null && !sender.hasPermission(permission)) {
-            sender.sendMessage("You do not have permission to use this commands");
+            sender.sendMessage("You do not have permission to use this command");
             return true;
         }
         // Remove the sub-command from the args list and pass along the rest

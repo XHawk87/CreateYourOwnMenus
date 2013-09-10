@@ -2,13 +2,14 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package me.xhawk87.CreateYourOwnMenus.commands;
+package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
+import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.Command;
