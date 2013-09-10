@@ -69,7 +69,7 @@ public class MenuScriptAppendCommand implements IMenuCommand {
             if (loreStrings.size() == 1) {
                 // Handle first-line special case
                 String firstLine = loreStrings.get(0);
-                int lastPartIndex = firstLine.lastIndexOf("/r") + 1;
+                int lastPartIndex = firstLine.lastIndexOf("\r") + 1;
                 String lastPart = firstLine.substring(lastPartIndex);
                 if (lastPart.isEmpty()) {
                     loreStrings.set(0, firstLine.substring(0, lastPartIndex) + commandString);

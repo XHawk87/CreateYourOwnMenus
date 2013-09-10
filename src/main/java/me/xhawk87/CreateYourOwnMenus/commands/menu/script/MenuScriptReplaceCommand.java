@@ -89,7 +89,7 @@ public class MenuScriptReplaceCommand implements IMenuCommand {
             if (index == 0) {
                 // Handle first-line special case
                 String firstLine = loreStrings.get(0);
-                int lastPartIndex = firstLine.lastIndexOf("/r") + 1;
+                int lastPartIndex = firstLine.lastIndexOf("\r") + 1;
                 loreStrings.set(0, firstLine.substring(0, lastPartIndex) + commandString);
             } else {
                 loreStrings.set(index, commandString);

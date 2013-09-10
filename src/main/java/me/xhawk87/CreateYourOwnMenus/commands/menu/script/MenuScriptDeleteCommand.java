@@ -84,7 +84,8 @@ public class MenuScriptDeleteCommand implements IMenuCommand {
                     replacedWith = "";
                 }
                 String firstLine = loreStrings.get(0);
-                int lastPartIndex = firstLine.lastIndexOf("/r") + 1;
+                System.out.println("Attempting to delete first line: " + firstLine);
+                int lastPartIndex = firstLine.lastIndexOf('\r') + 1;
                 removedText = firstLine.substring(lastPartIndex);
                 loreStrings.set(0, firstLine.substring(0, lastPartIndex) + replacedWith);
             } else {

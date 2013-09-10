@@ -38,6 +38,14 @@ public class MenuScriptCommand implements IMenuCommand {
         subCommands.put("insert", new MenuScriptInsertCommand());
         subCommands.put("replace", new MenuScriptReplaceCommand());
         subCommands.put("delete", new MenuScriptDeleteCommand());
+        
+        // Aliases
+        subCommands.put("add", subCommands.get("append"));
+        subCommands.put("remove", subCommands.get("delete"));
+        subCommands.put("set", subCommands.get("replace"));
+        subCommands.put("commands", subCommands.get("show"));
+        subCommands.put("comments", subCommands.get("hide"));
+        subCommands.put("reset", subCommands.get("clear"));
     }
 
     @Override
