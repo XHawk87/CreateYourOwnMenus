@@ -93,7 +93,13 @@ public class MenuScriptUtils {
             ItemMeta meta = item.getItemMeta();
             if (meta.hasLore()) {
                 // Check that the lore contains at least one scripted command
-                for (String loreString : meta.getLore()) {
+                List<String> loreStrings = meta.getLore();
+                if (loreStrings.isEmpty()) {
+                    return false;
+                }
+                loreStrings.addAll(unpackHiddenLines(loreStrings.get(0)));
+
+                for (String loreString : loreStrings) {
                     if (loreString.startsWith(commandStart)
                             || loreString.startsWith(playerCommand)
                             || loreString.startsWith(hiddenCommand)

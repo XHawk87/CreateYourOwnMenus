@@ -288,6 +288,8 @@ public class Menu implements InventoryHolder {
         MenuCommandSender consoleSender = new MenuCommandSender(player, plugin.getServer().getConsoleSender());
         while (commands.hasNext()) {
             String command = commands.next();
+            
+            plugin.getLogger().info("Parsing menu script command: " + command);
 
             // Legacy - Check if the command is hidden
             if (command.startsWith(MenuScriptUtils.hiddenCommand)
