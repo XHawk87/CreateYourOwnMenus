@@ -4,10 +4,10 @@
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -86,6 +86,9 @@ public class MenuScriptUtils {
      * @return True if it is a valid menu item, otherwise false
      */
     public static boolean isValidMenuItem(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) {
+            return false;
+        }
         if (item.hasItemMeta()) {
             ItemMeta meta = item.getItemMeta();
             if (meta.hasLore()) {

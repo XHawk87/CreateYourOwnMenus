@@ -8,6 +8,7 @@ import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.GameMode;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -17,6 +18,7 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
@@ -97,7 +99,7 @@ public class MenuListener implements Listener {
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    menu.select(player, selected);
+                                    menu.select(player, selected, null, null);
                                 }
                             }.runTask(plugin);
                         }
@@ -118,7 +120,7 @@ public class MenuListener implements Listener {
                                 new BukkitRunnable() {
                                     @Override
                                     public void run() {
-                                        defaultMenu.select(player, selected);
+                                        defaultMenu.select(player, selected, null, null);
                                     }
                                 }.runTask(plugin);
                                 event.setCancelled(true);
@@ -146,17 +148,37 @@ public class MenuListener implements Listener {
             if (event.hasItem()) {
                 final Player player = event.getPlayer();
                 final ItemStack item = event.getItem();
+                final Block clicked = event.getClickedBlock();
                 // only bother messaging if its an item with lore
                 if (MenuScriptUtils.isValidMenuItem(item)) {
                     // Schedule it for the next tick to avoid conflicts with the event action
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            defaultMenu.select(player, item);
+                            defaultMenu.select(player, item, null, clicked);
                         }
                     }.runTask(plugin);
                     event.setCancelled(true);
                 }
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onRightClickPlayerWithMenuItem(PlayerInteractEntityEvent event) {
+        if (event.getRightClicked() instanceof Player) {
+            final Player player = event.getPlayer();
+            final Player target = (Player) event.getRightClicked();
+            final ItemStack item = player.getItemInHand();
+            if (MenuScriptUtils.isValidMenuItem(item)) {
+                // Schedule it for the next tick to avoid conflicts with the event action
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        defaultMenu.select(player, item, target, null);
+                    }
+                }.runTask(plugin);
+                event.setCancelled(true);
             }
         }
     }

@@ -20,6 +20,7 @@ import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
@@ -257,8 +258,12 @@ public class Menu implements InventoryHolder {
      *
      * @param player The player selecting the item
      * @param menuItem The item being selected
+     * @param targetPlayer The player being right-clicked with this menu item,
+     * if any
+     * @param targetBlock The block being right-clicked with this menu item, if
+     * any
      */
-    public void select(Player player, ItemStack menuItem) {
+    public void select(Player player, ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         if (menuItem.hasItemMeta()) {
             ItemMeta meta = menuItem.getItemMeta();
 
@@ -270,7 +275,7 @@ public class Menu implements InventoryHolder {
                     String firstLine = lore.get(0);
                     commands.addAll(MenuScriptUtils.unpackHiddenLines(firstLine));
                     commands.addAll(lore.subList(1, lore.size()));
-                    parseCommands(commands.iterator(), player, menuItem);
+                    parseCommands(commands.iterator(), player, menuItem, targetPlayer, targetBlock);
                     return;
                 }
             }
@@ -279,7 +284,7 @@ public class Menu implements InventoryHolder {
         player.sendMessage("This is not a valid menu item");
     }
 
-    private void parseCommands(final Iterator<String> commands, final Player player, final ItemStack menuItem) {
+    private void parseCommands(final Iterator<String> commands, final Player player, final ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         MenuCommandSender consoleSender = new MenuCommandSender(player, plugin.getServer().getConsoleSender());
         while (commands.hasNext()) {
             String command = commands.next();
@@ -303,6 +308,19 @@ public class Menu implements InventoryHolder {
             if (command.startsWith("/")) {
                 // Replace @p with the clicking player's name
                 command = command.replaceAll("@p", player.getName());
+                if (targetPlayer != null) {
+                    command = command.replaceAll("@t", targetPlayer.getName());
+                }
+                if (targetBlock != null) {
+                    command = command.replaceAll("@x", Integer.toString(targetBlock.getX()));
+                    command = command.replaceAll("@y", Integer.toString(targetBlock.getY()));
+                    command = command.replaceAll("@z", Integer.toString(targetBlock.getZ()));
+                } else {
+                    Location loc = player.getLocation();
+                    command = command.replaceAll("@x", Integer.toString(loc.getBlockX()));
+                    command = command.replaceAll("@y", Integer.toString(loc.getBlockY()));
+                    command = command.replaceAll("@z", Integer.toString(loc.getBlockZ()));
+                }
 
                 if (command.contains("@a") || command.contains("@w")) {
                     int range = -1;
@@ -363,12 +381,12 @@ public class Menu implements InventoryHolder {
                             continue;
                         }
                         String targettedCommand = command.replaceAll("@t", target.getName());
-                        if (!parseCommand(sender, player, targettedCommand, commands, menuItem)) {
+                        if (!parseCommand(sender, player, targettedCommand, commands, menuItem, targetPlayer, targetBlock)) {
                             return;
                         }
                     }
                 } else {
-                    if (!parseCommand(sender, player, command, commands, menuItem)) {
+                    if (!parseCommand(sender, player, command, commands, menuItem, targetPlayer, targetBlock)) {
                         return;
                     }
                 }
@@ -376,7 +394,9 @@ public class Menu implements InventoryHolder {
         }
     }
 
-    private boolean parseCommand(final CommandSender sender, final Player player, String command, final Iterator<String> commands, final ItemStack menuItem) {
+    private boolean parseCommand(final CommandSender sender, final Player player, 
+            String command, final Iterator<String> commands, final ItemStack menuItem, 
+            final Player targetPlayer, final Block targetBlock) {
         // Handle the special menu script commands
         String[] args = command.split(" ");
         String specialCommand = args[0];
@@ -430,7 +450,7 @@ public class Menu implements InventoryHolder {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        parseCommands(commands, player, menuItem);
+                        parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
                     }
                 }.runTaskLater(plugin, delay);
                 return false;
@@ -498,7 +518,7 @@ public class Menu implements InventoryHolder {
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    parseCommands(commands, player, menuItem);
+                                    parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
                                 }
                             }.runTask(plugin);
                         }
