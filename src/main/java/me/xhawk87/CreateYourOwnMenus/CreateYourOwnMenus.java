@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.CommandSender;
@@ -44,6 +45,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
 
         // Register commands
         getCommand("menu").setExecutor(new MenuCommand(this));
+        getCommand("sudo").setExecutor(new SudoCommand(this));
 
         // Register listeners
         new MenuListener().registerEvents(this);
