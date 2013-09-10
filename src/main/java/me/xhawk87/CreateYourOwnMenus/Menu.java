@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandSender;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -46,11 +46,6 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class Menu implements InventoryHolder {
 
-    public static final String commandStart = "/";
-    public static final String playerCommand = "@p/";
-    public static final String hiddenCommand = ChatColor.COLOR_CHAR + "/";
-    public static final String hiddenPlayerCommand = ChatColor.COLOR_CHAR + "@"
-            + ChatColor.COLOR_CHAR + "p" + ChatColor.COLOR_CHAR + "/";
     private CreateYourOwnMenus plugin;
     private String id;
     private Inventory inventory;
@@ -266,10 +261,18 @@ public class Menu implements InventoryHolder {
     public void select(Player player, ItemStack menuItem) {
         if (menuItem.hasItemMeta()) {
             ItemMeta meta = menuItem.getItemMeta();
+
             if (meta.hasLore()) {
-                List<String> commands = meta.getLore();
-                parseCommands(commands.iterator(), player, menuItem);
-                return;
+                List<String> lore = meta.getLore();
+                if (!lore.isEmpty()) {
+                    List<String> commands = new ArrayList<>();
+                    // Unpack any hidden commands
+                    String firstLine = lore.get(0);
+                    commands.addAll(MenuScriptUtils.unpackHiddenLines(firstLine));
+                    commands.addAll(lore.subList(1, lore.size()));
+                    parseCommands(commands.iterator(), player, menuItem);
+                    return;
+                }
             }
         }
         // The item doesn't have metadata or lore
@@ -281,16 +284,10 @@ public class Menu implements InventoryHolder {
         while (commands.hasNext()) {
             String command = commands.next();
 
-            // Check if the command is hidden
-            if (command.startsWith(hiddenCommand)
-                    || command.startsWith(hiddenPlayerCommand)) {
-                StringBuilder sb = new StringBuilder();
-                for (char c : command.toCharArray()) {
-                    if (c != ChatColor.COLOR_CHAR) {
-                        sb.append(c);
-                    }
-                }
-                command = sb.toString();
+            // Legacy - Check if the command is hidden
+            if (command.startsWith(MenuScriptUtils.hiddenCommand)
+                    || command.startsWith(MenuScriptUtils.hiddenPlayerCommand)) {
+                command = MenuScriptUtils.unpackHiddenText(command);
             }
 
             // If a command is prefixed with @p then execute it as the player not the console

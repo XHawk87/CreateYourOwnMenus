@@ -6,6 +6,7 @@ package me.xhawk87.CreateYourOwnMenus.listeners;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -146,7 +147,7 @@ public class MenuListener implements Listener {
                 final Player player = event.getPlayer();
                 final ItemStack item = event.getItem();
                 // only bother messaging if its an item with lore
-                if (plugin.isValidMenuItem(item)) {
+                if (MenuScriptUtils.isValidMenuItem(item)) {
                     // Schedule it for the next tick to avoid conflicts with the event action
                     new BukkitRunnable() {
                         @Override
