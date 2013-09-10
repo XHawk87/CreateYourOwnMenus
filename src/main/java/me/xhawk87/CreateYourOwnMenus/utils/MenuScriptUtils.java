@@ -4,7 +4,7 @@
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -30,7 +30,13 @@ public class MenuScriptUtils {
      * @return The unpacked hidden lines
      */
     public static List<String> unpackHiddenLines(String firstLine) {
-        return Arrays.asList(unpackHiddenText(firstLine).split("\r", -1));
+        String[] lines = firstLine.split(ChatColor.COLOR_CHAR + "\r", -1);
+        List<String> unpacked = new ArrayList<>();
+        for (int i = 0; i < lines.length - 1; i++) {
+            unpacked.add(unpackHiddenText(lines[i]));
+        }
+        unpacked.add(lines[lines.length - 1]);
+        return unpacked;
     }
 
     /**
