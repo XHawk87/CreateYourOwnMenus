@@ -88,9 +88,9 @@ public class MenuScriptShowCommand implements IMenuCommand {
             // and condense them into the first line
             loreStrings = commands;
             if (loreStrings.isEmpty()) {
-                loreStrings.add(commands.toString());
+                loreStrings.add(comments.toString());
             } else {
-                loreStrings.set(0, commands.toString() + loreStrings.get(0));
+                loreStrings.set(0, comments.toString() + loreStrings.get(0));
             }
 
             sender.sendMessage("All commands on this menu item should now be visible");
