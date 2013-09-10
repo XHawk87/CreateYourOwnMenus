@@ -85,7 +85,16 @@ public class MenuScriptReplaceCommand implements IMenuCommand {
                 // Support for colour codes in non-commands
                 commandString = commandString.replace('&', ChatColor.COLOR_CHAR);
             }
-            loreStrings.set(index, commandString);
+
+            if (index == 0) {
+                // Handle first-line special case
+                String firstLine = loreStrings.get(0);
+                int lastPartIndex = firstLine.lastIndexOf("/r") + 1;
+                loreStrings.set(0, firstLine.substring(0, lastPartIndex) + commandString);
+            } else {
+                loreStrings.set(index, commandString);
+            }
+
             sender.sendMessage(commandString + " replaced line " + index + " in the command list of this menu item");
 
             // Update the item

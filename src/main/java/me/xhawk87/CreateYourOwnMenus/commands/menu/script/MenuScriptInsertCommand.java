@@ -85,7 +85,18 @@ public class MenuScriptInsertCommand implements IMenuCommand {
                 // Support for colour codes in non-commands
                 commandString = commandString.replace('&', ChatColor.COLOR_CHAR);
             }
-            loreStrings.add(index, commandString);
+
+            if (index == 0) {
+                // Handle first-line special case
+                String firstLine = loreStrings.get(0);
+                int lastPartIndex = firstLine.lastIndexOf("/r") + 1;
+                String displacedText = firstLine.substring(lastPartIndex);
+                loreStrings.set(0, firstLine.substring(0, lastPartIndex) + commandString);
+                loreStrings.add(1, displacedText);
+            } else {
+                loreStrings.add(index, commandString);
+            }
+            
             sender.sendMessage(commandString + " was inserted before line " + index + " in the command list of this menu item");
 
             // Update the item

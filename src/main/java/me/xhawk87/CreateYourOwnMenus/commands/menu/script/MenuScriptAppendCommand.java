@@ -65,7 +65,21 @@ public class MenuScriptAppendCommand implements IMenuCommand {
                 commandString = commandString.replace('&', ChatColor.COLOR_CHAR);
             }
             // Otherwise append this to the lore
-            loreStrings.add(commandString);
+
+            if (loreStrings.size() == 1) {
+                // Handle first-line special case
+                String firstLine = loreStrings.get(0);
+                int lastPartIndex = firstLine.lastIndexOf("/r") + 1;
+                String lastPart = firstLine.substring(lastPartIndex);
+                if (lastPart.isEmpty()) {
+                    loreStrings.set(0, firstLine.substring(0, lastPartIndex) + commandString);
+                } else {
+                    loreStrings.add(commandString);
+                }
+            } else {
+                loreStrings.add(commandString);
+            }
+
             sender.sendMessage(commandString + " was added to the command list of this menu item");
 
             // Update the item

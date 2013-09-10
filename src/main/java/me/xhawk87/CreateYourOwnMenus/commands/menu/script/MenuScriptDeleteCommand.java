@@ -71,9 +71,26 @@ public class MenuScriptDeleteCommand implements IMenuCommand {
                 sender.sendMessage("The index must be a whole number: " + indexString);
                 return true;
             }
-            
+
             // Remove the deleted line
-            sender.sendMessage("Removed " + loreStrings.remove(index) + " from line " + index + " in the command list of this menu item");
+            String removedText;
+            if (index == 0) {
+                // Handle first-line special case
+                String replacedWith;
+                if (loreStrings.size() >= 2) {
+                    replacedWith = loreStrings.get(1);
+                    loreStrings.remove(1);
+                } else {
+                    replacedWith = "";
+                }
+                String firstLine = loreStrings.get(0);
+                int lastPartIndex = firstLine.lastIndexOf("/r") + 1;
+                removedText = firstLine.substring(lastPartIndex);
+                loreStrings.set(0, firstLine.substring(0, lastPartIndex) + replacedWith);
+            } else {
+                removedText = loreStrings.remove(index);
+            }
+            sender.sendMessage("Removed " + removedText + " from line " + index + " in the command list of this menu item");
 
             // Update the item
             meta.setLore(loreStrings);
