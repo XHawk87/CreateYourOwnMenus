@@ -11,7 +11,10 @@ import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptAppendCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptClearCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptDeleteCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptHideCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptInsertCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptReplaceCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptShowCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -32,6 +35,9 @@ public class MenuScriptCommand implements IMenuCommand {
         subCommands.put("show", new MenuScriptShowCommand());
         subCommands.put("hide", new MenuScriptHideCommand());
         subCommands.put("append", new MenuScriptAppendCommand());
+        subCommands.put("insert", new MenuScriptInsertCommand());
+        subCommands.put("replace", new MenuScriptReplaceCommand());
+        subCommands.put("delete", new MenuScriptDeleteCommand());
     }
 
     @Override
