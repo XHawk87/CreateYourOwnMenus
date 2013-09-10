@@ -30,7 +30,7 @@ public class MenuScriptUtils {
      * @return The unpacked hidden lines
      */
     public static List<String> unpackHiddenLines(String firstLine) {
-        return Arrays.asList(unpackHiddenText(firstLine).split("\r"));
+        return Arrays.asList(unpackHiddenText(firstLine).split("\r", -1));
     }
 
     /**
