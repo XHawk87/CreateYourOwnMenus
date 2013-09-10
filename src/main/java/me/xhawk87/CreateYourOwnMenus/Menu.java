@@ -398,8 +398,8 @@ public class Menu implements InventoryHolder {
         }
     }
 
-    private boolean parseCommand(final CommandSender sender, final Player player, 
-            String command, final Iterator<String> commands, final ItemStack menuItem, 
+    private boolean parseCommand(final CommandSender sender, final Player player,
+            String command, final Iterator<String> commands, final ItemStack menuItem,
             final Player targetPlayer, final Block targetBlock) {
         // Handle the special menu script commands
         String[] args = command.split(" ");
@@ -514,24 +514,21 @@ public class Menu implements InventoryHolder {
                         parts.iterator(), player, new MessagePrompt() {
                     @Override
                     protected Prompt getNextPrompt(ConversationContext context) {
-                        String command = parsedCommand.toString();
-                        if (command.startsWith("/")) {
-                            command = command.substring(1);
-                        }
-                        // Execute the command
-                        if (!plugin.getServer().dispatchCommand(sender,
-                                command)) {
-                            // If it fails to execute
-                            player.sendMessage("Error in menu script line (unknown command): " + command);
-                        } else {
-                            // If it succeeds, proceed to the next command
-                            new BukkitRunnable() {
-                                @Override
-                                public void run() {
+                        final String command = parsedCommand.toString();
+                        new BukkitRunnable() {
+                            @Override
+                            public void run() {
+                                // Execute the command
+                                if (!plugin.getServer().dispatchCommand(sender,
+                                        command)) {
+                                    // If it fails to execute
+                                    player.sendMessage("Error in menu script line (unknown command): " + command);
+                                } else {
+                                    // If it succeeds, continue with the script execution
                                     parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
                                 }
-                            }.runTask(plugin);
-                        }
+                            }
+                        }.runTask(plugin);
                         return END_OF_CONVERSATION;
                     }
 
