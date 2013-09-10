@@ -62,12 +62,12 @@ public class MenuScriptHideCommand implements IMenuCommand {
             StringBuilder commands = new StringBuilder();
             List<String> comments = new ArrayList<>();
 
-            // Expand all hidden comments from the first line
+            // Expand all hidden lines from the first line
             if (!loreStrings.isEmpty()) {
                 String firstLine = loreStrings.get(0);
                 List<String> lines = unpackHiddenLines(firstLine);
                 loreStrings.set(0, lines.get(lines.size() - 1));
-                comments.addAll(lines.subList(0, lines.size() - 1));
+                loreStrings.addAll(lines.subList(0, lines.size() - 1));
             }
 
             for (int i = 0; i < loreStrings.size(); i++) {

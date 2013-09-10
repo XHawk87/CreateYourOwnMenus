@@ -68,7 +68,7 @@ public class MenuScriptShowCommand implements IMenuCommand {
                 String firstLine = loreStrings.get(0);
                 List<String> lines = unpackHiddenLines(firstLine);
                 loreStrings.set(0, lines.get(lines.size() - 1));
-                commands.addAll(lines.subList(0, lines.size() - 1));
+                loreStrings.addAll(lines.subList(0, lines.size() - 1));
             }
 
             for (int i = 0; i < loreStrings.size(); i++) {
