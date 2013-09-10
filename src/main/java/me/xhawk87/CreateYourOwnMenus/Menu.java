@@ -310,6 +310,10 @@ public class Menu implements InventoryHolder {
                 command = command.replaceAll("@p", player.getName());
                 if (targetPlayer != null) {
                     command = command.replaceAll("@t", targetPlayer.getName());
+                } else {
+                    if (command.contains("@t")) {
+                        return;
+                    }
                 }
                 if (targetBlock != null) {
                     command = command.replaceAll("@x", Integer.toString(targetBlock.getX()));
