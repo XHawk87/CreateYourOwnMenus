@@ -88,6 +88,6 @@ public class MenuScriptCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "cyom.commands.menu.script";
+        return null;
     }
 }

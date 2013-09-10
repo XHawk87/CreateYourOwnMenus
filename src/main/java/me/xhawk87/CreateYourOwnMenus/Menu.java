@@ -364,7 +364,7 @@ public class Menu implements InventoryHolder {
                                     match = true;
                                 }
                                 if (match) {
-                                    command = command.replaceFirst(targetString, "@t");
+                                    command = command.replaceFirst(targetString, "@o");
                                     i -= targetString.length();
                                     i += 2;
                                 }
@@ -384,7 +384,7 @@ public class Menu implements InventoryHolder {
                         if (world != null && !target.getWorld().equals(world)) {
                             continue;
                         }
-                        String targettedCommand = command.replaceAll("@t", target.getName());
+                        String targettedCommand = command.replaceAll("@o", target.getName());
                         if (!parseCommand(sender, player, targettedCommand, commands, menuItem, targetPlayer, targetBlock)) {
                             return;
                         }
@@ -515,10 +515,16 @@ public class Menu implements InventoryHolder {
                     @Override
                     protected Prompt getNextPrompt(ConversationContext context) {
                         String command = parsedCommand.toString();
+                        if (command.startsWith("/")) {
+                            command = command.substring(1);
+                        }
+                        // Execute the command
                         if (!plugin.getServer().dispatchCommand(sender,
                                 command)) {
+                            // If it fails to execute
                             player.sendMessage("Error in menu script line (unknown command): " + command);
                         } else {
+                            // If it succeeds, proceed to the next command
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
