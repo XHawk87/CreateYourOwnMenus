@@ -534,7 +534,7 @@ public class Menu implements InventoryHolder {
 
                     @Override
                     public String getPromptText(ConversationContext context) {
-                        return parsedCommand.toString();
+                        return "";
                     }
                 })));
                 return false;
