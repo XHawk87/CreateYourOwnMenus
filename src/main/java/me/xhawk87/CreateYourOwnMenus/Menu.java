@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandSender;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -276,7 +277,7 @@ public class Menu implements InventoryHolder {
     }
 
     private void parseCommands(final Iterator<String> commands, final Player player, final ItemStack menuItem) {
-        ConsoleCommandSender consoleSender = plugin.getServer().getConsoleSender();
+        MenuCommandSender consoleSender = new MenuCommandSender(player, plugin.getServer().getConsoleSender());
         while (commands.hasNext()) {
             String command = commands.next();
 
