@@ -2,7 +2,7 @@ name: ${project.name}
 main: ${project.groupId}.${project.artifactId}.${project.name}
 version: ${project.version}
 description: ${project.description}
-soft-depend: [Vault]
+softdepend: [Vault]
 
 commands:
   menu:
@@ -10,9 +10,13 @@ commands:
     usage: /menu [create|edit|delete|list|open|script|reload|grab|copy] [parameters...]
     aliases: [m]
     permissions: cyom.commands.menu
-  
+  sudo:
+    description: Allows you to execute a command as another player
+    usage: /sudo [player] [command]
+    permissions: cyom.commands.sudo
+
 permissions:
-  cyom.commands.menu.*:
+  cyom.commands.menu:
     description: Allows use of all menu commands
     default: op
     children:
@@ -44,11 +48,43 @@ permissions:
     description: Allows opening of menus for other players
     default: op
   cyom.commands.menu.script:
-    description: Allows scripting of menu items
+    description: Allows use of all menu script commands
+    default: op
+    children:
+      cyom.commands.menu.script.append: true
+      cyom.commands.menu.script.hide: true
+      cyom.commands.menu.script.show: true
+      cyom.commands.menu.script.clear: true
+      cyom.commands.menu.script.insert: true
+      cyom.commands.menu.script.replace: true
+      cyom.commands.menu.script.delete: true
+  cyom.commands.menu.script.append:
+    description: Allows adding lines to a menu script
+    default: op
+  cyom.commands.menu.script.hide:
+    description: Allows hiding commands in a menu script
+    default: op
+  cyom.commands.menu.script.show:
+    description: Allows showing hidden commands in a menu script
+    default: op
+  cyom.commands.menu.script.clear:
+    description: Allows clearing all lines in a menu script
+    default: op
+  cyom.commands.menu.script.insert:
+    description: Allows insert lines into a menu script
+    default: op
+  cyom.commands.menu.script.replace:
+    description: Allows replacing lines in a menu script
+    default: op
+  cyom.commands.menu.script.delete:
+    description: Allows deleting lines from a menu script
     default: op
   cyom.commands.menu.reload:
     description: Allows reloading of menus from disk
     default: op
   cyom.commands.menu.grab:
     description: Allows grabbing copies of items from a menu
+    default: op
+  cyom.commands.sudo:
+    description: Allows use of the sudo command
     default: op
