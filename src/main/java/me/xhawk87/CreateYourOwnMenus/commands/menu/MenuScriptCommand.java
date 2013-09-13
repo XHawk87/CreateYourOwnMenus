@@ -29,6 +29,11 @@ public class MenuScriptCommand implements IMenuCommand {
      * All subcommands of the menu command, stored by their name
      */
     private Map<String, IMenuCommand> subCommands = new HashMap<>();
+    /**
+     * All aliases of the menu command. these should not be listed in help as
+     * separate subcommands
+     */
+    private Map<String, IMenuCommand> aliases = new HashMap<>();
 
     public MenuScriptCommand(CreateYourOwnMenus plugin) {
         subCommands.put("clear", new MenuScriptClearCommand());
@@ -38,14 +43,14 @@ public class MenuScriptCommand implements IMenuCommand {
         subCommands.put("insert", new MenuScriptInsertCommand());
         subCommands.put("replace", new MenuScriptReplaceCommand());
         subCommands.put("delete", new MenuScriptDeleteCommand());
-        
+
         // Aliases
-        subCommands.put("add", subCommands.get("append"));
-        subCommands.put("remove", subCommands.get("delete"));
-        subCommands.put("set", subCommands.get("replace"));
-        subCommands.put("commands", subCommands.get("show"));
-        subCommands.put("comments", subCommands.get("hide"));
-        subCommands.put("reset", subCommands.get("clear"));
+        aliases.put("add", subCommands.get("append"));
+        aliases.put("remove", subCommands.get("delete"));
+        aliases.put("set", subCommands.get("replace"));
+        aliases.put("commands", subCommands.get("show"));
+        aliases.put("comments", subCommands.get("hide"));
+        aliases.put("reset", subCommands.get("clear"));
     }
 
     @Override
@@ -65,8 +70,12 @@ public class MenuScriptCommand implements IMenuCommand {
         String subCommandName = args[0];
         IMenuCommand menuScriptCommand = subCommands.get(subCommandName.toLowerCase());
         if (menuScriptCommand == null) {
-            return false; // They mistyped or entered an invalid subcommand
+            menuScriptCommand = aliases.get(subCommandName.toLowerCase());
+            if (menuScriptCommand == null) {
+                return false; // They mistyped or entered an invalid subcommand
+            }
         }
+
         // Handle the permissions check
         String permission = menuScriptCommand.getPermission();
         if (permission != null && !sender.hasPermission(permission)) {
