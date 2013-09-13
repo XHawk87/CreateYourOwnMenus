@@ -83,7 +83,7 @@ public class MenuScriptCommand implements IMenuCommand {
 
     @Override
     public String getUsage() {
-        return "/menu script [clear|command] - Add a command to a held menu item or clear all commands from it";
+        return "/menu script [clear|show|hide|append|insert|replace|delete] [parameters...]";
     }
 
     @Override
