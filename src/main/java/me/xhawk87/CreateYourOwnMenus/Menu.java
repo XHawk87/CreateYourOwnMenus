@@ -15,9 +15,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
-import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -36,7 +36,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -284,7 +283,7 @@ public class Menu implements InventoryHolder {
         player.sendMessage("This is not a valid menu item");
     }
 
-    private void parseCommands(final Iterator<String> commands, final Player player, final ItemStack menuItem, Player targetPlayer, Block targetBlock) {
+    public void parseCommands(final Iterator<String> commands, final Player player, final ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         MenuCommandSender consoleSender = new MenuCommandSender(player, plugin.getServer().getConsoleSender());
         while (commands.hasNext()) {
             String command = commands.next();
@@ -409,83 +408,12 @@ public class Menu implements InventoryHolder {
             player.sendMessage("Error in menu script line (command is not allowed): " + command);
             return false;
         }
-        if (specialCommand.equalsIgnoreCase("/requirepermission")) {
-            if (args.length != 2) {
-                player.sendMessage("Error in menu script line (expected permission node): " + command);
-                return false;
-            }
-            String permission = args[1];
-            if (!player.hasPermission(permission)) {
-                player.sendMessage("You do not have permission to use this menu item");
-                return false;
-            }
-        } else if (specialCommand.equalsIgnoreCase("/close")) {
-            if (args.length != 1) {
-                player.sendMessage("Error in menu script line (expected no arguments): " + command);
-                return false;
-            }
-            player.closeInventory();
-        } else if (specialCommand.equalsIgnoreCase("/consume")) {
-            if (args.length != 1) {
-                player.sendMessage("Error in menu script line (expected no arguments): " + command);
-                return false;
-            }
-            int amount = menuItem.getAmount() - 1;
-            if (amount > 0) {
-                menuItem.setAmount(amount);
-            } else {
-                PlayerInventory inv = player.getInventory();
-                ItemStack held = inv.getItemInHand();
-                if (held.equals(menuItem)) {
-                    inv.clear(inv.getHeldItemSlot());
-                } else {
-                    player.sendMessage("Cannot locate menu item to remove it. Was it moved?");
-                    return false;
-                }
-            }
-            player.updateInventory();
-        } else if (specialCommand.equalsIgnoreCase("/delay")) {
-            if (args.length != 2) {
-                player.sendMessage("Error in menu script line (expected delay in ticks): " + command);
-                return false;
-            }
-            try {
-                int delay = Integer.parseInt(args[1]);
-                new BukkitRunnable() {
-                    @Override
-                    public void run() {
-                        parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
-                    }
-                }.runTaskLater(plugin, delay);
-                return false;
-            } catch (NumberFormatException ex) {
-                player.sendMessage("Error in menu script line (delay must be a whole number of ticks): " + command);
-                return false;
-            }
-        } else if (specialCommand.equalsIgnoreCase("/requirecurrency")) {
-            EconomyWrapper economy = plugin.getEconomy();
-            if (economy == null) {
-                player.sendMessage("The /requirecurrency special command requires Vault to work");
-                return false;
-            }
-            if (args.length != 2) {
-                player.sendMessage("Error in menu script line (expected currency amount): " + command);
-                return false;
-            }
-            String amountString = args[1];
-            try {
-                double amount = Double.parseDouble(amountString);
-                if (economy.getBalance(player.getName()) < amount) {
-                    player.sendMessage("You must have at least " + economy.format(amount) + ChatColor.RESET + " to do this");
-                    return false;
-                }
-            } catch (NumberFormatException ex) {
-                player.sendMessage("Error in menu script line (expected currency amount): " + command);
-                return false;
-            }
+        ScriptCommand scriptCommand = plugin.getScriptCommand(specialCommand);
+        if (scriptCommand != null) {
+            return scriptCommand.execute(this, player, args, command, menuItem, commands, targetPlayer, targetBlock);
         } else {
             // Otherwise, parse it as a normal command. 
-
+            
             if (command.contains("{")) {
                 // Parse for {dynamic arguments}
                 StringBuilder commandString = new StringBuilder();

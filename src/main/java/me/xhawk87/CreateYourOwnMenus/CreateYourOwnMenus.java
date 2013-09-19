@@ -13,6 +13,14 @@ import java.util.Set;
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
+import me.xhawk87.CreateYourOwnMenus.script.CloseCommand;
+import me.xhawk87.CreateYourOwnMenus.script.ConsumeCommand;
+import me.xhawk87.CreateYourOwnMenus.script.DelayCommand;
+import me.xhawk87.CreateYourOwnMenus.script.GiveChestCommand;
+import me.xhawk87.CreateYourOwnMenus.script.RequireCurrencyCommand;
+import me.xhawk87.CreateYourOwnMenus.script.RequirePermissionCommand;
+import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.script.TakeChestCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -33,6 +41,8 @@ public class CreateYourOwnMenus extends JavaPlugin {
     private Set<String> commandBlacklist = new HashSet<>();
     private Set<String> commandWhitelist = new HashSet<>();
     private EconomyWrapper economy = null;
+    // Names are in lower case
+    private Map<String, ScriptCommand> scriptCommands = new HashMap<>();
 
     @Override
     public void onEnable() {
@@ -49,6 +59,15 @@ public class CreateYourOwnMenus extends JavaPlugin {
 
         // Register listeners
         new MenuListener().registerEvents(this);
+
+        // Register script commands
+        scriptCommands.put("close", new CloseCommand());
+        scriptCommands.put("consume", new ConsumeCommand());
+        scriptCommands.put("delay", new DelayCommand(this));
+        scriptCommands.put("requirecurrency", new RequireCurrencyCommand(this));
+        scriptCommands.put("requirepermission", new RequirePermissionCommand());
+        scriptCommands.put("givechest", new GiveChestCommand());
+        scriptCommands.put("takechest", new TakeChestCommand());
     }
 
     private void setupEconomy() {
@@ -212,5 +231,18 @@ public class CreateYourOwnMenus extends JavaPlugin {
         } else {
             return commandWhitelist.contains(commandName.toLowerCase());
         }
+    }
+
+    /**
+     * Gets a script-only command by its name
+     *
+     * @param commandString The command name
+     * @return The script command
+     */
+    public ScriptCommand getScriptCommand(String commandString) {
+        if (commandString.startsWith("/")) {
+            commandString = commandString.substring(1);
+        }
+        return scriptCommands.get(commandString.toLowerCase());
     }
 }
