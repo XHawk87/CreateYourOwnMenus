@@ -85,7 +85,7 @@ public class TakeChestCommand implements ScriptCommand {
                 int toSlot;
                 try {
                     toSlot = Integer.parseInt(fromToStrings[1]);
-                    if (fromSlot <= toSlot) {
+                    if (fromSlot > toSlot) {
                         player.sendMessage("Error in menu script line (expected slot range to number higher than from number " + fromSlot + "): " + toSlot);
                         return false;
                     }
