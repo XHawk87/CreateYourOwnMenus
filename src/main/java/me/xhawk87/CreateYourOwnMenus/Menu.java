@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -410,7 +411,7 @@ public class Menu implements InventoryHolder {
         }
         ScriptCommand scriptCommand = plugin.getScriptCommand(specialCommand);
         if (scriptCommand != null) {
-            return scriptCommand.execute(this, player, args, command, menuItem, commands, targetPlayer, targetBlock);
+            return scriptCommand.execute(this, player, Arrays.copyOfRange(args, 1, args.length), command, menuItem, commands, targetPlayer, targetBlock);
         } else {
             // Otherwise, parse it as a normal command. 
             
