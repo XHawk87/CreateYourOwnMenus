@@ -4,33 +4,27 @@
  */
 package me.xhawk87.CreateYourOwnMenus.script;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.InventoryReport;
 import me.xhawk87.CreateYourOwnMenus.utils.ValidationUtils;
-import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 
 /**
  *
  * @author XHawk87
  */
-public class TakeChestCommand implements ScriptCommand {
+public class CountChestCommand implements ScriptCommand {
 
     @Override
     public boolean execute(Menu menu, Player player, String[] args, String command, ItemStack menuItem, Iterator<String> commands, Player targetPlayer, Block targetBlock) {
         if (args.length != 5) {
-            player.sendMessage("Error in menu script line (expected /TakeChest [x] [y] [z] [slot1,fromSlot-toSlot...] [amount]): " + command);
+            player.sendMessage("Error in menu script line (expected /CountChest [x] [y] [z] [slot1,fromSlot-toSlot...] [amount]): " + command);
             return false;
         }
 
@@ -85,53 +79,15 @@ public class TakeChestCommand implements ScriptCommand {
         if (block.getState() instanceof InventoryHolder) {
             InventoryHolder chest = (InventoryHolder) block.getState();
             Inventory inv = chest.getInventory();
-            InventoryReport chestData;
             try {
-                chestData = InventoryReport.getReport(inv, slots);
+                InventoryReport report = InventoryReport.getReport(inv, slots);
+                if (report.getCount() <= amount) {
+                    player.sendMessage("There are not enough " + report.getType().toString().toLowerCase() + " in stock");
+                    return false;
+                }
             } catch (IllegalArgumentException ex) {
                 player.sendMessage(ex.getLocalizedMessage());
                 return false;
-            }
-            if (chestData.getCount() <= amount) {
-                player.sendMessage("There are not enough " + chestData.toString() + " in stock");
-                return false;
-            }
-            int count = 0;
-            PlayerInventory to = player.getInventory();
-            List<ItemStack> toDrop = new ArrayList<>();
-            for (Map.Entry<Integer, ItemStack> entry : chestData.getItems().entrySet()) {
-                int slot = entry.getKey();
-                ItemStack item = entry.getValue();
-                count += item.getAmount();
-                if (count < amount) {
-                    inv.clear(slot);
-                    toDrop.addAll(to.addItem(item).values());
-                } else {
-                    int remaining = count - amount;
-                    if (remaining > 0) {
-                        ItemStack split = item.clone();
-                        split.setAmount(item.getAmount() - remaining);
-                        item.setAmount(remaining);
-                        toDrop.addAll(to.addItem(split).values());
-                    } else {
-                        inv.clear(slot);
-                        toDrop.addAll(to.addItem(item).values());
-                    }
-                    break;
-                }
-            }
-            if (!toDrop.isEmpty()) {
-                World world = player.getWorld();
-                Location loc = player.getLocation();
-                for (ItemStack drop : toDrop) {
-                    world.dropItem(loc, drop);
-                }
-            }
-            player.updateInventory();
-            for (HumanEntity viewer : chest.getInventory().getViewers()) {
-                if (viewer instanceof Player) {
-                    ((Player) viewer).updateInventory();
-                }
             }
             return true;
         } else {

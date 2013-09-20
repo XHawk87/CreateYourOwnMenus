@@ -15,6 +15,7 @@ import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import me.xhawk87.CreateYourOwnMenus.script.CloseCommand;
 import me.xhawk87.CreateYourOwnMenus.script.ConsumeCommand;
+import me.xhawk87.CreateYourOwnMenus.script.CountChestCommand;
 import me.xhawk87.CreateYourOwnMenus.script.DelayCommand;
 import me.xhawk87.CreateYourOwnMenus.script.GiveChestCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequireCurrencyCommand;
@@ -68,6 +69,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
         scriptCommands.put("requirepermission", new RequirePermissionCommand());
         scriptCommands.put("givechest", new GiveChestCommand());
         scriptCommands.put("takechest", new TakeChestCommand());
+        scriptCommands.put("countchest", new CountChestCommand());
     }
 
     private void setupEconomy() {

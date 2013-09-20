@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import me.xhawk87.CreateYourOwnMenus.Menu;
-import org.bukkit.Material;
+import me.xhawk87.CreateYourOwnMenus.utils.InventoryReport;
+import me.xhawk87.CreateYourOwnMenus.utils.ValidationUtils;
 import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -57,54 +58,12 @@ public class GiveChestCommand implements ScriptCommand {
             return false;
         }
 
-        String slotsString = args[3];
-        List<Integer> slots = new ArrayList<>();
-        String[] slotStrings = slotsString.split(",");
-        for (String slotString : slotStrings) {
-            if (slotString.contains("-")) {
-                String[] fromToStrings = slotString.split("-");
-                if (fromToStrings.length != 2) {
-                    player.sendMessage("Error in menu script line (expected slot range from-to): " + slotString);
-                    return false;
-                }
-                int fromSlot;
-                try {
-                    fromSlot = Integer.parseInt(fromToStrings[0]);
-                    if (fromSlot < 0) {
-                        player.sendMessage("Error in menu script line (expected positive slot range from number): " + fromSlot);
-                        return false;
-                    }
-                } catch (NumberFormatException ex) {
-                    player.sendMessage("Error in menu script line (expected slot range from as whole number): " + fromToStrings[0]);
-                    return false;
-                }
-                int toSlot;
-                try {
-                    toSlot = Integer.parseInt(fromToStrings[1]);
-                    if (fromSlot > toSlot) {
-                        player.sendMessage("Error in menu script line (expected slot range to number higher than from number " + fromSlot + "): " + toSlot);
-                        return false;
-                    }
-                } catch (NumberFormatException ex) {
-                    player.sendMessage("Error in menu script line (expected slot range to as whole number): " + fromToStrings[1]);
-                    return false;
-                }
-                for (int i = fromSlot; i <= toSlot; i++) {
-                    slots.add(i);
-                }
-            } else {
-                try {
-                    int slotNumber = Integer.parseInt(slotString);
-                    if (slotNumber < 0) {
-                        player.sendMessage("Error in menu script line (expected positive slot number): " + slotNumber);
-                        return false;
-                    }
-                    slots.add(slotNumber);
-                } catch (NumberFormatException ex) {
-                    player.sendMessage("Error in menu script line (expected whole number for slot): " + slotString);
-                    return false;
-                }
-            }
+        List<Integer> slots;
+        try {
+            slots = ValidationUtils.getSlotRange(args[3]);
+        } catch (IllegalArgumentException ex) {
+            player.sendMessage("Error in menu script line " + ex.getLocalizedMessage());
+            return false;
         }
 
         int amount;
@@ -123,42 +82,19 @@ public class GiveChestCommand implements ScriptCommand {
         if (block.getState() instanceof InventoryHolder) {
             InventoryHolder chest = (InventoryHolder) block.getState();
             Inventory toInv = chest.getInventory();
-
-            int spaces = 0;
-            int empties = 0;
-            int maxStackSize = 0;
-            ItemStack type = null;
-            for (int slot : slots) {
-                if (slot >= toInv.getSize()) {
-                    player.sendMessage("Error in menu script line (expected slot number less than inventory size " + toInv.getSize() + "): " + slot);
-                    return false;
-                }
-                ItemStack item = toInv.getItem(slot);
-                if (item != null && item.getType() != Material.AIR) {
-                    if (type == null || item.isSimilar(item)) {
-                        if (type == null) {
-                            type = item;
-                            maxStackSize = type.getMaxStackSize();
-                            if (maxStackSize == -1) {
-                                maxStackSize = 64;
-                            }
-                        }
-                        spaces += maxStackSize - item.getAmount();
-                    } else {
-                        player.sendMessage("Error in menu script line (expected similar items in slots " + type.toString() + "): " + item.toString());
-                        return false;
-                    }
-                } else {
-                    empties++;
-                }
+            InventoryReport chestData;
+            try {
+                chestData = InventoryReport.getReport(toInv, slots);
+            } catch (IllegalArgumentException ex) {
+                player.sendMessage(ex.getLocalizedMessage());
+                return false;
             }
 
-            if (type == null) {
+            if (!chestData.hasType()) {
                 player.sendMessage("This item is no longer being stocked");
                 return false;
             }
-            spaces += empties * maxStackSize;
-            if (spaces < amount) {
+            if (chestData.getSpaces() < amount) {
                 player.sendMessage("This item is already fully stocked");
                 return false;
             }
@@ -168,7 +104,7 @@ public class GiveChestCommand implements ScriptCommand {
             PlayerInventory fromInv = player.getInventory();
             for (int slot = 0; slot < fromInv.getSize(); slot++) {
                 ItemStack item = fromInv.getItem(slot);
-                if (item != null && item.isSimilar(type)) {
+                if (item != null && item.isSimilar(chestData.getType())) {
                     count += item.getAmount();
                     toGive.add(slot);
                     if (count >= amount) {
@@ -196,10 +132,10 @@ public class GiveChestCommand implements ScriptCommand {
                         fromSlot = itFrom.next();
                     }
                 } else {
-                    int space = maxStackSize - toItem.getAmount();
+                    int space = chestData.getMaxStackSize() - toItem.getAmount();
                     if (fromItem.getAmount() > space) {
                         fromItem.setAmount(fromItem.getAmount() - space);
-                        toItem.setAmount(maxStackSize);
+                        toItem.setAmount(chestData.getMaxStackSize());
                         count += space;
                         if (itTo.hasNext()) {
                             toSlot = itTo.next();
