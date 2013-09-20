@@ -26,7 +26,7 @@ public class MenuScriptDeleteCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "cyom.commands.menu.script.delete";
+        return null;
     }
 
     @Override

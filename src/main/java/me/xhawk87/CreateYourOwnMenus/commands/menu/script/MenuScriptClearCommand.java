@@ -26,7 +26,7 @@ public class MenuScriptClearCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "cyom.commands.menu.script.clear";
+        return null;
     }
 
     @Override

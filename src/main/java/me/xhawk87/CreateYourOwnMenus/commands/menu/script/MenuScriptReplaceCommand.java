@@ -27,7 +27,7 @@ public class MenuScriptReplaceCommand implements IMenuCommand {
 
     @Override
     public String getPermission() {
-        return "cyom.commands.menu.script.replace";
+        return null;
     }
 
     @Override
