@@ -80,9 +80,9 @@ public class CountChestCommand implements ScriptCommand {
             InventoryHolder chest = (InventoryHolder) block.getState();
             Inventory inv = chest.getInventory();
             try {
-                InventoryReport report = InventoryReport.getReport(inv, slots);
-                if (report.getCount() <= amount) {
-                    player.sendMessage("There are not enough " + report.getType().toString().toLowerCase() + " in stock");
+                InventoryReport chestData = InventoryReport.getReport(inv, slots);
+                if (chestData.getCount() <= amount) {
+                    player.sendMessage("There are not enough " + chestData.toString() + " in stock");
                     return false;
                 }
             } catch (IllegalArgumentException ex) {

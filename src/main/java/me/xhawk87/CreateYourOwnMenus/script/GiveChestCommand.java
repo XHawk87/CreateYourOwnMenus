@@ -96,7 +96,7 @@ public class GiveChestCommand implements ScriptCommand {
                 return false;
             }
             if (chestData.getSpaces() < amount) {
-                player.sendMessage("This item is already fully stocked");
+                player.sendMessage(chestData.toString() + " is already fully stocked");
                 return false;
             }
 
@@ -114,7 +114,7 @@ public class GiveChestCommand implements ScriptCommand {
                 }
             }
             if (count < amount) {
-                player.sendMessage("You do not have enough of this item");
+                player.sendMessage("You do not have enough " + chestData.toString());
                 return false;
             }
 
