@@ -29,6 +29,7 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitRunnable;
 
 /**
  * A plugin to allow server owners to design and create their own menus in-game
@@ -49,7 +50,12 @@ public class CreateYourOwnMenus extends JavaPlugin {
     public void onEnable() {
         saveDefaultConfig();
 
-        setupEconomy();
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                setupEconomy();
+            }
+        }.runTaskLater(this, 20);
 
         // Load menus
         reloadMenus();
