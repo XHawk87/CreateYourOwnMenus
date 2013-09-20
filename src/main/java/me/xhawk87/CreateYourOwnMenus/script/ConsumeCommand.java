@@ -19,7 +19,7 @@ public class ConsumeCommand implements ScriptCommand {
 
     @Override
     public boolean execute(Menu menu, Player player, String[] args, String command, ItemStack menuItem, Iterator<String> commands, Player targetPlayer, Block targetBlock) {
-        if (args.length != 1) {
+        if (args.length != 0) {
             player.sendMessage("Error in menu script line (expected no arguments): " + command);
             return false;
         }

@@ -26,12 +26,12 @@ public class DelayCommand implements ScriptCommand {
 
     @Override
     public boolean execute(final Menu menu, final Player player, String[] args, String command, final ItemStack menuItem, final Iterator<String> commands, final Player targetPlayer, final Block targetBlock) {
-        if (args.length != 2) {
+        if (args.length != 1) {
             player.sendMessage("Error in menu script line (expected delay in ticks): " + command);
             return false;
         }
         try {
-            int delay = Integer.parseInt(args[1]);
+            int delay = Integer.parseInt(args[0]);
             new BukkitRunnable() {
                 @Override
                 public void run() {

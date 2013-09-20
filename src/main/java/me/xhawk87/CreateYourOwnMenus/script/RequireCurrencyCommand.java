@@ -32,11 +32,11 @@ public class RequireCurrencyCommand implements ScriptCommand {
             player.sendMessage("The /requirecurrency special command requires Vault to work");
             return false;
         }
-        if (args.length != 2) {
+        if (args.length != 1) {
             player.sendMessage("Error in menu script line (expected currency amount): " + command);
             return false;
         }
-        String amountString = args[1];
+        String amountString = args[0];
         try {
             double amount = Double.parseDouble(amountString);
             if (economy.getBalance(player.getName()) < amount) {
