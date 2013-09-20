@@ -10,6 +10,7 @@ import java.util.List;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.InventoryReport;
 import me.xhawk87.CreateYourOwnMenus.utils.ValidationUtils;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -125,22 +126,44 @@ public class GiveChestCommand implements ScriptCommand {
             while (count < amount) {
                 ItemStack fromItem = fromInv.getItem(fromSlot);
                 ItemStack toItem = toInv.getItem(toSlot);
-                if (toItem == null) {
-                    toInv.setItem(toSlot, fromItem);
-                    count += fromItem.getAmount();
-                    if (itFrom.hasNext()) {
-                        fromSlot = itFrom.next();
+                if (toItem == null || toItem.getType() == Material.AIR) {
+                    // toSlot is empty
+                    if (count + fromItem.getAmount() > amount) {
+                        // Don't take more than required
+                        int moving = amount - count;
+                        toItem = fromItem.clone();
+                        toItem.setAmount(moving);
+                        fromItem.setAmount(fromItem.getAmount() - moving);
+                        toInv.setItem(toSlot, toItem);
+                        count += moving;
+                    } else {
+                        // moving fromItem to toSlot
+                        toInv.setItem(toSlot, fromItem);
+                        count += fromItem.getAmount();
+                        fromInv.clear(fromSlot);
+                        if (itFrom.hasNext()) {
+                            fromSlot = itFrom.next();
+                        }
                     }
                 } else {
-                    int space = chestData.getMaxStackSize() - toItem.getAmount();
-                    if (fromItem.getAmount() > space) {
-                        fromItem.setAmount(fromItem.getAmount() - space);
-                        toItem.setAmount(chestData.getMaxStackSize());
-                        count += space;
+                    // toSlot is occupied, find out how much can move
+                    int moving = chestData.getMaxStackSize() - toItem.getAmount();
+
+                    // Don't take more than required
+                    if (count + moving > amount) {
+                        moving = amount - count;
+                    }
+
+                    if (fromItem.getAmount() > moving) {
+                        // There are more in fromSlot than are needed/can fit
+                        fromItem.setAmount(fromItem.getAmount() - moving);
+                        toItem.setAmount(toItem.getAmount() + moving);
+                        count += moving;
                         if (itTo.hasNext()) {
                             toSlot = itTo.next();
                         }
                     } else {
+                        // Combine the two stacks into toSlot
                         toItem.setAmount(toItem.getAmount() + fromItem.getAmount());
                         count += fromItem.getAmount();
                         fromInv.clear(fromSlot);
