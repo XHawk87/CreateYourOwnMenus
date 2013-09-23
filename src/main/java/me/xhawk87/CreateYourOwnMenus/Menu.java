@@ -4,10 +4,8 @@
  */
 package me.xhawk87.CreateYourOwnMenus;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.FileUpdater;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.Location;
@@ -52,7 +51,7 @@ public class Menu implements InventoryHolder {
     private Inventory inventory;
     private Set<String> editing = new HashSet<>();
     private File file;
-    private long saveCount = 0;
+    private FileUpdater fileUpdater;
 
     /**
      * Create a new menu with the given id, title and number of rows.
@@ -79,6 +78,7 @@ public class Menu implements InventoryHolder {
         this.id = id.toLowerCase();
         File menusFolder = new File(plugin.getDataFolder(), "menus");
         this.file = new File(menusFolder, id + ".yml");
+        this.fileUpdater = new FileUpdater(file);
     }
 
     /**
@@ -107,28 +107,7 @@ public class Menu implements InventoryHolder {
                 contentsData.set(Integer.toString(i), item);
             }
         }
-        final String toWrite = data.saveToString();
-        saveCount++;
-        final long currentSave = saveCount;
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                // Putting a lock on the file to ensure no other async thread 
-                // can work on it at the same time
-                synchronized (file) {
-                    // If multiple updates are made at the same time, only allow 
-                    // the most recent to be saved
-                    if (saveCount == currentSave) {
-                        // Try-with-resources, automatically cleans up after we're done
-                        try (BufferedWriter out = new BufferedWriter(new FileWriter(file))) {
-                            out.write(toWrite);
-                        } catch (IOException ex) {
-                            plugin.getLogger().log(Level.SEVERE, "Failed to write to " + file.getPath(), ex);
-                        }
-                    }
-                }
-            }
-        }.runTaskAsynchronously(plugin);
+        fileUpdater.save(plugin, data.saveToString());
     }
 
     /**
