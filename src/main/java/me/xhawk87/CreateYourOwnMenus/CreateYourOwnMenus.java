@@ -19,6 +19,7 @@ import me.xhawk87.CreateYourOwnMenus.script.CountChestCommand;
 import me.xhawk87.CreateYourOwnMenus.script.DelayCommand;
 import me.xhawk87.CreateYourOwnMenus.script.GiveChestCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequireCurrencyCommand;
+import me.xhawk87.CreateYourOwnMenus.script.RequireLevelCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequirePermissionCommand;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
 import me.xhawk87.CreateYourOwnMenus.script.TakeChestCommand;
@@ -70,12 +71,13 @@ public class CreateYourOwnMenus extends JavaPlugin {
         // Register script commands
         scriptCommands.put("close", new CloseCommand());
         scriptCommands.put("consume", new ConsumeCommand());
-        scriptCommands.put("delay", new DelayCommand(this));
-        scriptCommands.put("requirecurrency", new RequireCurrencyCommand(this));
-        scriptCommands.put("requirepermission", new RequirePermissionCommand());
-        scriptCommands.put("givechest", new GiveChestCommand());
-        scriptCommands.put("takechest", new TakeChestCommand());
         scriptCommands.put("countchest", new CountChestCommand());
+        scriptCommands.put("delay", new DelayCommand(this));
+        scriptCommands.put("givechest", new GiveChestCommand());
+        scriptCommands.put("requirecurrency", new RequireCurrencyCommand(this));
+        scriptCommands.put("requirelevel", new RequireLevelCommand());
+        scriptCommands.put("requirepermission", new RequirePermissionCommand());
+        scriptCommands.put("takechest", new TakeChestCommand());
     }
 
     private void setupEconomy() {
