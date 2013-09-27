@@ -5,6 +5,7 @@
 package me.xhawk87.CreateYourOwnMenus.script;
 
 import java.util.Iterator;
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -15,27 +16,59 @@ import org.bukkit.inventory.ItemStack;
  * @author XHawk87
  */
 public class RequireLevelCommand implements ScriptCommand {
-
-    public RequireLevelCommand() {
+    
+    private CreateYourOwnMenus plugin;
+    
+    public RequireLevelCommand(CreateYourOwnMenus plugin) {
+        this.plugin = plugin;
     }
-
+    
     @Override
     public boolean execute(Menu menu, Player player, String[] args, String command, ItemStack menuItem, Iterator<String> commands, Player targetPlayer, Block targetBlock) {
-        if (args.length != 1) {
-            player.sendMessage("Error in menu script line (expected experience level): " + command);
+        if (args.length < 1) {
+            player.sendMessage("Error in menu script line (expected /requirelevel ([player]) [level] ([fail message])): " + command);
             return false;
         }
-        String levelString = args[0];
+        int index = 0;
+        Player target;
+        if (args.length > 1) {
+            String playerName = args[index++];
+            target = plugin.getServer().getPlayerExact(playerName);
+            if (target == null) {
+                target = player;
+                index--;
+            }
+        } else {
+            target = player;
+        }
+        
+        int level;
         try {
-            int level = Integer.parseInt(levelString);
+            level = Integer.parseInt(args[index++]);
             if (level < 0) {
                 player.sendMessage("Error in menu script line (expected positive experience level): " + level);
                 return false;
             }
-            return player.getLevel() >= level;
         } catch (NumberFormatException ex) {
             player.sendMessage("Error in menu script line (expected experience level amount): " + command);
             return false;
+        }
+        
+        if (target.getLevel() < level) {
+            StringBuilder sb = new StringBuilder();
+            while (index < args.length) {
+                sb.append(args[index++]);
+                if (index < args.length) {
+                    sb.append(" ");
+                }
+            }
+            String failMessage = sb.toString();
+            if (!failMessage.isEmpty()) {
+                player.sendMessage(failMessage);
+            }
+            return false;
+        } else {
+            return true;
         }
     }
 }

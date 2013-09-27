@@ -75,7 +75,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
         scriptCommands.put("delay", new DelayCommand(this));
         scriptCommands.put("givechest", new GiveChestCommand());
         scriptCommands.put("requirecurrency", new RequireCurrencyCommand(this));
-        scriptCommands.put("requirelevel", new RequireLevelCommand());
+        scriptCommands.put("requirelevel", new RequireLevelCommand(this));
         scriptCommands.put("requirepermission", new RequirePermissionCommand());
         scriptCommands.put("takechest", new TakeChestCommand());
     }
