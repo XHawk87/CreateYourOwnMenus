@@ -105,29 +105,6 @@ public class MenuListener implements Listener {
                         }
                     }
                 }
-            } else {
-                // Menu items can still be activated if right-clicked in inventory
-                if (event.getClick() == ClickType.RIGHT) {
-                    final ItemStack selected = event.getCurrentItem();
-                    if (selected != null) {
-                        // only bother messaging if its an item with lore
-                        if (selected.hasItemMeta()) {
-                            ItemMeta meta = selected.getItemMeta();
-                            if (meta.hasLore()) {
-                                // To prevent glitches, its safer to wait one tick
-                                // before executing any commands that might affect
-                                // the menu
-                                new BukkitRunnable() {
-                                    @Override
-                                    public void run() {
-                                        defaultMenu.select(player, selected, null, null);
-                                    }
-                                }.runTask(plugin);
-                                event.setCancelled(true);
-                            }
-                        }
-                    }
-                }
             }
         }
     }
