@@ -393,7 +393,7 @@ public class Menu implements InventoryHolder {
             return scriptCommand.execute(this, player, Arrays.copyOfRange(args, 1, args.length), command, menuItem, commands, targetPlayer, targetBlock);
         } else {
             // Otherwise, parse it as a normal command. 
-            
+
             if (command.contains("{")) {
                 // Parse for {dynamic arguments}
                 StringBuilder commandString = new StringBuilder();
@@ -404,6 +404,7 @@ public class Menu implements InventoryHolder {
                     char c = command.charAt(i);
                     if (c == '{' && promptString == null) {
                         parts.add(commandString.toString());
+                        commandString = null;
                         promptString = new StringBuilder();
                     } else if (c == '}' && promptString != null) {
                         parts.add(promptString.toString());
@@ -414,6 +415,13 @@ public class Menu implements InventoryHolder {
                     } else {
                         promptString.append(c);
                     }
+                }
+                if (promptString != null) {
+                    player.sendMessage("Error in menu script line (incomplete dynamic argument): " + command);
+                    return false;
+                }
+                if (commandString != null) {
+                    parts.add(commandString.toString());
                 }
                 final StringBuilder parsedCommand = new StringBuilder();
                 player.beginConversation(
