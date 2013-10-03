@@ -92,6 +92,10 @@ public class TakeChestCommand implements ScriptCommand {
                 player.sendMessage(ex.getLocalizedMessage());
                 return false;
             }
+            if (!chestData.hasType()) {
+                player.sendMessage("This item is no longer being stocked");
+                return false;
+            }
             if (chestData.getCount() <= amount) {
                 player.sendMessage("There are not enough " + chestData.toString() + " in stock");
                 return false;
