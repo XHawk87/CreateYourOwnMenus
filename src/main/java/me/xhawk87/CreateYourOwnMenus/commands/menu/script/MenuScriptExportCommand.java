@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.logging.Level;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -60,11 +61,14 @@ public class MenuScriptExportCommand implements IMenuCommand {
                 player.sendMessage("This item has no lore to export");
                 return true;
             }
-            final List<String> lore = meta.getLore();
+            
+            List<String> lore = meta.getLore();
             if (lore.isEmpty()) {
                 player.sendMessage("This item has no lore to export");
                 return true;
             }
+            final List<String> lines = MenuScriptUtils.unpackHiddenLines(lore.get(0));
+            lines.addAll(lore.subList(1, lore.size()));
 
             if (args.length < 1) {
                 return false;
@@ -88,7 +92,7 @@ public class MenuScriptExportCommand implements IMenuCommand {
                         scriptsFolder.mkdirs();
                     }
                     try (BufferedWriter out = new BufferedWriter(new FileWriter(scriptFile))) {
-                        for (String line : lore) {
+                        for (String line : lines) {
                             out.write(line.replace(ChatColor.COLOR_CHAR, '&'));
                             out.newLine();
                         }
