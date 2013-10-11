@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -20,21 +21,21 @@ import org.bukkit.plugin.Plugin;
  * @author XHawk87
  */
 public class TextFileLoader implements Runnable {
-    
+
     private Plugin plugin;
     private File file;
     private TextCallback callback;
-    
+
     public TextFileLoader(Plugin plugin, File file, TextCallback callback) {
         this.plugin = plugin;
         this.file = file;
         this.callback = callback;
     }
-    
+
     public void load() {
         plugin.getServer().getScheduler().runTaskAsynchronously(plugin, this);
     }
-    
+
     @Override
     public void run() {
         if (!file.exists()) {
@@ -46,11 +47,11 @@ public class TextFileLoader implements Runnable {
             });
         }
         final List<String> lines = new ArrayList<>();
-        
+
         try {
             byte[] encoded = Files.readAllBytes(file.toPath());
             String contents = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
-            lines.addAll(Arrays.asList(contents.split("\n")));
+            lines.addAll(Arrays.asList(contents.replace('&', ChatColor.COLOR_CHAR).replace("\r\n", "\n").split("\n")));
         } catch (final IOException ex) {
             plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
                 @Override
