@@ -4,13 +4,13 @@
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import org.bukkit.ChatColor;
 import org.bukkit.plugin.Plugin;
 
@@ -45,9 +45,9 @@ public class TextFileLoader implements Runnable {
             });
         }
         final List<String> lines = new ArrayList<>();
-        try (BufferedReader in = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = in.readLine()) != null) {
+        try (Scanner in = new Scanner(new FileReader(file))) {
+            while (in.hasNext("\n")) {
+                String line = in.next("\n");
                 lines.add(line.replace('&', ChatColor.COLOR_CHAR));
             }
 
