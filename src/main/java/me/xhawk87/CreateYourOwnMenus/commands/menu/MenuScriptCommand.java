@@ -12,7 +12,9 @@ import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptAppendCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptClearCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptDeleteCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptExportCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptHideCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptImportCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptInsertCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptReplaceCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptShowCommand;
@@ -43,6 +45,8 @@ public class MenuScriptCommand implements IMenuCommand {
         subCommands.put("insert", new MenuScriptInsertCommand());
         subCommands.put("replace", new MenuScriptReplaceCommand());
         subCommands.put("delete", new MenuScriptDeleteCommand());
+        subCommands.put("import", new MenuScriptImportCommand(plugin));
+        subCommands.put("export", new MenuScriptExportCommand(plugin));
 
         // Aliases
         aliases.put("add", subCommands.get("append"));
