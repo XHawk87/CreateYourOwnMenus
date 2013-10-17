@@ -18,6 +18,7 @@ import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptImportComman
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptInsertCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptReplaceCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptShowCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptTitleCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
@@ -38,15 +39,16 @@ public class MenuScriptCommand implements IMenuCommand {
     private Map<String, IMenuCommand> aliases = new HashMap<>();
 
     public MenuScriptCommand(CreateYourOwnMenus plugin) {
-        subCommands.put("clear", new MenuScriptClearCommand());
-        subCommands.put("show", new MenuScriptShowCommand());
-        subCommands.put("hide", new MenuScriptHideCommand());
         subCommands.put("append", new MenuScriptAppendCommand());
+        subCommands.put("clear", new MenuScriptClearCommand());
+        subCommands.put("delete", new MenuScriptDeleteCommand());
+        subCommands.put("export", new MenuScriptExportCommand(plugin));
+        subCommands.put("hide", new MenuScriptHideCommand());
+        subCommands.put("import", new MenuScriptImportCommand(plugin));
         subCommands.put("insert", new MenuScriptInsertCommand());
         subCommands.put("replace", new MenuScriptReplaceCommand());
-        subCommands.put("delete", new MenuScriptDeleteCommand());
-        subCommands.put("import", new MenuScriptImportCommand(plugin));
-        subCommands.put("export", new MenuScriptExportCommand(plugin));
+        subCommands.put("show", new MenuScriptShowCommand());
+        subCommands.put("title", new MenuScriptTitleCommand());
 
         // Aliases
         aliases.put("add", subCommands.get("append"));
