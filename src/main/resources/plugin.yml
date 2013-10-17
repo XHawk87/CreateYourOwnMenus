@@ -59,3 +59,68 @@ permissions:
   cyom.commands.sudo:
     description: Allows use of the sudo command
     default: op
+  cyom.slot.lock.all:
+    description: Treats the entire player inventory as a locked menu
+    default: false
+    children:
+      cyom.slot.lock.storage: true
+      cyom.slot.lock.hotbar: true
+  cyom.slot.lock.storage:
+    description: Treats the top 3 rows of the player's inventory as a locked menu
+    default: false
+    children:
+      cyom.slot.lock.toprow: true
+      cyom.slot.lock.middlerow: true
+      cyom.slot.lock.bottomrow: true
+  cyom.slot.lock.toprow:
+    description: Treats the top row of the player's inventory as a locked menu
+    default: false
+    children:
+      cyom.slot.lock.9: true
+      cyom.slot.lock.10: true
+      cyom.slot.lock.11: true
+      cyom.slot.lock.12: true
+      cyom.slot.lock.13: true
+      cyom.slot.lock.14: true
+      cyom.slot.lock.15: true
+      cyom.slot.lock.16: true
+      cyom.slot.lock.17: true
+  cyom.slot.lock.middlerow:
+    description: Treats the middle row of the player's inventory as a locked menu
+    default: false
+    children:
+      cyom.slot.lock.18: true
+      cyom.slot.lock.19: true
+      cyom.slot.lock.20: true
+      cyom.slot.lock.21: true
+      cyom.slot.lock.22: true
+      cyom.slot.lock.23: true
+      cyom.slot.lock.24: true
+      cyom.slot.lock.25: true
+      cyom.slot.lock.26: true
+  cyom.slot.lock.bottomrow:
+    description: Treats the bottom row of the player's inventory as a locked menu
+    default: false
+    children:
+      cyom.slot.lock.27: true
+      cyom.slot.lock.28: true
+      cyom.slot.lock.29: true
+      cyom.slot.lock.30: true
+      cyom.slot.lock.31: true
+      cyom.slot.lock.32: true
+      cyom.slot.lock.33: true
+      cyom.slot.lock.34: true
+      cyom.slot.lock.35: true
+  cyom.slot.lock.hotbar:
+    description: Treats the player's hotbar as a locked menu
+    default: false
+    children:
+      cyom.slot.lock.0: true
+      cyom.slot.lock.1: true
+      cyom.slot.lock.2: true
+      cyom.slot.lock.3: true
+      cyom.slot.lock.4: true
+      cyom.slot.lock.5: true
+      cyom.slot.lock.6: true
+      cyom.slot.lock.7: true
+      cyom.slot.lock.8: true

@@ -24,7 +24,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -64,6 +63,37 @@ public class MenuListener implements Listener {
         if (event.getWhoClicked() instanceof Player) {
             final Player player = (Player) event.getWhoClicked();
 
+            // First check if the clicked slot is a locked inventory slot
+            int rawSlot = event.getRawSlot();
+            int numInTop = event.getView().getTopInventory().getSize();
+            if (rawSlot >= numInTop) {
+                // The clicked slot is the player's inventory
+                int slot = event.getSlot();
+                if (player.hasPermission("cyom.slot.lock." + slot)) {
+
+                    // Prevent any modification to the locked slot
+                    event.setCancelled(true);
+
+                    // Activate it if its a left click
+                    if (event.getClick() == ClickType.LEFT) {
+                        final ItemStack selected = event.getCurrentItem();
+                        if (selected != null) {
+
+                            // To prevent glitches, its safer to wait one tick
+                            // before executing any commands that might affect
+                            // the player's inventory
+                            new BukkitRunnable() {
+                                @Override
+                                public void run() {
+                                    defaultMenu.select(player, selected);
+                                }
+                            }.runTask(plugin);
+                        }
+                    }
+                    return;
+                }
+            }
+
             // Since we set Menu as the holder for any menu inventory, we can 
             // easily check if any inventory relates to a menu and get the 
             // related menu
@@ -99,13 +129,50 @@ public class MenuListener implements Listener {
                             new BukkitRunnable() {
                                 @Override
                                 public void run() {
-                                    menu.select(player, selected, null, null);
+                                    menu.select(player, selected);
                                 }
                             }.runTask(plugin);
                         }
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Fired when the new drag click is used on a menu
+     *
+     * @param event The drag click event
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onDragMenu(InventoryDragEvent event) {
+        if (event.getWhoClicked() instanceof Player) {
+            Player player = (Player) event.getWhoClicked();
+            Inventory top = event.getView().getTopInventory();
+            int numInTop = top.getSize();
+            
+            for (int rawSlot : event.getRawSlots()) {
+                if (rawSlot >= numInTop) {
+                    int slot = event.getView().convertSlot(rawSlot);
+                    if (player.hasPermission("cyom.slot.lock." + slot)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+            
+            
+            if (top.getHolder() instanceof Menu) {
+                Menu menu = (Menu) top.getHolder();
+
+                // Just to be on the safe side, let's make sure any drags are
+                // also cancelled, so non-editing players cannot make changes
+                // to the menus
+                if (!menu.isEditing(player)) {
+                    event.setCancelled(true);
+                }
+            }
+
         }
     }
 
@@ -132,7 +199,7 @@ public class MenuListener implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
-                            defaultMenu.select(player, item, null, clicked);
+                            defaultMenu.select(player, item, clicked);
                         }
                     }.runTask(plugin);
                     event.setCancelled(true);
@@ -141,6 +208,11 @@ public class MenuListener implements Listener {
         }
     }
 
+    /**
+     * Fired when a player right-clicks on an entity or player
+     *
+     * @param event The interact event
+     */
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onRightClickPlayerWithMenuItem(PlayerInteractEntityEvent event) {
         if (event.getRightClicked() instanceof Player) {
@@ -152,33 +224,10 @@ public class MenuListener implements Listener {
                 new BukkitRunnable() {
                     @Override
                     public void run() {
-                        defaultMenu.select(player, item, target, null);
+                        defaultMenu.select(player, item, target);
                     }
                 }.runTask(plugin);
                 event.setCancelled(true);
-            }
-        }
-    }
-
-    /**
-     * Fired when the new drag click is used on a menu
-     *
-     * @param event The drag click event
-     */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-    public void onDragMenu(InventoryDragEvent event) {
-        if (event.getWhoClicked() instanceof Player) {
-            Player player = (Player) event.getWhoClicked();
-            Inventory top = event.getView().getTopInventory();
-            if (top.getHolder() instanceof Menu) {
-                Menu menu = (Menu) top.getHolder();
-
-                // Just to be on the safe side, let's make sure any drags are
-                // also cancelled, so non-editing players cannot make changes
-                // to the menus
-                if (!menu.isEditing(player)) {
-                    event.setCancelled(true);
-                }
             }
         }
     }

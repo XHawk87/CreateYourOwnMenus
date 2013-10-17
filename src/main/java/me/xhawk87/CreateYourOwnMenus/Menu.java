@@ -237,12 +237,44 @@ public class Menu implements InventoryHolder {
      *
      * @param player The player selecting the item
      * @param menuItem The item being selected
+     */
+    public void select(Player player, ItemStack menuItem) {
+        select(player, menuItem, null, null);
+    }
+
+    /**
+     * A player selects a menu item for this menu
+     *
+     * @param player The player selecting the item
+     * @param menuItem The item being selected
+     * @param targetPlayer The player being right-clicked with this menu item
+     */
+    public void select(Player player, ItemStack menuItem, Player targetPlayer) {
+        select(player, menuItem, targetPlayer, null);
+    }
+
+    /**
+     * A player selects a menu item for this menu
+     *
+     * @param player The player selecting the item
+     * @param menuItem The item being selected
+     * @param targetBlock The block being right-clicked with this menu item
+     */
+    public void select(Player player, ItemStack menuItem, Block targetBlock) {
+        select(player, menuItem, null, targetBlock);
+    }
+
+    /**
+     * A player selects a menu item for this menu
+     *
+     * @param player The player selecting the item
+     * @param menuItem The item being selected
      * @param targetPlayer The player being right-clicked with this menu item,
      * if any
      * @param targetBlock The block being right-clicked with this menu item, if
      * any
      */
-    public void select(Player player, ItemStack menuItem, Player targetPlayer, Block targetBlock) {
+    private void select(Player player, ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         if (menuItem.hasItemMeta()) {
             ItemMeta meta = menuItem.getItemMeta();
 

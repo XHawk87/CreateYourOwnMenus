@@ -78,6 +78,12 @@ public class CreateYourOwnMenus extends JavaPlugin {
         scriptCommands.put("requirelevel", new RequireLevelCommand(this));
         scriptCommands.put("requirepermission", new RequirePermissionCommand());
         scriptCommands.put("takechest", new TakeChestCommand());
+
+        // Register permissions
+        PluginManager mgr = getServer().getPluginManager();
+        for (int i = 0; i < 40; i++) {
+            mgr.addPermission(new Permission("cyom.slot.lock." + i, "Treats the " + i + " slot of the player's inventory as locked menu", PermissionDefault.FALSE));
+        }
     }
 
     private void setupEconomy() {
