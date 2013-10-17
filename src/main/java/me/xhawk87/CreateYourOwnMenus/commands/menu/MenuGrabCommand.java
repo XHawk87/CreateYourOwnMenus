@@ -74,7 +74,7 @@ public class MenuGrabCommand implements IMenuCommand {
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
             if (item != null && item.getTypeId() != 0) {
-                if (i < inv.getSize()) {
+                if (i < 40) { // Player inventory and armour size
                     ItemStack replaced = inv.getItem(i);
                     if (replaced != null && replaced.getTypeId() != 0) {
                         toAdd.add(replaced);

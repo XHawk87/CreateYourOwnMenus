@@ -161,7 +161,6 @@ public class MenuListener implements Listener {
                 }
             }
             
-            
             if (top.getHolder() instanceof Menu) {
                 Menu menu = (Menu) top.getHolder();
 
