@@ -32,7 +32,7 @@ public class MenuGrabCommand implements IMenuCommand {
 
     @Override
     public String getUsage() {
-        return "/menu grab ([player]) [menu id]. Gives copies of all items in the given menu to the specified player (or the sender if no player is given)";
+        return "/menu grab ([player]) [menu id]. Gives copies of all items in the given menu to the specified player (or the sender if no player is given). This will attempt to place items in the same location in the player's inventory as in the menu, starting with the top row as the hotbar.";
     }
 
     @Override
@@ -69,13 +69,23 @@ public class MenuGrabCommand implements IMenuCommand {
             return true;
         }
         PlayerInventory inv = target.getInventory();
-        List<ItemStack> items = new ArrayList<>();
-        for (ItemStack item : menu.getInventory().getContents()) {
+        List<ItemStack> toAdd = new ArrayList<>();
+        ItemStack[] contents = menu.getInventory().getContents();
+        for (int i = 0; i < contents.length; i++) {
+            ItemStack item = contents[i].clone();
             if (item != null && item.getTypeId() != 0) {
-                items.add(item.clone());
+                if (i < inv.getSize()) {
+                    ItemStack replaced = inv.getItem(i);
+                    if (replaced != null && replaced.getTypeId() != 0) {
+                        toAdd.add(replaced);
+                    }
+                    inv.setItem(i, item);
+                } else {
+                    toAdd.add(item);
+                }
             }
         }
-        HashMap<Integer, ItemStack> toDrop = inv.addItem(items.toArray(new ItemStack[items.size()]));
+        HashMap<Integer, ItemStack> toDrop = inv.addItem(toAdd.toArray(new ItemStack[toAdd.size()]));
         World world = target.getWorld();
         Location location = target.getLocation();
         for (ItemStack drop : toDrop.values()) {
