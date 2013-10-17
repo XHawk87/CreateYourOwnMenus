@@ -72,16 +72,16 @@ public class MenuGrabCommand implements IMenuCommand {
         List<ItemStack> toAdd = new ArrayList<>();
         ItemStack[] contents = menu.getInventory().getContents();
         for (int i = 0; i < contents.length; i++) {
-            ItemStack item = contents[i].clone();
+            ItemStack item = contents[i];
             if (item != null && item.getTypeId() != 0) {
                 if (i < inv.getSize()) {
                     ItemStack replaced = inv.getItem(i);
                     if (replaced != null && replaced.getTypeId() != 0) {
                         toAdd.add(replaced);
                     }
-                    inv.setItem(i, item);
+                    inv.setItem(i, item.clone());
                 } else {
-                    toAdd.add(item);
+                    toAdd.add(item.clone());
                 }
             }
         }
