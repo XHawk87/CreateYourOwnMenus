@@ -5,12 +5,15 @@
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,6 +27,21 @@ import org.bukkit.inventory.PlayerInventory;
  */
 public class MenuGrabCommand implements IMenuCommand {
 
+    private static final Set<Material> boots = EnumSet.of(
+            Material.LEATHER_BOOTS, Material.CHAINMAIL_BOOTS,
+            Material.IRON_BOOTS, Material.GOLD_BOOTS, Material.DIAMOND_BOOTS);
+    private static final Set<Material> leggings = EnumSet.of(
+            Material.LEATHER_LEGGINGS, Material.CHAINMAIL_LEGGINGS,
+            Material.IRON_LEGGINGS, Material.GOLD_LEGGINGS,
+            Material.DIAMOND_LEGGINGS);
+    private static final Set<Material> chestplates = EnumSet.of(
+            Material.LEATHER_CHESTPLATE, Material.CHAINMAIL_CHESTPLATE,
+            Material.IRON_CHESTPLATE, Material.GOLD_CHESTPLATE,
+            Material.DIAMOND_CHESTPLATE);
+    private static final Set<Material> helmets = EnumSet.of(
+            Material.LEATHER_HELMET, Material.CHAINMAIL_HELMET,
+            Material.IRON_HELMET, Material.GOLD_HELMET,
+            Material.DIAMOND_HELMET, Material.PUMPKIN, Material.SKULL_ITEM);
     private CreateYourOwnMenus plugin;
 
     public MenuGrabCommand(CreateYourOwnMenus plugin) {
@@ -74,7 +92,11 @@ public class MenuGrabCommand implements IMenuCommand {
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
             if (item != null && item.getTypeId() != 0) {
-                if (i < 40) { // Player inventory and armour size
+                if (i < inv.getSize()
+                        || (i == 36 && isBoots(item))
+                        || (i == 37 && isLeggings(item))
+                        || (i == 38 && isChestplate(item))
+                        || (i == 39 && isHelmet(item))) {
                     ItemStack replaced = inv.getItem(i);
                     if (replaced != null && replaced.getTypeId() != 0) {
                         toAdd.add(replaced);
@@ -93,5 +115,21 @@ public class MenuGrabCommand implements IMenuCommand {
         }
         sender.sendMessage(menu.getTitle() + " was grabbed for " + target.getDisplayName());
         return true;
+    }
+
+    private boolean isBoots(ItemStack item) {
+        return boots.contains(item.getType());
+    }
+
+    private boolean isLeggings(ItemStack item) {
+        return leggings.contains(item.getType());
+    }
+
+    private boolean isChestplate(ItemStack item) {
+        return chestplates.contains(item.getType());
+    }
+
+    private boolean isHelmet(ItemStack item) {
+        return helmets.contains(item.getType());
     }
 }
