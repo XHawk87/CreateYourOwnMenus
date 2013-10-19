@@ -10,6 +10,7 @@ import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -22,10 +23,12 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -196,6 +199,66 @@ public class MenuListener implements Listener {
                 event.setCancelled(true);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPickUpItemIntoLockedSlot(PlayerPickupItemEvent event) {
+        Player player = event.getPlayer();
+        PlayerInventory inv = player.getInventory();
+        ItemStack pickup = event.getItem().getItemStack();
+        int toAdd = pickup.getAmount() - event.getRemaining();
+        for (int i = 0; i < inv.getSize(); i++) {
+            ItemStack slot = inv.getItem(i);
+            if (slot == null || slot.getType() == Material.AIR) {
+                if (player.hasPermission("cyom.slot.lock." + i)) {
+                    event.setCancelled(true);
+                    overrideItemPickup(player, event.getItem());
+                }
+                break;
+            } else if (slot.isSimilar(pickup) && slot.getAmount() < slot.getMaxStackSize()) {
+                toAdd -= slot.getMaxStackSize() - slot.getAmount();
+                if (toAdd <= 0) {
+                    break;
+                }
+            }
+        }
+    }
+
+    private void overrideItemPickup(final Player player, final Item item) {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                PlayerInventory inv = player.getInventory();
+                ItemStack pickup = item.getItemStack();
+                for (int i = 0; i < inv.getSize(); i++) {
+                    if (player.hasPermission("cyom.slot.lock." + i)) {
+                        continue;
+                    }
+                    ItemStack slot = inv.getItem(i);
+                    if (slot == null || slot.getType() == Material.AIR) {
+                        inv.setItem(i, pickup);
+                        item.remove();
+                        break;
+                    } else if (slot.isSimilar(pickup)) {
+                        int maxStackSize = slot.getMaxStackSize();
+                        if (maxStackSize == -1) {
+                            maxStackSize = 64;
+                        }
+                        int amount = maxStackSize - slot.getAmount();
+                        if (amount > 0) {
+                            if (pickup.getAmount() > amount) {
+                                item.remove();
+                                slot.setAmount(slot.getAmount() + amount);
+                                break;
+                            } else {
+                                pickup.setAmount(pickup.getAmount() - amount);
+                                slot.setAmount(maxStackSize);
+                            }
+                        }
+                    }
+                }
+            }
+        }.runTask(plugin);
     }
 
     /**
