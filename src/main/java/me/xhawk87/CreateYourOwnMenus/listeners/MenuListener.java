@@ -18,12 +18,14 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -150,7 +152,7 @@ public class MenuListener implements Listener {
             Player player = (Player) event.getWhoClicked();
             Inventory top = event.getView().getTopInventory();
             int numInTop = top.getSize();
-            
+
             for (int rawSlot : event.getRawSlots()) {
                 if (rawSlot >= numInTop) {
                     int slot = event.getView().convertSlot(rawSlot);
@@ -160,7 +162,7 @@ public class MenuListener implements Listener {
                     }
                 }
             }
-            
+
             if (top.getHolder() instanceof Menu) {
                 Menu menu = (Menu) top.getHolder();
 
@@ -172,6 +174,26 @@ public class MenuListener implements Listener {
                 }
             }
 
+        }
+    }
+
+    /**
+     * Fired when a player drops an item using the drop item key, or by throwing
+     * items out of their inventory.
+     *
+     * We only want to cancel it if they are using the drop item key, as they
+     * are already prevented from picking up locked items to throw out
+     *
+     * @param event The drop item event
+     */
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    public void onDropFromLockedSlot(PlayerDropItemEvent event) {
+        Player player = event.getPlayer();
+        if (player.getItemOnCursor() == null) {
+            int slot = player.getInventory().getHeldItemSlot();
+            if (player.hasPermission("cyom.slot.lock." + slot)) {
+                event.setCancelled(true);
+            }
         }
     }
 
