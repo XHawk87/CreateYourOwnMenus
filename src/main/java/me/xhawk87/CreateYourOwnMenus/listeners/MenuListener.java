@@ -249,15 +249,16 @@ public class MenuListener implements Listener {
                         if (maxStackSize == -1) {
                             maxStackSize = 64;
                         }
-                        int amount = maxStackSize - slot.getAmount();
-                        if (amount > 0) {
+                        int spaceInSlot = maxStackSize - slot.getAmount();
+                        if (spaceInSlot > 0) {
                             dosound = true;
-                            if (pickup.getAmount() > amount) {
-                                pickup.setAmount(pickup.getAmount() - amount);
+                            if (pickup.getAmount() > spaceInSlot) {
+                                pickup.setAmount(pickup.getAmount() - spaceInSlot);
                                 slot.setAmount(maxStackSize);
+                                continue;
                             } else {
                                 item.remove();
-                                slot.setAmount(slot.getAmount() + amount);
+                                slot.setAmount(slot.getAmount() + pickup.getAmount());
                                 break;
                             }
                         }
