@@ -4,6 +4,7 @@
  */
 package me.xhawk87.CreateYourOwnMenus.listeners;
 
+import java.util.Random;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
@@ -39,6 +40,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class MenuListener implements Listener {
 
+    private static final Random random = new Random();
     private CreateYourOwnMenus plugin;
     /**
      * A dummy menu to be used for in-inventory and in-hand menu item clicks
@@ -231,6 +233,7 @@ public class MenuListener implements Listener {
             public void run() {
                 PlayerInventory inv = player.getInventory();
                 ItemStack pickup = item.getItemStack();
+                boolean dosound = false;
                 for (int i = 0; i < inv.getSize(); i++) {
                     if (player.hasPermission("cyom.slot.lock." + i)) {
                         continue;
@@ -239,7 +242,7 @@ public class MenuListener implements Listener {
                     if (slot == null || slot.getType() == Material.AIR) {
                         inv.setItem(i, pickup);
                         item.remove();
-                        player.playSound(item.getLocation(), Sound.ITEM_PICKUP, 1.0f, 1.0f);
+                        dosound = true;
                         break;
                     } else if (slot.isSimilar(pickup)) {
                         int maxStackSize = slot.getMaxStackSize();
@@ -248,9 +251,9 @@ public class MenuListener implements Listener {
                         }
                         int amount = maxStackSize - slot.getAmount();
                         if (amount > 0) {
+                            dosound = true;
                             if (pickup.getAmount() > amount) {
                                 item.remove();
-                                player.playSound(item.getLocation(), Sound.ITEM_PICKUP, 1.0f, 1.0f);
                                 slot.setAmount(slot.getAmount() + amount);
                                 break;
                             } else {
@@ -259,6 +262,9 @@ public class MenuListener implements Listener {
                             }
                         }
                     }
+                }
+                if (dosound) {
+                    player.playSound(item.getLocation(), Sound.ITEM_PICKUP, 0.2f, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 }
             }
         }.runTask(plugin);
