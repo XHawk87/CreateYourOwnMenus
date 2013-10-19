@@ -8,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
@@ -67,7 +68,9 @@ public class MenuScriptExportCommand implements IMenuCommand {
                 player.sendMessage("This item has no lore to export");
                 return true;
             }
-            final List<String> lines = MenuScriptUtils.unpackHiddenLines(lore.get(0));
+            final List<String> lines = new ArrayList<>();
+            lines.add(meta.hasDisplayName() ? meta.getDisplayName() : "");
+            lines.addAll(MenuScriptUtils.unpackHiddenLines(lore.get(0)));
             lines.addAll(lore.subList(1, lore.size()));
 
             if (args.length < 1) {

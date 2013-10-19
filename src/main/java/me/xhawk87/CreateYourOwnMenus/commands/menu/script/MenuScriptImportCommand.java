@@ -77,7 +77,8 @@ public class MenuScriptImportCommand implements IMenuCommand {
                         return;
                     }
                     ItemMeta meta = held.getItemMeta();
-                    meta.setLore(lines);
+                    meta.setDisplayName(lines.get(0));
+                    meta.setLore(lines.subList(1, lines.size()));
                     held.setItemMeta(meta);
                     player.sendMessage("Import successful");
                 }
