@@ -240,7 +240,7 @@ public class MenuListener implements Listener {
                     }
                     ItemStack slot = inv.getItem(i);
                     if (slot == null || slot.getType() == Material.AIR) {
-                        inv.setItem(i, pickup);
+                        inv.setItem(i, pickup.clone());
                         item.remove();
                         dosound = true;
                         break;
@@ -253,12 +253,12 @@ public class MenuListener implements Listener {
                         if (amount > 0) {
                             dosound = true;
                             if (pickup.getAmount() > amount) {
+                                pickup.setAmount(pickup.getAmount() - amount);
+                                slot.setAmount(maxStackSize);
+                            } else {
                                 item.remove();
                                 slot.setAmount(slot.getAmount() + amount);
                                 break;
-                            } else {
-                                pickup.setAmount(pickup.getAmount() - amount);
-                                slot.setAmount(maxStackSize);
                             }
                         }
                     }
