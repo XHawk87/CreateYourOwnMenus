@@ -189,7 +189,7 @@ public class MenuListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDropFromLockedSlot(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (player.getItemOnCursor() == null) {
+        if (player.getItemOnCursor() == null) { // Returns the item if dropped from inventory
             int slot = player.getInventory().getHeldItemSlot();
             if (player.hasPermission("cyom.slot.lock." + slot)) {
                 event.setCancelled(true);
