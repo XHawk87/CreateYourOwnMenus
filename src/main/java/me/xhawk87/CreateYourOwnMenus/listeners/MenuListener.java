@@ -9,6 +9,7 @@ import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -238,6 +239,7 @@ public class MenuListener implements Listener {
                     if (slot == null || slot.getType() == Material.AIR) {
                         inv.setItem(i, pickup);
                         item.remove();
+                        player.playSound(item.getLocation(), Sound.ITEM_PICKUP, 1.0f, 1.0f);
                         break;
                     } else if (slot.isSimilar(pickup)) {
                         int maxStackSize = slot.getMaxStackSize();
@@ -248,6 +250,7 @@ public class MenuListener implements Listener {
                         if (amount > 0) {
                             if (pickup.getAmount() > amount) {
                                 item.remove();
+                                player.playSound(item.getLocation(), Sound.ITEM_PICKUP, 1.0f, 1.0f);
                                 slot.setAmount(slot.getAmount() + amount);
                                 break;
                             } else {
