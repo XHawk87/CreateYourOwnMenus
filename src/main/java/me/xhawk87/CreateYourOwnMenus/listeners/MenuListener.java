@@ -8,6 +8,7 @@ import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,7 +26,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
@@ -189,7 +189,8 @@ public class MenuListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDropFromLockedSlot(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (player.getItemOnCursor() == null) { // Returns the item if dropped from inventory
+        if (player.getItemOnCursor() == null
+                || player.getItemOnCursor().getType() == Material.AIR) {
             int slot = player.getInventory().getHeldItemSlot();
             if (player.hasPermission("cyom.slot.lock." + slot)) {
                 event.setCancelled(true);
