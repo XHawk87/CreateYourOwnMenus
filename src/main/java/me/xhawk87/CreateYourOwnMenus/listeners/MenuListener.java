@@ -204,16 +204,16 @@ public class MenuListener implements Listener {
                 ItemStack item = event.getItemDrop().getItemStack();
                 ItemStack slotItem = inv.getItem(slot);
                 if (slotItem == null || slotItem.getTypeId() == 0) {
-                    inv.setItem(slot, item);
+                    inv.setItem(slot, item.clone());
                 } else {
                     slotItem.setAmount(slotItem.getAmount() + item.getAmount());
                 }
                 
-                // Make it impossible to return to a random slot
-                item.setAmount(0);
-                
                 // Stop it from being dropped
-                event.setCancelled(true);
+                event.getItemDrop().remove();
+                
+                // Make sure player sees everything as normal
+                player.updateInventory();
             }
         }
     }
