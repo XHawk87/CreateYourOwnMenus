@@ -114,6 +114,9 @@ public class MenuGrabCommand implements IMenuCommand {
             world.dropItem(location, drop);
         }
         sender.sendMessage(menu.getTitle() + " was grabbed for " + target.getDisplayName());
+        
+        // Force inventory to update
+        target.updateInventory();
         return true;
     }
 
