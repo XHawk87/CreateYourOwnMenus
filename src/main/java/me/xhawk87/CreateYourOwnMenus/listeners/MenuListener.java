@@ -197,8 +197,22 @@ public class MenuListener implements Listener {
         Player player = event.getPlayer();
         if (player.getItemOnCursor() == null
                 || player.getItemOnCursor().getType() == Material.AIR) {
-            int slot = player.getInventory().getHeldItemSlot();
+            PlayerInventory inv = player.getInventory();
+            int slot = inv.getHeldItemSlot();
             if (player.hasPermission("cyom.slot.lock." + slot)) {
+                // Replace the item back where it was
+                ItemStack item = event.getItemDrop().getItemStack();
+                ItemStack slotItem = inv.getItem(slot);
+                if (slotItem == null || slotItem.getTypeId() == 0) {
+                    inv.setItem(slot, item);
+                } else {
+                    slotItem.setAmount(slotItem.getAmount() + item.getAmount());
+                }
+                
+                // Make it impossible to return to a random slot
+                item.setAmount(0);
+                
+                // Stop it from being dropped
                 event.setCancelled(true);
             }
         }
