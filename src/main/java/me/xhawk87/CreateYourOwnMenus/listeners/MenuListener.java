@@ -25,6 +25,7 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
@@ -378,6 +379,14 @@ public class MenuListener implements Listener {
                 // while they are editing a menu
                 menu.doneEditing(player);
             }
+        }
+    }
+    
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onPlayerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (player.hasPermission("i.have.every.permission")) {
+            player.sendMessage("CreateYourOwnMenus has detected that you may have been granted every permission node. This is generally a bad idea because it means that you will also be granted permissions that you don't necessarily want, such as the 'cyom.slot.lock.*' permissions, which lock your inventory slots causing them to act like menus. If you wish to remove this warning, please remove the 'i.have.every.permission' node from yourself, or stop using the '*' node. It really isn't needed, Ops automatically get all permissions that default to Op anyway.");
         }
     }
 }

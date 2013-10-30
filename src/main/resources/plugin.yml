@@ -124,3 +124,6 @@ permissions:
       cyom.slot.lock.6: true
       cyom.slot.lock.7: true
       cyom.slot.lock.8: true
+  i.have.every.permission:
+    description: Displays a warning about slot locking to all server owners who recklessly grant players the '*' permission node
+    default: false
