@@ -28,13 +28,29 @@ public class MenuEditCommand implements IMenuCommand {
         // Entering a sub-command without parameters is assumed to be a request 
         // for information. So display some detailed help.
         if (args.length == 0) {
-            sender.sendMessage("/menu edit [id] - Opens the menu with the given id for editing. This allows you to move menu items in and out of a menu");
+            sender.sendMessage("/menu edit ([player]) [id] - Opens the menu with the given id for editing. This allows you to move menu items in and out of a menu. If a player is given, it will open the menu for the given player for editing, whether or not they have permission");
             return true;
         }
-        
+
         // Expecting exactly one parameter, the id
-        if (args.length != 1) {
+        if (args.length < 1 || args.length > 2) {
             return false;
+        }
+
+        Player target;
+        if (args.length == 2) {
+            target = plugin.getServer().getPlayer(args[1]);
+            if (target == null) {
+                sender.sendMessage("There is no player named " + args[1] + " on the server");
+                return true;
+            }
+        } else {
+            if (sender instanceof Player) {
+                target = (Player) sender;
+            } else {
+                sender.sendMessage("The console must provide a player name");
+                return false;
+            }
         }
 
         // Check the id is valid
@@ -44,20 +60,14 @@ public class MenuEditCommand implements IMenuCommand {
             sender.sendMessage("There is no menu with id " + id);
             return true;
         }
-        
-        // Only players can open inventories
-        if (sender instanceof Player) {
-            Player player = (Player) sender;
-            menu.edit(player);
-        } else {
-            sender.sendMessage("You must be a player to edit a menu in-game");
-        }
+
+        menu.edit(target);
         return true;
     }
 
     @Override
     public String getUsage() {
-        return "/menu edit [id] - Open an existing menu by its id for editing";
+        return "/menu edit ([player]) [id] - Open an existing menu by its id for editing";
     }
 
     @Override
