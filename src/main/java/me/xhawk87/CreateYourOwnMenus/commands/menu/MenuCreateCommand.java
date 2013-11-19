@@ -5,6 +5,7 @@
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
+import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -65,7 +66,8 @@ public class MenuCreateCommand implements IMenuCommand {
         }
 
         // Create the menu
-        plugin.createMenu(id, title, rows);
+        Menu menu = plugin.createMenu(id, title, rows);
+        menu.save();
         sender.sendMessage(title + " menu has been created");
         return true;
     }

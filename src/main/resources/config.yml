@@ -6,3 +6,5 @@
 ## blacklist-commands - If you specify a list of blacklisted commands, then none
 ## of these commands can be used in menu scripts.
 ---
+blacklist-commands:
+  - op
