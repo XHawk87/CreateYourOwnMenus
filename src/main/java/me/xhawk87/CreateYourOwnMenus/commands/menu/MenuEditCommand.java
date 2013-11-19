@@ -40,7 +40,7 @@ public class MenuEditCommand implements IMenuCommand {
         Player target;
         String id;
         if (args.length == 2) {
-            target = plugin.getServer().getPlayer(args[1]);
+            target = plugin.getServer().getPlayer(args[0]);
             if (target == null) {
                 sender.sendMessage("There is no player named " + args[1] + " on the server");
                 return true;
