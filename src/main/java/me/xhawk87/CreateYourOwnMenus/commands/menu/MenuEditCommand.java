@@ -38,13 +38,16 @@ public class MenuEditCommand implements IMenuCommand {
         }
 
         Player target;
+        String id;
         if (args.length == 2) {
             target = plugin.getServer().getPlayer(args[1]);
             if (target == null) {
                 sender.sendMessage("There is no player named " + args[1] + " on the server");
                 return true;
             }
+            id = args[1];
         } else {
+            id = args[0];
             if (sender instanceof Player) {
                 target = (Player) sender;
             } else {
@@ -54,7 +57,6 @@ public class MenuEditCommand implements IMenuCommand {
         }
 
         // Check the id is valid
-        String id = args[0];
         Menu menu = plugin.getMenu(id);
         if (menu == null) {
             sender.sendMessage("There is no menu with id " + id);
