@@ -21,6 +21,7 @@ import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptShowCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptTitleCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 /**
  *
@@ -31,14 +32,17 @@ public class MenuScriptCommand implements IMenuCommand {
     /**
      * All subcommands of the menu command, stored by their name
      */
-    private Map<String, IMenuCommand> subCommands = new HashMap<>();
+    private Map<String, IMenuScriptCommand> subCommands = new HashMap<>();
     /**
      * All aliases of the menu command. these should not be listed in help as
      * separate subcommands
      */
-    private Map<String, IMenuCommand> aliases = new HashMap<>();
+    private Map<String, IMenuScriptCommand> aliases = new HashMap<>();
+    private CreateYourOwnMenus plugin;
 
     public MenuScriptCommand(CreateYourOwnMenus plugin) {
+        this.plugin = plugin;
+
         subCommands.put("append", new MenuScriptAppendCommand());
         subCommands.put("clear", new MenuScriptClearCommand());
         subCommands.put("delete", new MenuScriptDeleteCommand());
@@ -73,8 +77,21 @@ public class MenuScriptCommand implements IMenuCommand {
             return true;
         }
 
-        String subCommandName = args[0];
-        IMenuCommand menuScriptCommand = subCommands.get(subCommandName.toLowerCase());
+        int index = 0;
+        String subCommandName = args[index++];
+        Player target = plugin.getServer().getPlayerExact(subCommandName);
+        if (target != null) {
+            subCommandName = args[index++];
+        } else {
+            if (sender instanceof Player) {
+                target = (Player) sender;
+            } else {
+                sender.sendMessage("Console must specify a player");
+                return false;
+            }
+        }
+
+        IMenuScriptCommand menuScriptCommand = subCommands.get(subCommandName.toLowerCase());
         if (menuScriptCommand == null) {
             menuScriptCommand = aliases.get(subCommandName.toLowerCase());
             if (menuScriptCommand == null) {
@@ -89,7 +106,7 @@ public class MenuScriptCommand implements IMenuCommand {
             return true;
         }
         // Remove the sub-command from the args list and pass along the rest
-        if (!menuScriptCommand.onCommand(sender, command, label, Arrays.copyOfRange(args, 1, args.length))) {
+        if (!menuScriptCommand.onCommand(sender, target, command, label, Arrays.copyOfRange(args, index, args.length))) {
             // A sub-command returning false should display the usage information for that sub-command
             sender.sendMessage(menuScriptCommand.getUsage());
         }
@@ -98,7 +115,7 @@ public class MenuScriptCommand implements IMenuCommand {
 
     @Override
     public String getUsage() {
-        return "/menu script [clear|show|hide|append|insert|replace|delete] [parameters...]";
+        return "/menu script ([player]) [clear|show|hide|append|insert|replace|delete] [parameters...]";
     }
 
     @Override

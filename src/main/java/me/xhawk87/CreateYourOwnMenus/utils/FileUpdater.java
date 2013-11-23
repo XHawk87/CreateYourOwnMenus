@@ -5,8 +5,10 @@
 package me.xhawk87.CreateYourOwnMenus.utils;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.logging.Level;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -57,7 +59,8 @@ public class FileUpdater {
                 if (currentSave == saveCount) { // enforce save order
                     synchronized (file) {
                         if (currentSave == saveCount) { // enforce save order
-                            try (FileWriter out = new FileWriter(file)) {
+                            try (OutputStreamWriter out = new OutputStreamWriter(
+                                    new FileOutputStream(file), Charset.forName("UTF8"))) {
                                 out.write(record);
                             } catch (IOException ex) {
                                 plugin.getLogger().log(Level.SEVERE, "Could not save: " + file.getPath(), ex);
