@@ -4,7 +4,10 @@
  */
 package me.xhawk87.CreateYourOwnMenus.listeners;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.TreeMap;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
@@ -18,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
@@ -209,10 +213,10 @@ public class MenuListener implements Listener {
                 } else {
                     slotItem.setAmount(slotItem.getAmount() + item.getAmount());
                 }
-                
+
                 // Stop it from being dropped
                 event.getItemDrop().remove();
-                
+
                 // Make sure player sees everything as normal
                 player.updateInventory();
             }
@@ -381,7 +385,45 @@ public class MenuListener implements Listener {
             }
         }
     }
-    
+
+    /**
+     * Fired when a player dies. Lowest priority so that we can redo the drop
+     * list, allowing only unlocked slots to drop, before any other plugins try
+     * to alter it.
+     *
+     * @param event
+     */
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onDropLockedItemOnDeath(PlayerDeathEvent event) {
+        if (event.getEntity().getWorld().isGameRule("keepInventory")) {
+            return;
+        }
+        List<ItemStack> drops = event.getDrops();
+        drops.clear();
+        final Player player = event.getEntity();
+        PlayerInventory inv = player.getInventory();
+        final Map<Integer, ItemStack> toKeep = new TreeMap<>();
+        for (int index = 0; index < 40; index++) {
+            if (player.hasPermission("cyom.slot.lock." + index)) {
+                toKeep.put(index, inv.getItem(index));
+            } else {
+                drops.add(inv.getItem(index));
+            }
+        }
+        if (!toKeep.isEmpty()) {
+            new BukkitRunnable() {
+
+                @Override
+                public void run() {
+                    PlayerInventory inv = player.getInventory();
+                    for (Map.Entry<Integer, ItemStack> entry : toKeep.entrySet()) {
+                        inv.setItem(entry.getKey(), entry.getValue());
+                    }
+                }
+            }.runTask(plugin);
+        }
+    }
+
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
