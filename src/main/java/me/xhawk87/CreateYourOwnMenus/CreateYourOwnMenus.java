@@ -15,14 +15,11 @@ import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import me.xhawk87.CreateYourOwnMenus.script.CloseCommand;
 import me.xhawk87.CreateYourOwnMenus.script.ConsumeCommand;
-import me.xhawk87.CreateYourOwnMenus.script.CountChestCommand;
 import me.xhawk87.CreateYourOwnMenus.script.DelayCommand;
-import me.xhawk87.CreateYourOwnMenus.script.GiveChestCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequireCurrencyCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequireLevelCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequirePermissionCommand;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
-import me.xhawk87.CreateYourOwnMenus.script.TakeChestCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -71,13 +68,13 @@ public class CreateYourOwnMenus extends JavaPlugin {
         // Register script commands
         scriptCommands.put("close", new CloseCommand());
         scriptCommands.put("consume", new ConsumeCommand());
-        scriptCommands.put("countchest", new CountChestCommand());
+        //scriptCommands.put("countchest", new CountChestCommand());
         scriptCommands.put("delay", new DelayCommand(this));
-        scriptCommands.put("givechest", new GiveChestCommand());
+        //scriptCommands.put("givechest", new GiveChestCommand());
         scriptCommands.put("requirecurrency", new RequireCurrencyCommand(this));
         scriptCommands.put("requirelevel", new RequireLevelCommand(this));
         scriptCommands.put("requirepermission", new RequirePermissionCommand());
-        scriptCommands.put("takechest", new TakeChestCommand());
+        //scriptCommands.put("takechest", new TakeChestCommand());
 
         // Register permissions
         PluginManager mgr = getServer().getPluginManager();

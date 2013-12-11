@@ -50,6 +50,17 @@ permissions:
   cyom.commands.menu.script:
     description: Allows use of all menu script commands
     default: op
+    children:
+      cyom.commands.menu.script.append: true
+      cyom.commands.menu.script.clear: true
+      cyom.commands.menu.script.delete: true
+      cyom.commands.menu.script.export: true
+      cyom.commands.menu.script.hide: true
+      cyom.commands.menu.script.import: true
+      cyom.commands.menu.script.insert: true
+      cyom.commands.menu.script.replace: true
+      cyom.commands.menu.script.show: true
+      cyom.commands.menu.script.title: true
   cyom.commands.menu.reload:
     description: Allows reloading of menus from disk
     default: op
@@ -59,6 +70,36 @@ permissions:
   cyom.commands.sudo:
     description: Allows use of the sudo command
     default: op
+  cyom.commands.menu.script.append:
+    description: Allows use of the menu script append command
+    default: false
+  cyom.commands.menu.script.clear:
+    description: Allows use of the menu script clear command
+    default: false
+  cyom.commands.menu.script.delete:
+    description: Allows use of the menu script delete command
+    default: false
+  cyom.commands.menu.script.export:
+    description: Allows use of the menu script export command
+    default: false
+  cyom.commands.menu.script.hide:
+    description: Allows use of the menu script hide command
+    default: false
+  cyom.commands.menu.script.import:
+    description: Allows use of the menu script import command
+    default: false
+  cyom.commands.menu.script.insert:
+    description: Allows use of the menu script insert command
+    default: false
+  cyom.commands.menu.script.replace:
+    description: Allows use of the menu script replace command
+    default: false
+  cyom.commands.menu.script.show:
+    description: Allows use of the menu script show command
+    default: false
+  cyom.commands.menu.script.title:
+    description: Allows use of the menu script title command
+    default: false
   cyom.slot.lock.all:
     description: Treats the entire player inventory as a locked menu
     default: false

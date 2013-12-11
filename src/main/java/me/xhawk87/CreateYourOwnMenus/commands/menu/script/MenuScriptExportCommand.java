@@ -41,7 +41,7 @@ public class MenuScriptExportCommand extends IMenuScriptCommand {
 
     @Override
     public String getPermission() {
-        return null;
+        return "cyom.commands.menu.script.export";
     }
 
     @Override

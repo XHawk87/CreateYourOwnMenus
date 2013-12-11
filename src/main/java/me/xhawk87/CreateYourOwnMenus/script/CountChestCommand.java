@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
  *
  * @author XHawk87
  */
+@Deprecated
 public class CountChestCommand implements ScriptCommand {
 
     @Override

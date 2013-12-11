@@ -25,6 +25,7 @@ import org.bukkit.inventory.PlayerInventory;
  *
  * @author XHawk87
  */
+@Deprecated
 public class TakeChestCommand implements ScriptCommand {
 
     @Override

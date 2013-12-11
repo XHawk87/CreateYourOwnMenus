@@ -23,19 +23,22 @@ public class ConsumeCommand implements ScriptCommand {
             player.sendMessage("Error in menu script line (expected no arguments): " + command);
             return false;
         }
-        int amount = menuItem.getAmount() - 1;
-        if (amount > 0) {
-            menuItem.setAmount(amount);
-        } else {
-            PlayerInventory inv = player.getInventory();
-            ItemStack held = inv.getItemInHand();
-            if (held.equals(menuItem)) {
-                inv.clear(inv.getHeldItemSlot());
+        
+        PlayerInventory inv = player.getInventory();
+        ItemStack held = inv.getItemInHand();
+        if (held.equals(menuItem)) {
+            int amount = menuItem.getAmount() - 1;
+            if (amount > 0) {
+                menuItem.setAmount(amount);
+                inv.setItemInHand(menuItem);
             } else {
-                player.sendMessage("Cannot locate menu item to remove it. Was it moved?");
-                return false;
+                inv.clear(inv.getHeldItemSlot());
             }
+        } else {
+            player.sendMessage("Cannot locate menu item to remove it. Was it moved?");
+            return false;
         }
+
         player.updateInventory();
         return true;
     }

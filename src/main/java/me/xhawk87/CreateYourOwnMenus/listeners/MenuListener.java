@@ -131,6 +131,15 @@ public class MenuListener implements Listener {
                     // Prevent them from making any changes
                     event.setCancelled(true);
 
+                    // To reduce visual glitches in 1.7.2 the inventory on the 
+                    // next tick
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            player.updateInventory();
+                        }
+                    }.runTask(plugin);
+
                     // But still activate the menu item if its a left-click
                     if (event.getClick() == ClickType.LEFT) {
                         final ItemStack selected = event.getCurrentItem();
@@ -212,6 +221,7 @@ public class MenuListener implements Listener {
                     inv.setItem(slot, item.clone());
                 } else {
                     slotItem.setAmount(slotItem.getAmount() + item.getAmount());
+                    inv.setItem(slot, slotItem);
                 }
 
                 // Stop it from being dropped
@@ -273,11 +283,14 @@ public class MenuListener implements Listener {
                             dosound = true;
                             if (pickup.getAmount() > spaceInSlot) {
                                 pickup.setAmount(pickup.getAmount() - spaceInSlot);
+                                item.setItemStack(pickup);
                                 slot.setAmount(maxStackSize);
+                                inv.setItem(i, slot);
                                 continue;
                             } else {
                                 item.remove();
                                 slot.setAmount(slot.getAmount() + pickup.getAmount());
+                                inv.setItem(i, slot);
                                 break;
                             }
                         }
@@ -412,7 +425,6 @@ public class MenuListener implements Listener {
         }
         if (!toKeep.isEmpty()) {
             new BukkitRunnable() {
-
                 @Override
                 public void run() {
                     PlayerInventory inv = player.getInventory();

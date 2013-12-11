@@ -23,6 +23,7 @@ import org.bukkit.inventory.PlayerInventory;
  *
  * @author XHawk87
  */
+@Deprecated
 public class GiveChestCommand implements ScriptCommand {
 
     @Override
@@ -134,6 +135,7 @@ public class GiveChestCommand implements ScriptCommand {
                         toItem = fromItem.clone();
                         toItem.setAmount(moving);
                         fromItem.setAmount(fromItem.getAmount() - moving);
+                        fromInv.setItem(fromSlot, fromItem);
                         toInv.setItem(toSlot, toItem);
                         count += moving;
                     } else {
@@ -157,7 +159,9 @@ public class GiveChestCommand implements ScriptCommand {
                     if (fromItem.getAmount() > moving) {
                         // There are more in fromSlot than are needed/can fit
                         fromItem.setAmount(fromItem.getAmount() - moving);
+                        fromInv.setItem(fromSlot, fromItem);
                         toItem.setAmount(toItem.getAmount() + moving);
+                        toInv.setItem(toSlot, toItem);
                         count += moving;
                         if (itTo.hasNext()) {
                             toSlot = itTo.next();
@@ -165,6 +169,7 @@ public class GiveChestCommand implements ScriptCommand {
                     } else {
                         // Combine the two stacks into toSlot
                         toItem.setAmount(toItem.getAmount() + fromItem.getAmount());
+                        toInv.setItem(toSlot, toItem);
                         count += fromItem.getAmount();
                         fromInv.clear(fromSlot);
                         if (itFrom.hasNext()) {
