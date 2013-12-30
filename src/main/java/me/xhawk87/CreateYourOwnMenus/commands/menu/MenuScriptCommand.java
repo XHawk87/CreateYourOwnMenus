@@ -43,16 +43,16 @@ public class MenuScriptCommand implements IMenuCommand {
     public MenuScriptCommand(CreateYourOwnMenus plugin) {
         this.plugin = plugin;
 
-        subCommands.put("append", new MenuScriptAppendCommand());
-        subCommands.put("clear", new MenuScriptClearCommand());
-        subCommands.put("delete", new MenuScriptDeleteCommand());
+        subCommands.put("append", new MenuScriptAppendCommand(plugin));
+        subCommands.put("clear", new MenuScriptClearCommand(plugin));
+        subCommands.put("delete", new MenuScriptDeleteCommand(plugin));
         subCommands.put("export", new MenuScriptExportCommand(plugin));
-        subCommands.put("hide", new MenuScriptHideCommand());
+        subCommands.put("hide", new MenuScriptHideCommand(plugin));
         subCommands.put("import", new MenuScriptImportCommand(plugin));
-        subCommands.put("insert", new MenuScriptInsertCommand());
-        subCommands.put("replace", new MenuScriptReplaceCommand());
-        subCommands.put("show", new MenuScriptShowCommand());
-        subCommands.put("title", new MenuScriptTitleCommand());
+        subCommands.put("insert", new MenuScriptInsertCommand(plugin));
+        subCommands.put("replace", new MenuScriptReplaceCommand(plugin));
+        subCommands.put("show", new MenuScriptShowCommand(plugin));
+        subCommands.put("title", new MenuScriptTitleCommand(plugin));
 
         // Aliases
         aliases.put("add", subCommands.get("append"));
@@ -68,32 +68,34 @@ public class MenuScriptCommand implements IMenuCommand {
         // It is assumed that entering the menu command without parameters is an
         // attempt to get information about it. So let's give it to them.
         if (args.length == 0) {
-            for (IMenuCommand menuCommand : subCommands.values()) {
+            for (Map.Entry<String, IMenuScriptCommand> entry : subCommands.entrySet()) {
+                String name = entry.getKey();
+                IMenuScriptCommand menuCommand = entry.getValue();
                 String permission = menuCommand.getPermission();
                 if (permission != null && sender.hasPermission(permission)) {
-                    sender.sendMessage(menuCommand.getUsage());
+                    sender.sendMessage(plugin.translate(sender, "menu-script-" + name + "-usage", menuCommand.getUsage()));
                 }
             }
             return true;
         }
 
         int index = 0;
-        String subCommandName = args[index++];
+        String subCommandName = args[index++].toLowerCase();
         Player target = plugin.getServer().getPlayerExact(subCommandName);
         if (target != null) {
-            subCommandName = args[index++];
+            subCommandName = args[index++].toLowerCase();
         } else {
             if (sender instanceof Player) {
                 target = (Player) sender;
             } else {
-                sender.sendMessage("Console must specify a player");
+                sender.sendMessage(plugin.translate(sender, "console-no-target", "The console must specify a player"));
                 return false;
             }
         }
 
-        IMenuScriptCommand menuScriptCommand = subCommands.get(subCommandName.toLowerCase());
+        IMenuScriptCommand menuScriptCommand = subCommands.get(subCommandName);
         if (menuScriptCommand == null) {
-            menuScriptCommand = aliases.get(subCommandName.toLowerCase());
+            menuScriptCommand = aliases.get(subCommandName);
             if (menuScriptCommand == null) {
                 return false; // They mistyped or entered an invalid subcommand
             }
@@ -102,13 +104,13 @@ public class MenuScriptCommand implements IMenuCommand {
         // Handle the permissions check
         String permission = menuScriptCommand.getPermission();
         if (permission != null && !sender.hasPermission(permission)) {
-            sender.sendMessage("You do not have permission to use this command");
+            sender.sendMessage(plugin.translate(sender, "command-no-perms", "You do not have permission to use this command"));
             return true;
         }
         // Remove the sub-command from the args list and pass along the rest
         if (!menuScriptCommand.onCommand(sender, target, command, label, Arrays.copyOfRange(args, index, args.length))) {
             // A sub-command returning false should display the usage information for that sub-command
-            sender.sendMessage(menuScriptCommand.getUsage());
+            sender.sendMessage(plugin.translate(sender, "menu-script-" + subCommandName + "-usage", menuScriptCommand.getUsage()));
         }
         return true;
     }

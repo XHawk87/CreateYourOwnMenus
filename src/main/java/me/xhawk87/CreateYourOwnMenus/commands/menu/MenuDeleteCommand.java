@@ -27,27 +27,27 @@ public class MenuDeleteCommand implements IMenuCommand {
         // Entering a sub-command without parameters is assumed to be a request 
         // for information. So display some detailed help.
         if (args.length == 0) {
-            sender.sendMessage("/menu delete [id] - Deletes the menu with the given id");
+            sender.sendMessage(plugin.translate(sender, "menu-delete-usage-extended", "/menu delete [id] - Deletes the menu with the given id"));
             return true;
         }
-        
+
         // Expecting exactly 1 parameter, the id
         if (args.length != 1) {
             return false;
         }
-        
+
         String id = args[0];
-        
+
         // Check that ths id is valid
         Menu menu = plugin.getMenu(id);
         if (menu == null) {
-            sender.sendMessage("There is no menu with id " + id);
+            sender.sendMessage(plugin.translate(sender, "no-menu-by-id", "There is no menu with id {0}", id));
             return true;
         }
-        
+
         // Delete the menu
         menu.delete();
-        sender.sendMessage(menu.getTitle() + " has been deleted");
+        sender.sendMessage(plugin.translate(sender, "menu-deleted", "{0} has been deleted", menu.getTitle()));
         return true;
     }
 

@@ -31,7 +31,7 @@ public class MenuCopyCommand implements IMenuCommand {
         // Entering a sub-command without parameters is assumed to be a request 
         // for information. So display some detailed help.
         if (args.length == 0) {
-            sender.sendMessage("/menu copy [old menu id] [new menu id] [new title] - Creates a new menu with the given id, title with the same size and contents as the given menu");
+            sender.sendMessage(plugin.translate(sender, "menu-copy-usage-extended", "/menu copy [old menu id] [new menu id] [new title] - Create a new menu with the same size and contents as the given menu but with a new id and title"));
             return true;
         }
         // The title may contain spaces, so more than 3 args may be present
@@ -41,14 +41,14 @@ public class MenuCopyCommand implements IMenuCommand {
 
         String oldMenuId = args[0];
         String newMenuId = args[1];
-        
+
         Menu oldMenu = plugin.getMenu(oldMenuId);
         if (oldMenu == null) {
-            sender.sendMessage("There is no menu with id " + oldMenuId);
+            sender.sendMessage(plugin.translate(sender, "no-menu-by-id", "There is no menu with id {0}", oldMenuId));
             return true;
         }
         int rows = oldMenu.getInventory().getSize() / 9;
-        
+
         // Build the title
         StringBuilder sb = new StringBuilder(args[2].replace('&', ChatColor.COLOR_CHAR));
         for (int i = 3; i < args.length; i++) {
@@ -56,13 +56,13 @@ public class MenuCopyCommand implements IMenuCommand {
         }
         String title = sb.toString();
         if (title.length() > 32) {
-            sender.sendMessage("Titles are limited to 32 characters (including colours)");
+            sender.sendMessage(plugin.translate(sender, "title-char-limit", "Titles are limited to 32 characters (including colours)"));
             return true;
         }
-        
+
         // Check that the id is unique
         if (plugin.getMenu(newMenuId) != null) {
-            sender.sendMessage("A menu with id " + newMenuId + " already exists");
+            sender.sendMessage(plugin.translate(sender, "menu-already-exists", "A menu with id {0} already exists", newMenuId));
             return true;
         }
 
@@ -77,7 +77,7 @@ public class MenuCopyCommand implements IMenuCommand {
             }
         }
         newMenu.save();
-        sender.sendMessage(title + " menu has been created");
+        sender.sendMessage(plugin.translate(sender, "menu-created", "{0} menu has been created", title));
         return true;
     }
 

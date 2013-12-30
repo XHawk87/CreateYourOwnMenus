@@ -4,6 +4,7 @@
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -17,6 +18,10 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @author XHawk87
  */
 public class MenuScriptTitleCommand extends IMenuScriptCommand {
+
+    public MenuScriptTitleCommand(CreateYourOwnMenus plugin) {
+        super(plugin);
+    }
 
     @Override
     public String getUsage() {
@@ -33,7 +38,7 @@ public class MenuScriptTitleCommand extends IMenuScriptCommand {
         // Check the player is holding the item
         ItemStack held = target.getItemInHand();
         if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage("You must be holding a menu item");
+            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }
 
@@ -54,7 +59,7 @@ public class MenuScriptTitleCommand extends IMenuScriptCommand {
         }
         // Otherwise append this to the lore
 
-        sender.sendMessage("The title of this menu item is now " + titleString);
+        sender.sendMessage(plugin.translate(sender, "item-title-set", "The title of this menu item is now {0}", titleString));
 
         // Update the item
         meta.setDisplayName(titleString);

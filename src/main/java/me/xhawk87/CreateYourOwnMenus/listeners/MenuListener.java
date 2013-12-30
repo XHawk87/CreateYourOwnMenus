@@ -440,7 +440,7 @@ public class MenuListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         if (player.hasPermission("i.have.every.permission")) {
-            player.sendMessage("CreateYourOwnMenus has detected that you may have been granted every permission node. This is generally a bad idea because it means that you will also be granted permissions that you don't necessarily want, such as the 'cyom.slot.lock.*' permissions, which lock your inventory slots causing them to act like menus. If you wish to remove this warning, please remove the 'i.have.every.permission' node from yourself, or stop using the '*' node. It really isn't needed, all permissions default to Op unless the developer specifically set them otherwise");
+            player.sendMessage(plugin.translate(player, "starnode-warning", "CreateYourOwnMenus has detected that you may have been granted every permission node. This is generally a bad idea because it means that you will also be granted permissions that you don't necessarily want, such as the 'cyom.slot.lock.*' permissions, which lock your inventory slots causing them to act like menus. If you wish to remove this warning, please remove the 'i.have.every.permission' node from yourself, or stop using the '*' node. It really isn't needed, all permissions default to Op unless the developer specifically set them otherwise"));
         }
     }
 }

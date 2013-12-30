@@ -6,6 +6,7 @@ package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
 import java.util.ArrayList;
 import java.util.List;
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -19,6 +20,10 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @author XHawk87
  */
 public class MenuScriptAppendCommand extends IMenuScriptCommand {
+
+    public MenuScriptAppendCommand(CreateYourOwnMenus plugin) {
+        super(plugin);
+    }
 
     @Override
     public String getUsage() {
@@ -35,7 +40,7 @@ public class MenuScriptAppendCommand extends IMenuScriptCommand {
         // Check the player is holding the item
         ItemStack held = target.getItemInHand();
         if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage("You must be holding a menu item");
+            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }
 
@@ -76,7 +81,7 @@ public class MenuScriptAppendCommand extends IMenuScriptCommand {
             loreStrings.add(commandString);
         }
 
-        sender.sendMessage(commandString + " was added to the command list of this menu item");
+        sender.sendMessage(plugin.translate(sender, "script-appended", "{0} was added to the command list of this menu item", commandString));
 
         // Update the item
         meta.setLore(loreStrings);

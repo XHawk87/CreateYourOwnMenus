@@ -16,17 +16,17 @@ import org.bukkit.inventory.ItemStack;
  * @author XHawk87
  */
 public class RequireLevelCommand implements ScriptCommand {
-    
+
     private CreateYourOwnMenus plugin;
-    
+
     public RequireLevelCommand(CreateYourOwnMenus plugin) {
         this.plugin = plugin;
     }
-    
+
     @Override
     public boolean execute(Menu menu, Player player, String[] args, String command, ItemStack menuItem, Iterator<String> commands, Player targetPlayer, Block targetBlock) {
         if (args.length < 1) {
-            player.sendMessage("Error in menu script line (expected /requirelevel ([player]) [level] ([fail message])): " + command);
+            player.sendMessage(plugin.translate(player, "require-level-usage", "Error in menu script line (expected /requirelevel ([player]) [level] ([fail message])): {0}", command));
             return false;
         }
         int index = 0;
@@ -41,19 +41,19 @@ public class RequireLevelCommand implements ScriptCommand {
         } else {
             target = player;
         }
-        
+
         int level;
         try {
             level = Integer.parseInt(args[index++]);
             if (level < 0) {
-                player.sendMessage("Error in menu script line (expected positive experience level): " + level);
+                player.sendMessage(plugin.translate(player, "error-integer-xp-level", "Error in menu script line (expected positive experience level): {0}", level));
                 return false;
             }
         } catch (NumberFormatException ex) {
-            player.sendMessage("Error in menu script line (expected experience level amount): " + command);
+            player.sendMessage(plugin.translate(player, "error-integer-xp-level", "Error in menu script line (expected positive experience level): {0}", command));
             return false;
         }
-        
+
         if (target.getLevel() < level) {
             StringBuilder sb = new StringBuilder();
             while (index < args.length) {

@@ -29,7 +29,7 @@ public class MenuReloadCommand implements IMenuCommand {
         }
 
         plugin.reloadMenus();
-        sender.sendMessage("Menus reloaded from disk");
+        sender.sendMessage(plugin.translate(sender, "menus-reloaded", "Menus reloaded from disk"));
         return true;
     }
 

@@ -25,12 +25,12 @@ public class SudoCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!sender.hasPermission("cyom.commands.sudo")) {
-            sender.sendMessage("You do not have permission to use this command");
+            sender.sendMessage(plugin.translate(sender, "command-no-perms", "You do not have permission to use this command"));
             return true;
         }
 
         if (args.length == 0 || args.length == 1 && args[0].equalsIgnoreCase("help")) {
-            sender.sendMessage("/sudo [player] [command...]. Send a command as the specified player. This can be used in place of @p/ in menu scripts e.g. '/sudo @p kill' in place of '@p/kill'");
+            sender.sendMessage(plugin.translate(sender, "sudo-usage", "/sudo [player] [command...]. Send a command as the specified player. This can be used in place of @p/ in menu scripts e.g. '/sudo @p kill' in place of '@p/kill'"));
             return true;
         }
         if (args.length < 2) {
@@ -40,7 +40,7 @@ public class SudoCommand implements CommandExecutor {
         String targetName = args[0];
         Player target = plugin.getServer().getPlayer(targetName);
         if (target == null) {
-            sender.sendMessage(targetName + " is not online");
+            sender.sendMessage(plugin.translate(sender, "player-not-online", "{0} is not online", targetName));
             return true;
         }
 

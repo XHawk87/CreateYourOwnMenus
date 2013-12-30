@@ -28,7 +28,7 @@ public class MenuEditCommand implements IMenuCommand {
         // Entering a sub-command without parameters is assumed to be a request 
         // for information. So display some detailed help.
         if (args.length == 0) {
-            sender.sendMessage("/menu edit ([player]) [id] - Opens the menu with the given id for editing. This allows you to move menu items in and out of a menu. If a player is given, it will open the menu for the given player for editing, whether or not they have permission");
+            sender.sendMessage(plugin.translate(sender, "menu-edit-usage-extended", "/menu edit ([player]) [id] - Opens the menu with the given id for editing. This allows you to move menu items in and out of a menu. If a player is given, it will open the menu for the given player for editing, whether or not they have permission"));
             return true;
         }
 
@@ -42,7 +42,7 @@ public class MenuEditCommand implements IMenuCommand {
         if (args.length == 2) {
             target = plugin.getServer().getPlayer(args[0]);
             if (target == null) {
-                sender.sendMessage("There is no player named " + args[1] + " on the server");
+                sender.sendMessage(plugin.translate(sender, "player-not-online", "{0} is not online", args[0]));
                 return true;
             }
             id = args[1];
@@ -51,7 +51,7 @@ public class MenuEditCommand implements IMenuCommand {
             if (sender instanceof Player) {
                 target = (Player) sender;
             } else {
-                sender.sendMessage("The console must provide a player name");
+                sender.sendMessage(plugin.translate(sender, "console-no-target", "The console must specify a player"));
                 return false;
             }
         }
@@ -59,7 +59,7 @@ public class MenuEditCommand implements IMenuCommand {
         // Check the id is valid
         Menu menu = plugin.getMenu(id);
         if (menu == null) {
-            sender.sendMessage("There is no menu with id " + id);
+            sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", id));
             return true;
         }
 

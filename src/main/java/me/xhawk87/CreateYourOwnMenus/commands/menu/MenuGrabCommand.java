@@ -69,21 +69,21 @@ public class MenuGrabCommand implements IMenuCommand {
             if (sender instanceof Player) {
                 target = (Player) sender;
             } else {
-                sender.sendMessage("Console must specify a player");
+                sender.sendMessage(plugin.translate(sender, "console-no-target", "The console must specify a player"));
                 return true;
             }
         } else {
             String playerName = args[index++];
             target = plugin.getServer().getPlayer(playerName);
             if (target == null) {
-                sender.sendMessage("No player matching " + playerName);
+                sender.sendMessage(plugin.translate(sender, "player-not-online", "{0} is not online", playerName));
                 return true;
             }
         }
         String menuId = args[index++];
         Menu menu = plugin.getMenu(menuId);
         if (menu == null) {
-            sender.sendMessage("There is no menu matching " + menuId);
+            sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", menuId));
             return true;
         }
         PlayerInventory inv = target.getInventory();
@@ -113,8 +113,8 @@ public class MenuGrabCommand implements IMenuCommand {
         for (ItemStack drop : toDrop.values()) {
             world.dropItem(location, drop);
         }
-        sender.sendMessage(menu.getTitle() + " was grabbed for " + target.getDisplayName());
-        
+        sender.sendMessage(plugin.translate(sender, "menu-grabbed-for-player", "{0} was grabbed for {1}", menu.getTitle(), target.getDisplayName()));
+
         // Force inventory to update
         target.updateInventory();
         return true;

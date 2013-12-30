@@ -20,10 +20,10 @@ public class ConsumeCommand implements ScriptCommand {
     @Override
     public boolean execute(Menu menu, Player player, String[] args, String command, ItemStack menuItem, Iterator<String> commands, Player targetPlayer, Block targetBlock) {
         if (args.length != 0) {
-            player.sendMessage("Error in menu script line (expected no arguments): " + command);
+            player.sendMessage(menu.translate(player, "expected-no-args", "Error in menu script line (expected no arguments): {0}", command));
             return false;
         }
-        
+
         PlayerInventory inv = player.getInventory();
         ItemStack held = inv.getItemInHand();
         if (held.equals(menuItem)) {
@@ -35,7 +35,7 @@ public class ConsumeCommand implements ScriptCommand {
                 inv.clear(inv.getHeldItemSlot());
             }
         } else {
-            player.sendMessage("Cannot locate menu item to remove it. Was it moved?");
+            player.sendMessage(menu.translate(player, "consume-no-item", "Cannot locate menu item to remove it. Was it moved?"));
             return false;
         }
 

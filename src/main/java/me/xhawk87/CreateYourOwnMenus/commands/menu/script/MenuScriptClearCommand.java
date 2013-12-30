@@ -6,6 +6,7 @@ package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
 import java.util.ArrayList;
 import java.util.List;
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -18,6 +19,10 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @author XHawk87
  */
 public class MenuScriptClearCommand extends IMenuScriptCommand {
+
+    public MenuScriptClearCommand(CreateYourOwnMenus plugin) {
+        super(plugin);
+    }
 
     @Override
     public String getUsage() {
@@ -34,7 +39,7 @@ public class MenuScriptClearCommand extends IMenuScriptCommand {
         // Check the player is holding the item
         ItemStack held = target.getItemInHand();
         if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage("You must be holding a menu item");
+            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }
 
@@ -49,7 +54,7 @@ public class MenuScriptClearCommand extends IMenuScriptCommand {
 
         // Clear all lore
         loreStrings.clear();
-        sender.sendMessage("The command list for this menu item has been cleared");
+        sender.sendMessage(plugin.translate(sender, "script-cleared", "The command list for this menu item has been cleared"));
 
         // Update the item
         meta.setLore(loreStrings);

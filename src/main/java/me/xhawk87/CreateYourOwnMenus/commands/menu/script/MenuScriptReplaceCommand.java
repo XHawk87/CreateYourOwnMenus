@@ -6,6 +6,7 @@ package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
 import java.util.ArrayList;
 import java.util.List;
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -19,6 +20,10 @@ import org.bukkit.inventory.meta.ItemMeta;
  * @author XHawk87
  */
 public class MenuScriptReplaceCommand extends IMenuScriptCommand {
+
+    public MenuScriptReplaceCommand(CreateYourOwnMenus plugin) {
+        super(plugin);
+    }
 
     @Override
     public String getUsage() {
@@ -35,7 +40,7 @@ public class MenuScriptReplaceCommand extends IMenuScriptCommand {
         // Check the player is holding the item
         ItemStack held = target.getItemInHand();
         if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage("You must be holding a menu item");
+            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }
 
@@ -53,19 +58,8 @@ public class MenuScriptReplaceCommand extends IMenuScriptCommand {
         }
 
         String indexString = args[0];
-        int index;
-        try {
-            index = Integer.parseInt(indexString);
-            if (index < 0) {
-                sender.sendMessage("The index must be at least 0: " + indexString);
-                return true;
-            }
-            if (index >= loreStrings.size()) {
-                sender.sendMessage("The index must be less than the number of lines in the lore (" + loreStrings.size() + "): " + indexString);
-                return true;
-            }
-        } catch (NumberFormatException ex) {
-            sender.sendMessage("The index must be a whole number: " + indexString);
+        int index = getIndex(indexString, loreStrings.size(), sender);
+        if (index == -1) {
             return true;
         }
 
@@ -91,7 +85,7 @@ public class MenuScriptReplaceCommand extends IMenuScriptCommand {
             loreStrings.set(index, commandString);
         }
 
-        sender.sendMessage(commandString + " replaced line " + index + " in the command list of this menu item");
+        sender.sendMessage(plugin.translate(sender, "script-replaced", "{0} replaced line {1} in the command list of this menu item", commandString, index));
 
         // Update the item
         meta.setLore(loreStrings);

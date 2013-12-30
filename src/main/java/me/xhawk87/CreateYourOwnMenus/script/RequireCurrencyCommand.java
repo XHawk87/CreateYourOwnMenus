@@ -29,22 +29,22 @@ public class RequireCurrencyCommand implements ScriptCommand {
     public boolean execute(Menu menu, Player player, String[] args, String command, ItemStack menuItem, Iterator<String> commands, Player targetPlayer, Block targetBlock) {
         EconomyWrapper economy = plugin.getEconomy();
         if (economy == null) {
-            player.sendMessage("The /requirecurrency special command requires Vault to work");
+            player.sendMessage(plugin.translate(player, "vault-required", "The /requirecurrency special command requires Vault to work"));
             return false;
         }
         if (args.length != 1) {
-            player.sendMessage("Error in menu script line (expected currency amount): " + command);
+            player.sendMessage(plugin.translate(player, "error-no-currency", "Error in menu script line (expected currency amount): {0}", command));
             return false;
         }
         String amountString = args[0];
         try {
             double amount = Double.parseDouble(amountString);
             if (economy.getBalance(player.getName()) < amount) {
-                player.sendMessage("You must have at least " + economy.format(amount) + ChatColor.RESET + " to do this");
+                player.sendMessage(plugin.translate(player, "not-enough-currency", "You must have at least {0} to do this", economy.format(amount) + ChatColor.RESET));
                 return false;
             }
         } catch (NumberFormatException ex) {
-            player.sendMessage("Error in menu script line (expected currency amount): " + command);
+            player.sendMessage(plugin.translate(player, "error-number-currency", "Error in menu script line (expected currency amount): {0}", command));
             return false;
         }
         return true;

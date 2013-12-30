@@ -28,10 +28,8 @@ import org.bukkit.scheduler.BukkitRunnable;
  */
 public class MenuScriptExportCommand extends IMenuScriptCommand {
 
-    private CreateYourOwnMenus plugin;
-
     public MenuScriptExportCommand(CreateYourOwnMenus plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override
@@ -49,19 +47,19 @@ public class MenuScriptExportCommand extends IMenuScriptCommand {
         // Check the player is holding the item
         ItemStack held = target.getItemInHand();
         if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage("You must be holding a menu item");
+            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }
 
         ItemMeta meta = held.getItemMeta();
         if (!meta.hasLore()) {
-            sender.sendMessage("This item has no lore to export");
+            sender.sendMessage(plugin.translate(sender, "export-no-lore", "This item has no lore to export"));
             return true;
         }
 
         List<String> lore = meta.getLore();
         if (lore.isEmpty()) {
-            sender.sendMessage("This item has no lore to export");
+            sender.sendMessage(plugin.translate(sender, "export-no-lore", "This item has no lore to export"));
             return true;
         }
         final List<String> lines = new ArrayList<>();
@@ -96,11 +94,11 @@ public class MenuScriptExportCommand extends IMenuScriptCommand {
                         out.newLine();
                     }
                 } catch (IOException ex) {
-                    sender.sendMessage("An error occurred while attempting to write to " + scriptFile.getPath() + ". Please see console for details");
+                    sender.sendMessage(plugin.translate(sender, "export-save-error", "An error occurred while attempting to write to {0}. Please see console for details", scriptFile.getPath()));
                     plugin.getLogger().log(Level.SEVERE, "An error occurred while attempting to write to " + scriptFile.getPath(), ex);
                     return;
                 }
-                sender.sendMessage("Script was successfully exported to " + scriptFile.getPath());
+                sender.sendMessage(plugin.translate(sender, "script-exported", "Script was successfully exported to {0}", scriptFile.getPath()));
             }
         }.runTaskAsynchronously(plugin);
         return true;

@@ -19,12 +19,12 @@ public class RequirePermissionCommand implements ScriptCommand {
     @Override
     public boolean execute(Menu menu, Player player, String[] args, String command, ItemStack menuItem, Iterator<String> commands, Player targetPlayer, Block targetBlock) {
         if (args.length != 1) {
-            player.sendMessage("Error in menu script line (expected permission node): " + command);
+            player.sendMessage(menu.translate(player, "error-expected-perm", "Error in menu script line (expected permission node): {0}" , command));
             return false;
         }
         String permission = args[0];
         if (!player.hasPermission(permission)) {
-            player.sendMessage("You do not have permission to use this menu item");
+            player.sendMessage(menu.translate(player, "no-item-perms", "You do not have permission to use this menu item"));
             return false;
         }
         return true;

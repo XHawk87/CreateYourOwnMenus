@@ -27,7 +27,7 @@ public class DelayCommand implements ScriptCommand {
     @Override
     public boolean execute(final Menu menu, final Player player, String[] args, String command, final ItemStack menuItem, final Iterator<String> commands, final Player targetPlayer, final Block targetBlock) {
         if (args.length != 1) {
-            player.sendMessage("Error in menu script line (expected delay in ticks): " + command);
+            player.sendMessage(plugin.translate(player, "error-no-delay", "Error in menu script line (expected delay in ticks): {0}", command));
             return false;
         }
         try {
@@ -40,7 +40,7 @@ public class DelayCommand implements ScriptCommand {
             }.runTaskLater(plugin, delay);
             return false;
         } catch (NumberFormatException ex) {
-            player.sendMessage("Error in menu script line (delay must be a whole number of ticks): " + command);
+            player.sendMessage(plugin.translate(player, "expected-integer-delay", "Error in menu script line (delay must be a whole number of ticks): {0}", command));
             return false;
         }
     }

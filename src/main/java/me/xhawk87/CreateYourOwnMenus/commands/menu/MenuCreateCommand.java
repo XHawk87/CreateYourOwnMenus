@@ -29,7 +29,7 @@ public class MenuCreateCommand implements IMenuCommand {
         // Entering a sub-command without parameters is assumed to be a request 
         // for information. So display some detailed help.
         if (args.length == 0) {
-            sender.sendMessage("/menu create [id] [rows] [title] - Creates a new menu with the given id, title and number of rows. The id is used to refer to the menu in commands, it must be unique and cannot contain spaces or colours. The title is displayed to everyone opening the menu and can contain spaces and colours (using & instead of the section symbol). The number of rows determine how large an inventory is used for this menu.");
+            sender.sendMessage(plugin.translate(sender, "menu-create-usage-extended", "/menu create [id] [rows] [title] - Creates a new menu with the given id, title and number of rows. The id is used to refer to the menu in commands, it must be unique and cannot contain spaces or colours. The title is displayed to everyone opening the menu and can contain spaces and colours (using & instead of the section symbol). The number of rows determine how large an inventory is used for this menu."));
             return true;
         }
         // The title may contain spaces, so more than 3 args may be present
@@ -44,7 +44,7 @@ public class MenuCreateCommand implements IMenuCommand {
         try {
             rows = Integer.parseInt(args[1]);
         } catch (NumberFormatException ex) {
-            sender.sendMessage("The number of rows must be a whole number: " + args[1]);
+            sender.sendMessage(plugin.translate(sender, "expected-integer-rows", "The number of rows must be a whole number: {0}" , args[1]));
             return true;
         }
 
@@ -55,20 +55,20 @@ public class MenuCreateCommand implements IMenuCommand {
         }
         String title = sb.toString();
         if (title.length() > 32) {
-            sender.sendMessage("Titles are limited to 32 characters (including colours)");
+            sender.sendMessage(plugin.translate(sender, "title-char-limit", "Titles are limited to 32 characters (including colours)"));
             return true;
         }
 
         // Check that the id is unique
         if (plugin.getMenu(id) != null) {
-            sender.sendMessage("A menu with id " + id + " already exists");
+            sender.sendMessage(plugin.translate(sender, "menu-already-exists", "A menu with id {0} already exists", id));
             return true;
         }
 
         // Create the menu
         Menu menu = plugin.createMenu(id, title, rows);
         menu.save();
-        sender.sendMessage(title + " menu has been created");
+        sender.sendMessage(plugin.translate(sender, "menu-created", "{0} menu has been created", title));
         return true;
     }
 

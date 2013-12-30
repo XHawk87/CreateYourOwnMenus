@@ -6,6 +6,7 @@ package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
 import java.util.ArrayList;
 import java.util.List;
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
 import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.commandStart;
 import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.hiddenCommand;
@@ -27,6 +28,10 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class MenuScriptShowCommand extends IMenuScriptCommand {
 
+    public MenuScriptShowCommand(CreateYourOwnMenus plugin) {
+        super(plugin);
+    }
+
     @Override
     public String getUsage() {
         return "/menu script ([player]) show - Shows all hidden commands for the menu item in your hand, and hides all comments";
@@ -42,7 +47,7 @@ public class MenuScriptShowCommand extends IMenuScriptCommand {
         // Check the player is holding the item
         ItemStack held = target.getItemInHand();
         if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage("You must be holding a menu item");
+            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }
 
@@ -89,7 +94,7 @@ public class MenuScriptShowCommand extends IMenuScriptCommand {
             loreStrings.set(0, comments.toString() + loreStrings.get(0));
         }
 
-        sender.sendMessage("All commands on this menu item should now be visible");
+        sender.sendMessage(plugin.translate(sender, "script-commands-shown", "All commands on this menu item should now be visible"));
 
         // Update the item
         meta.setLore(loreStrings);

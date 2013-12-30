@@ -24,10 +24,8 @@ import org.bukkit.inventory.meta.ItemMeta;
  */
 public class MenuScriptImportCommand extends IMenuScriptCommand {
 
-    private CreateYourOwnMenus plugin;
-
     public MenuScriptImportCommand(CreateYourOwnMenus plugin) {
-        this.plugin = plugin;
+        super(plugin);
     }
 
     @Override
@@ -45,7 +43,7 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
         // Check the player is holding the item
         ItemStack held = target.getItemInHand();
         if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage("You must be holding a menu item");
+            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }
 
@@ -69,22 +67,22 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
             public void onLoad(List<String> lines) {
                 ItemStack held = target.getItemInHand();
                 if (held == null || held.getTypeId() == 0) {
-                    sender.sendMessage("You must be holding a menu item");
+                    sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
                     return;
                 }
                 ItemMeta meta = held.getItemMeta();
                 meta.setDisplayName(lines.get(0));
                 meta.setLore(lines.subList(1, lines.size()));
                 held.setItemMeta(meta);
-                sender.sendMessage("Import successful");
+                sender.sendMessage(plugin.translate(sender, "script-imported", "Import successful"));
             }
 
             @Override
             public void fail(Exception ex) {
                 if (ex instanceof FileNotFoundException) {
-                    sender.sendMessage("Could not find " + scriptFile.getPath());
+                    sender.sendMessage(plugin.translate(sender, "import-file-not-found", "Could not find {0}", scriptFile.getPath()));
                 } else {
-                    sender.sendMessage("An error occurred while attempting to read " + scriptFile.getPath() + ". Please see console for details.");
+                    sender.sendMessage(plugin.translate(sender, "import-load-error", "An error occurred while attempting to read {0}. Please see console for details.", scriptFile.getPath()));
                     plugin.getLogger().log(Level.WARNING, "Error occured while attempting to read " + scriptFile.getPath(), ex);
                 }
             }

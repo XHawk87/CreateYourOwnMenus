@@ -32,8 +32,10 @@ public class MenuCommand implements CommandExecutor {
      * All subcommands of the menu command, stored by their name
      */
     private Map<String, IMenuCommand> subCommands = new HashMap<>();
+    private CreateYourOwnMenus plugin;
 
     public MenuCommand(CreateYourOwnMenus plugin) {
+        this.plugin = plugin;
         subCommands.put("create", new MenuCreateCommand(plugin));
         subCommands.put("edit", new MenuEditCommand(plugin));
         subCommands.put("delete", new MenuDeleteCommand(plugin));
@@ -50,30 +52,32 @@ public class MenuCommand implements CommandExecutor {
         // It is assumed that entering the menu command without parameters is an
         // attempt to get information about it. So let's give it to them.
         if (args.length == 0) {
-            for (IMenuCommand menuCommand : subCommands.values()) {
+            for (Map.Entry<String,IMenuCommand> entry : subCommands.entrySet()) {
+                String name = entry.getKey();
+                IMenuCommand menuCommand = entry.getValue();
                 String permission = menuCommand.getPermission();
                 if (permission != null && sender.hasPermission(permission)) {
-                    sender.sendMessage(menuCommand.getUsage());
+                    sender.sendMessage(plugin.translate(sender, "menu-" + name + "-usage", menuCommand.getUsage()));
                 }
             }
             return true;
         }
 
-        String subCommandName = args[0];
-        IMenuCommand menuCommand = subCommands.get(subCommandName.toLowerCase());
+        String subCommandName = args[0].toLowerCase();
+        IMenuCommand menuCommand = subCommands.get(subCommandName);
         if (menuCommand == null) {
             return false; // They mistyped or entered an invalid subcommand
         }
         // Handle the permissions check
         String permission = menuCommand.getPermission();
         if (permission != null && !sender.hasPermission(permission)) {
-            sender.sendMessage("You do not have permission to use this command");
+            sender.sendMessage(plugin.translate(sender, "command-no-perms", "You do not have permission to use this command"));
             return true;
         }
         // Remove the sub-command from the args list and pass along the rest
         if (!menuCommand.onCommand(sender, command, label, Arrays.copyOfRange(args, 1, args.length))) {
             // A sub-command returning false should display the usage information for that sub-command
-            sender.sendMessage(menuCommand.getUsage());
+            sender.sendMessage(plugin.translate(sender, "menu-" + subCommandName + "-usage", menuCommand.getUsage()));
         }
         return true;
     }

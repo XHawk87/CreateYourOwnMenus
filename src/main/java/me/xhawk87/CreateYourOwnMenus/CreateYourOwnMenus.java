@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Set;
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
+import me.xhawk87.CreateYourOwnMenus.i18n.LanguageWrapper;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import me.xhawk87.CreateYourOwnMenus.script.CloseCommand;
 import me.xhawk87.CreateYourOwnMenus.script.ConsumeCommand;
@@ -43,6 +44,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
     private EconomyWrapper economy = null;
     // Names are in lower case
     private Map<String, ScriptCommand> scriptCommands = new HashMap<>();
+    private LanguageWrapper language;
 
     @Override
     public void onEnable() {
@@ -81,6 +83,9 @@ public class CreateYourOwnMenus extends JavaPlugin {
         for (int i = 0; i < 40; i++) {
             mgr.addPermission(new Permission("cyom.slot.lock." + i, "Treats the " + i + " slot of the player's inventory as locked menu", PermissionDefault.FALSE));
         }
+
+        // Register LanguageAPI
+        language = new LanguageWrapper(this, "eng");
     }
 
     private void setupEconomy() {
@@ -215,14 +220,14 @@ public class CreateYourOwnMenus extends JavaPlugin {
      */
     public void displayMenuList(CommandSender sender) {
         if (menus.isEmpty()) {
-            sender.sendMessage("There are currently no menus. Use /menu create to create one");
+            sender.sendMessage(language.get(sender, "no-menus", "There are currently no menus. Use /menu create to create one"));
             return;
         }
-        sender.sendMessage("There are " + menus.size() + " menus:");
+        sender.sendMessage(language.get(sender, "menu-count", "There are {0} menus:", menus.size()));
         for (Map.Entry<String, Menu> entry : menus.entrySet()) {
             String id = entry.getKey();
             Menu menu = entry.getValue();
-            sender.sendMessage("    " + id + ": " + menu.getTitle());
+            sender.sendMessage(language.get(sender, "menu-list-item", "    {0}: {1}", id, menu.getTitle()));
         }
     }
 
@@ -257,5 +262,19 @@ public class CreateYourOwnMenus extends JavaPlugin {
             commandString = commandString.substring(1);
         }
         return scriptCommands.get(commandString.toLowerCase());
+    }
+
+    /**
+     * Translate this message into the specified language of the sender using
+     * the language files for this plugin.
+     *
+     * @param forWhom The player/console to translate for
+     * @param key The language key
+     * @param template The message template
+     * @param params The dynamic parameters
+     * @return The translated message
+     */
+    public String translate(CommandSender forWhom, String key, String template, Object... params) {
+        return language.get(forWhom, key, template, params);
     }
 }

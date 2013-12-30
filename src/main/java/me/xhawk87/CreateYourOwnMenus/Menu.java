@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.ElevatedCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.FileUpdater;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
@@ -292,7 +293,7 @@ public class Menu implements InventoryHolder {
             }
         }
         // The item doesn't have metadata or lore
-        player.sendMessage("This is not a valid menu item");
+        player.sendMessage(plugin.translate(player, "invalid-menu-item", "This is not a valid menu item"));
     }
 
     public void parseCommands(final Iterator<String> commands, final Player player, final ItemStack menuItem, Player targetPlayer, Block targetBlock) {
@@ -309,8 +310,13 @@ public class Menu implements InventoryHolder {
             // If a command is prefixed with @p then execute it as the player not the console
             final CommandSender sender;
             if (command.startsWith("@p")) {
-                sender = player;
-                command = command.substring(2);
+                if (command.charAt(2) == '+') {
+                    sender = new ElevatedCommandSender(player, consoleSender);
+                    command = command.substring(3);
+                } else {
+                    sender = player;
+                    command = command.substring(2);
+                }
             } else {
                 sender = consoleSender;
             }
@@ -361,7 +367,7 @@ public class Menu implements InventoryHolder {
                                     try {
                                         range = Integer.parseInt(targetString.substring(3));
                                     } catch (NumberFormatException ex) {
-                                        player.sendMessage("Error in menu script line (expected @a:range as an integer number): " + command);
+                                        player.sendMessage(plugin.translate(player, "error-integer-area", "Error in menu script line (expected @a:range as an integer number): {0}", command));
                                         return;
                                     }
                                     match = true;
@@ -369,7 +375,7 @@ public class Menu implements InventoryHolder {
                                     String worldName = targetString.substring(3);
                                     world = plugin.getServer().getWorld(worldName);
                                     if (world == null) {
-                                        player.sendMessage("Error in menu script line (@w:" + worldName + " unknown world): " + command);
+                                        player.sendMessage(plugin.translate(player, "error-unknown-world", "Error in menu script line (@w:{0} unknown world): {1}", worldName, command));
                                         return;
                                     }
                                     match = true;
@@ -417,7 +423,7 @@ public class Menu implements InventoryHolder {
         String specialCommand = args[0];
         if (!plugin.isValidMenuScriptCommand(specialCommand)
                 && !player.hasPermission("cyom.script.command." + specialCommand.toLowerCase())) {
-            player.sendMessage("Error in menu script line (command is not allowed): " + command);
+            player.sendMessage(plugin.translate(player, "error-illegal-command", "Error in menu script line (command is not allowed): {0}", command));
             return false;
         }
         ScriptCommand scriptCommand = plugin.getScriptCommand(specialCommand);
@@ -449,7 +455,7 @@ public class Menu implements InventoryHolder {
                     }
                 }
                 if (promptString != null) {
-                    player.sendMessage("Error in menu script line (incomplete dynamic argument): " + command);
+                    player.sendMessage(plugin.translate(player, "error-incomplete-dynamic-arg", "Error in menu script line (incomplete dynamic argument): {0}", command));
                     return false;
                 }
                 if (commandString != null) {
@@ -470,7 +476,7 @@ public class Menu implements InventoryHolder {
                                 if (!plugin.getServer().dispatchCommand(sender,
                                         command)) {
                                     // If it fails to execute
-                                    player.sendMessage("Error in menu script line (unknown command): " + command);
+                                    player.sendMessage(plugin.translate(player, "error-unknown-command", "Error in menu script line (unknown command): {0}", command));
                                 } else {
                                     // If it succeeds, continue with the script execution
                                     parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
@@ -489,7 +495,7 @@ public class Menu implements InventoryHolder {
             } else {
                 if (!plugin.getServer().dispatchCommand(sender,
                         command.substring(1))) {
-                    player.sendMessage("Error in menu script line (unknown command): " + command);
+                    player.sendMessage(plugin.translate(player, "error-unknown-command", "Error in menu script line (unknown command): {0}", command));
                     return false;
                 }
             }
@@ -513,7 +519,7 @@ public class Menu implements InventoryHolder {
         return new StringPrompt() {
             @Override
             public String getPromptText(ConversationContext context) {
-                return "Please enter " + promptPart + ":";
+                return plugin.translate(player, "dynamic-arg-prompt", "Please enter {0}:", promptPart);
             }
 
             @Override
@@ -530,5 +536,9 @@ public class Menu implements InventoryHolder {
      */
     public String getTitle() {
         return inventory.getTitle();
+    }
+
+    public String translate(CommandSender forWhom, String key, String template, Object... params) {
+        return plugin.translate(forWhom, key, template, params);
     }
 }
