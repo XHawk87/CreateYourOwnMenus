@@ -50,7 +50,7 @@ public class TextFileLoader implements Runnable {
 
         try {
             byte[] encoded = Files.readAllBytes(file.toPath());
-            String contents = Charset.defaultCharset().decode(ByteBuffer.wrap(encoded)).toString();
+            String contents = Charset.forName("UTF8").decode(ByteBuffer.wrap(encoded)).toString();
             lines.addAll(Arrays.asList(contents.replace('&', ChatColor.COLOR_CHAR).replace("\r\n", "\n").split("\n")));
         } catch (final IOException ex) {
             plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
