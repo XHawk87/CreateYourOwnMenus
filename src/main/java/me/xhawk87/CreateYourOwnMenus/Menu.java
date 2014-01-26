@@ -50,7 +50,7 @@ import org.bukkit.scheduler.BukkitRunnable;
  * @author XHawk87
  */
 public class Menu implements InventoryHolder {
-    
+
     private CreateYourOwnMenus plugin;
     private String id;
     private Inventory inventory;
@@ -92,7 +92,7 @@ public class Menu implements InventoryHolder {
     public String getId() {
         return id;
     }
-    
+
     @Override
     public Inventory getInventory() {
         return inventory;
@@ -125,29 +125,54 @@ public class Menu implements InventoryHolder {
                 // Only one thread must operate on the file at any one time to 
                 // prevent conflicts
                 synchronized (file) {
-                    final FileConfiguration data = new YamlConfiguration();
-                    try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName("UTF8")))) {
-                        String line;
-                        StringBuilder sb = new StringBuilder();
-                        while ((line = in.readLine()) != null) {
-                            sb.append(line);
-                            sb.append('\n');
-                        }
-                        data.loadFromString(sb.toString());
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                onLoad(data);
-                            }
-                        }.runTask(plugin);
-                    } catch (FileNotFoundException ex) {
-                        plugin.getLogger().warning(file.getPath() + " no longer exists");
-                    } catch (IOException | InvalidConfigurationException ex) {
-                        plugin.getLogger().log(Level.WARNING, "Error reading " + file.getPath(), ex);
-                    }
+                    readMenuFile("UTF8");
                 }
             }
         }.runTaskAsynchronously(plugin);
+    }
+
+    /**
+     * Called asynchronously to read the file data
+     *
+     * @param encoding The text-encoding to use for reading the file
+     */
+    private void readMenuFile(String encoding) {
+        final FileConfiguration data = new YamlConfiguration();
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName(encoding)))) {
+            String line;
+            StringBuilder sb = new StringBuilder();
+            while ((line = in.readLine()) != null) {
+                sb.append(line);
+                sb.append('\n');
+            }
+
+            data.loadFromString(sb.toString());
+
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    onLoad(data);
+                }
+            }.runTask(plugin);
+        } catch (FileNotFoundException ex) {
+            plugin.getLogger().warning(file.getPath() + " no longer exists");
+        } catch (IOException ex) {
+            plugin.getLogger().log(Level.WARNING, "Error reading " + file.getPath(), ex);
+        } catch (InvalidConfigurationException ex) {
+            if (encoding.equals("UTF8")) {
+                plugin.getLogger().warning("Outdated menu file detected, trying to read in ANSI: " + file.getName());
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        synchronized (file) {
+                            readMenuFile("Cp1252");
+                        }
+                    }
+                }.runTaskAsynchronously(plugin);
+            } else {
+                plugin.getLogger().log(Level.WARNING, "Corrupted menu file detected: " + file.getPath(), ex);
+            }
+        }
     }
 
     /**
@@ -288,7 +313,7 @@ public class Menu implements InventoryHolder {
     private void select(Player player, ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         if (menuItem.hasItemMeta()) {
             ItemMeta meta = menuItem.getItemMeta();
-            
+
             if (meta.hasLore()) {
                 List<String> lore = meta.getLore();
                 if (!lore.isEmpty()) {
@@ -305,7 +330,7 @@ public class Menu implements InventoryHolder {
         // The item doesn't have metadata or lore
         player.sendMessage(plugin.translate(player, "invalid-menu-item", "This is not a valid menu item"));
     }
-    
+
     public void parseCommands(final Iterator<String> commands, final Player player, final ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         MenuCommandSender consoleSender = new MenuCommandSender(player, plugin.getServer().getConsoleSender());
         while (commands.hasNext()) {
@@ -352,12 +377,12 @@ public class Menu implements InventoryHolder {
                     command = command.replaceAll("@y", Integer.toString(loc.getBlockY()));
                     command = command.replaceAll("@z", Integer.toString(loc.getBlockZ()));
                 }
-                
+
                 if (command.contains("@a") || command.contains("@w")) {
                     int range = -1;
                     World world = null;
                     Location from = player.getLocation();
-                    
+
                     StringBuilder sb = null;
                     for (int i = 0; i < command.length(); i++) {
                         char c = command.charAt(i);
@@ -401,7 +426,7 @@ public class Menu implements InventoryHolder {
                             }
                         }
                     }
-                    
+
                     for (Player target : plugin.getServer().getOnlinePlayers()) {
                         if (range != -1) {
                             if (from.distanceSquared(target.getLocation()) > range * range) {
@@ -424,7 +449,7 @@ public class Menu implements InventoryHolder {
             }
         }
     }
-    
+
     private boolean parseCommand(final CommandSender sender, final Player player,
             String command, final Iterator<String> commands, final ItemStack menuItem,
             final Player targetPlayer, final Block targetBlock) {
@@ -495,7 +520,7 @@ public class Menu implements InventoryHolder {
                         }.runTask(plugin);
                         return END_OF_CONVERSATION;
                     }
-                    
+
                     @Override
                     public String getPromptText(ConversationContext context) {
                         return "";
@@ -512,7 +537,7 @@ public class Menu implements InventoryHolder {
         }
         return true;
     }
-    
+
     private Prompt parseDynamicArgs(final StringBuilder parsedCommand,
             final Iterator<String> parts, final Player player, final Prompt message) {
         if (!parts.hasNext()) {
@@ -520,18 +545,18 @@ public class Menu implements InventoryHolder {
         }
         String commandPart = parts.next();
         parsedCommand.append(commandPart);
-        
+
         if (!parts.hasNext()) {
             return message;
         }
         final String promptPart = parts.next();
-        
+
         return new StringPrompt() {
             @Override
             public String getPromptText(ConversationContext context) {
                 return plugin.translate(player, "dynamic-arg-prompt", "Please enter {0}:", promptPart);
             }
-            
+
             @Override
             public Prompt acceptInput(ConversationContext context, String input) {
                 parsedCommand.append(input);
@@ -547,7 +572,7 @@ public class Menu implements InventoryHolder {
     public String getTitle() {
         return inventory.getTitle();
     }
-    
+
     public String translate(CommandSender forWhom, String key, String template, Object... params) {
         return plugin.translate(forWhom, key, template, params);
     }
