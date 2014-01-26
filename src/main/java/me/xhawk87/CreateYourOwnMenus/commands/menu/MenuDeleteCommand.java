@@ -41,7 +41,7 @@ public class MenuDeleteCommand implements IMenuCommand {
         // Check that ths id is valid
         Menu menu = plugin.getMenu(id);
         if (menu == null) {
-            sender.sendMessage(plugin.translate(sender, "no-menu-by-id", "There is no menu with id {0}", id));
+            sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", id));
             return true;
         }
 

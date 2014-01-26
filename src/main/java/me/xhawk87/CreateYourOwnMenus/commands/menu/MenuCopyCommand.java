@@ -44,7 +44,7 @@ public class MenuCopyCommand implements IMenuCommand {
 
         Menu oldMenu = plugin.getMenu(oldMenuId);
         if (oldMenu == null) {
-            sender.sendMessage(plugin.translate(sender, "no-menu-by-id", "There is no menu with id {0}", oldMenuId));
+            sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", oldMenuId));
             return true;
         }
         int rows = oldMenu.getInventory().getSize() / 9;

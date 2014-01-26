@@ -1,0 +1,79 @@
+no-menus: There are currently no menus. Use /menu create to create one
+menu-count: There are {0} menus:
+menu-list-item:     {0}: {1}
+invalid-menu-item: This is not a valid menu item
+error-integer-area: Error in menu script line (expected @a:range as an integer number): {0}
+error-unknown-world: Error in menu script line (@w:{0} unknown world): {1}
+error-illegal-command: Error in menu script line (command is not allowed): {0}
+error-incomplete-dynamic-arg: Error in menu script line (incomplete dynamic argument): {0}
+error-unknown-command: Error in menu script line (unknown command): {0}
+dynamic-arg-prompt: Please enter {0}:
+expected-no-args: Error in menu script line (expected no arguments): {0}
+consume-no-item: Cannot locate menu item to remove it. Was it moved?
+error-expected-perm: Error in menu script line (expected permission node): {0}
+no-item-perms: You do not have permission to use this menu item
+menu-create-usage: 
+menu-edit-usage: 
+menu-delete-usage: 
+menu-list-usage: 
+menu-open-usage: 
+menu-script-usage: 
+menu-reload-usage: 
+menu-grab-usage: 
+menu-copy-usage: 
+command-no-perms: You do not have permission to use this command
+sudo-usage: /sudo [player] [command...]. Send a command as the specified player. This can be used in place of @p/ in menu scripts e.g. '/sudo @p kill' in place of '@p/kill'
+player-not-online: {0} is not online
+error-negative-index: The index must be at least 0: {0}
+error-index-too-high: The index must be less than the number of lines in the lore ({0}): {1}
+expected-integer-index: The index must be a whole number: {0}
+menu-copy-usage-extended: /menu copy [old menu id] [new menu id] [new title] - Create a new menu with the same size and contents as the given menu but with a new id and title
+unknown-menu-id: There is no menu with id {0}
+title-char-limit: Titles are limited to 32 characters (including colours)
+menu-already-exists: A menu with id {0} already exists
+menu-created: {0} menu has been created
+menu-create-usage-extended: /menu create [id] [rows] [title] - Creates a new menu with the given id, title and number of rows. The id is used to refer to the menu in commands, it must be unique and cannot contain spaces or colours. The title is displayed to everyone opening the menu and can contain spaces and colours (using & instead of the section symbol). The number of rows determine how large an inventory is used for this menu.
+expected-integer-rows: The number of rows must be a whole number: {0}
+menu-delete-usage-extended: /menu delete [id] - Deletes the menu with the given id
+menu-deleted: {0} has been deleted
+menu-edit-usage-extended: /menu edit ([player]) [id] - Opens the menu with the given id for editing. This allows you to move menu items in and out of a menu. If a player is given, it will open the menu for the given player for editing, whether or not they have permission
+console-no-target: The console must specify a player
+menu-grabbed-for-player: {0} was grabbed for {1}
+menu-open-usage-extended: /menu open ([player]) [id] - Opens the menu with the given id for use. If a player is specified, the menu will open for this player instead of the command sender. Clicking an icon will not pick it up, but instead run all commands listed in the lore
+no-menu-perms: You do not have permission to open this menu
+command-no-perms: You do not have permission to use this command
+menus-reloaded: Menus reloaded from disk
+menu-script-append-usage: 
+menu-script-clear-usage: 
+menu-script-delete-usage: 
+menu-script-export-usage: 
+menu-script-hide-usage: 
+menu-script-import-usage: 
+menu-script-insert-usage: 
+menu-script-replace-usage: 
+menu-script-show-usage: 
+menu-script-title-usage: 
+error-no-item-in-hand: You must be holding a menu item
+script-appended: {0} was added to the command list of this menu item
+script-cleared: The command list for this menu item has been cleared
+script-line-removed: Removed {0} from line {1} in the command list of this menu item
+export-no-lore: This item has no lore to export
+export-save-error: An error occurred while attempting to write to {0}. Please see console for details
+script-exported: Script was successfully exported to {0}
+script-commands-hidden: All commands on this menu item should now be hidden
+script-imported: Import successful
+import-file-not-found: Could not find {0}
+import-load-error: An error occurred while attempting to read {0}. Please see console for details.
+script-inserted: {0} was inserted before line {1} in the command list of this menu item
+script-replaced: {0} replaced line {1} in the command list of this menu item
+script-commands-shown: All commands on this menu item should now be visible
+item-title-set: The title of this menu item is now {0}
+starnode-warning: CreateYourOwnMenus has detected that you may have been granted every permission node. This is generally a bad idea because it means that you will also be granted permissions that you don't necessarily want, such as the 'cyom.slot.lock.*' permissions, which lock your inventory slots causing them to act like menus. If you wish to remove this warning, please remove the 'i.have.every.permission' node from yourself, or stop using the '*' node. It really isn't needed, all permissions default to Op unless the developer specifically set them otherwise
+error-no-delay: Error in menu script line (expected delay in ticks): {0}
+expected-integer-delay: Error in menu script line (delay must be a whole number of ticks): {0}
+vault-required: The /requirecurrency special command requires Vault to work
+error-no-currency: Error in menu script line (expected currency amount): {0}
+not-enough-currency: You must have at least {0} to do this
+error-number-currency: Error in menu script line (expected currency amount): {0}
+require-level-usage: Error in menu script line (expected /requirelevel ([player]) [level] ([fail message])): {0}
+error-integer-xp-level: Error in menu script line (expected positive experience level): {0}

@@ -34,6 +34,7 @@ public class LanguageWrapper {
     public LanguageWrapper(Plugin plugin, String code) {
         this.plugin = plugin;
         if (Bukkit.getPluginManager().getPlugin("LanguageAPI") != null) {
+            plugin.saveResource("languages/lang-eng.yml", false);
             langObj = new PluginLanguageLibrary(plugin, ISOCode.findMatch(code));
         }
     }
