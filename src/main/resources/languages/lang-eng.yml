@@ -12,15 +12,15 @@ expected-no-args: Error in menu script line (expected no arguments): {0}
 consume-no-item: Cannot locate menu item to remove it. Was it moved?
 error-expected-perm: Error in menu script line (expected permission node): {0}
 no-item-perms: You do not have permission to use this menu item
-menu-create-usage: 
-menu-edit-usage: 
-menu-delete-usage: 
-menu-list-usage: 
-menu-open-usage: 
-menu-script-usage: 
-menu-reload-usage: 
-menu-grab-usage: 
-menu-copy-usage: 
+menu-create-usage: /menu create [id] [rows] [title] - Create a new menu with the given id, title and size
+menu-edit-usage: /menu edit ([player]) [id] - Open an existing menu by its id for editing
+menu-delete-usage: /menu delete [id] - Deletes an existing menu by its id
+menu-list-usage: /menu list - Lists all menus
+menu-open-usage: /menu open ([player]) [id] - Open an existing menu by its id for using. Optionally opens the menu for another player
+menu-script-usage: /menu script ([player]) [clear|show|hide|append|insert|replace|delete] [parameters...]
+menu-reload-usage: /menu reload - Reloads all menus from disk
+menu-grab-usage: /menu grab ([player]) [menu id]. Gives copies of all items in the given menu to the specified player (or the sender if no player is given). This will attempt to place items in the same location in the player's inventory as in the menu, starting with the top row as the hotbar.
+menu-copy-usage: /menu copy [old menu id] [new menu id] [new title] - Create a new menu with the same size and contents as the given menu but with a new id and title
 command-no-perms: You do not have permission to use this command
 sudo-usage: /sudo [player] [command...]. Send a command as the specified player. This can be used in place of @p/ in menu scripts e.g. '/sudo @p kill' in place of '@p/kill'
 player-not-online: {0} is not online
@@ -43,16 +43,16 @@ menu-open-usage-extended: /menu open ([player]) [id] - Opens the menu with the g
 no-menu-perms: You do not have permission to open this menu
 command-no-perms: You do not have permission to use this command
 menus-reloaded: Menus reloaded from disk
-menu-script-append-usage: 
-menu-script-clear-usage: 
-menu-script-delete-usage: 
-menu-script-export-usage: 
-menu-script-hide-usage: 
-menu-script-import-usage: 
-menu-script-insert-usage: 
-menu-script-replace-usage: 
-menu-script-show-usage: 
-menu-script-title-usage: 
+menu-script-append-usage: /menu script ([player]) append [text] - Adds this text as the last line in the held item's lore
+menu-script-clear-usage: /menu script ([player]) clear - Removes all lore from the item in your hand
+menu-script-delete-usage: /menu script ([player]) delete [index] - Deletes the line with the given index (0 for first) in the held item's lore
+menu-script-export-usage: /menu script ([player]) export [filename] - Saves all lore in the held item to the given file. Ampersand (&) is used as an alternate colour code
+menu-script-hide-usage: /menu script ([player]) hide - Hides all commands for the menu item in your hand, and shows all comments
+menu-script-import-usage: /menu script ([player]) import [filename] - Replaces all lore in the held item with the text from the given file. Ampersand (&) can be used as an alternate colour code
+menu-script-insert-usage: /menu script ([player]) insert [index] [text] - Inserts the given text at line with the given index (0 for before first) in the held item's lore
+menu-script-replace-usage: /menu script ([player]) replace [index] [text] - Replaces the line with the given index (0 for first) with the given text in the held item's lore
+menu-script-show-usage: /menu script ([player]) show - Shows all hidden commands for the menu item in your hand, and hides all comments
+menu-script-title-usage: /menu script ([player]) title [text] - Sets the held item's display name to the given text. May include formatting codes (&)
 error-no-item-in-hand: You must be holding a menu item
 script-appended: {0} was added to the command list of this menu item
 script-cleared: The command list for this menu item has been cleared

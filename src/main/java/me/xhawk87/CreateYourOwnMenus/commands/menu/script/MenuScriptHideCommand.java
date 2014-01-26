@@ -33,7 +33,7 @@ public class MenuScriptHideCommand extends IMenuScriptCommand {
 
     @Override
     public String getUsage() {
-        return "/menu script ([player]) show - Shows all hidden commands for the menu item in your hand, and hides all comments";
+        return "/menu script ([player]) hide - Hides all commands for the menu item in your hand, and shows all comments";
     }
 
     @Override
