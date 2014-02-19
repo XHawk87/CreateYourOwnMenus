@@ -44,7 +44,7 @@ public class SudoCommand implements CommandExecutor {
             return true;
         }
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder("/");
         for (int i = 1; i < args.length; i++) {
             sb.append(args[i]);
             if (i < args.length) {
@@ -52,7 +52,7 @@ public class SudoCommand implements CommandExecutor {
             }
         }
 
-        plugin.getServer().dispatchCommand(target, sb.toString());
+        target.chat(sb.toString());
         return true;
     }
 }
