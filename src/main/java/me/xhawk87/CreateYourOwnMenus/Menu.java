@@ -416,7 +416,7 @@ public class Menu implements InventoryHolder {
                                     match = true;
                                 }
                                 if (match) {
-                                    command = command.replaceFirst(targetString, "@o");
+                                    command = command.replaceFirst("\\Q" + targetString + "\\E", "@o");
                                     i -= targetString.length();
                                     i += 2;
                                 }
