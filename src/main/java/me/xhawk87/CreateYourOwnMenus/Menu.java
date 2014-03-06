@@ -390,7 +390,11 @@ public class Menu implements InventoryHolder {
                             sb = new StringBuilder();
                             sb.append(c);
                         } else if (sb != null) {
-                            if (c == ' ' || i == command.length() - 1) {
+                            if (i == command.length() - 1 && c != ' ') {
+                                sb.append(c);
+                                c = ' ';
+                            }
+                            if (c == ' ') {
                                 String targetString = sb.toString();
                                 boolean match = false;
                                 if (targetString.equalsIgnoreCase("@a")) {
