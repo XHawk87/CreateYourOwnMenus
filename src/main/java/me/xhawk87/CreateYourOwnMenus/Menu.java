@@ -254,6 +254,7 @@ public class Menu implements InventoryHolder {
         if (editing.remove(player.getName())) {
             // If the player was editing, make sure any changes they made were 
             // saved
+            plugin.getLogger().info("doneEditing - save(" + player.getName() + ")");
             save();
         }
     }

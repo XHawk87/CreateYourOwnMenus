@@ -23,7 +23,7 @@ public class FileUpdater {
     private static final long DEFAULT_INTERVAL = 1000;
     private final File file;
     private long saveCount = 0;
-    private long lastSave = 0;
+    private long lastSave = System.currentTimeMillis();
     private long interval;
     private BukkitTask saveTask = null;
 
