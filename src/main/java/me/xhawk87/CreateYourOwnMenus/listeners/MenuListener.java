@@ -83,7 +83,9 @@ public class MenuListener implements Listener {
                 // The clicked slot is the player's inventory
                 int slot = event.getSlot();
                 if (player.hasPermission("cyom.slot.lock." + slot)) {
-
+                    if (player.hasPermission("i.have.every.permission")) {
+                        player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
+                    }
                     // Prevent any modification to the locked slot
                     event.setCancelled(true);
 
@@ -177,6 +179,9 @@ public class MenuListener implements Listener {
                 if (rawSlot >= numInTop) {
                     int slot = event.getView().convertSlot(rawSlot);
                     if (player.hasPermission("cyom.slot.lock." + slot)) {
+                        if (player.hasPermission("i.have.every.permission")) {
+                            player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
+                        }
                         event.setCancelled(true);
                         return;
                     }
@@ -214,6 +219,9 @@ public class MenuListener implements Listener {
             PlayerInventory inv = player.getInventory();
             int slot = inv.getHeldItemSlot();
             if (player.hasPermission("cyom.slot.lock." + slot)) {
+                if (player.hasPermission("i.have.every.permission")) {
+                    player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
+                }
                 // Replace the item back where it was
                 ItemStack item = event.getItemDrop().getItemStack();
                 ItemStack slotItem = inv.getItem(slot);
@@ -239,6 +247,9 @@ public class MenuListener implements Listener {
         PlayerInventory inv = player.getInventory();
         ItemStack pickup = event.getItem().getItemStack();
         int toAdd = pickup.getAmount() - event.getRemaining();
+        if (player.hasPermission("i.have.every.permission")) {
+            player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
+        }
         for (int i = 0; i < inv.getSize(); i++) {
             ItemStack slot = inv.getItem(i);
             if (slot == null || slot.getType() == Material.AIR) {
@@ -416,6 +427,9 @@ public class MenuListener implements Listener {
         final Player player = event.getEntity();
         PlayerInventory inv = player.getInventory();
         final Map<Integer, ItemStack> toKeep = new TreeMap<>();
+        if (player.hasPermission("i.have.every.permission")) {
+            player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
+        }
         for (int index = 0; index < 40; index++) {
             if (player.hasPermission("cyom.slot.lock." + index)) {
                 toKeep.put(index, inv.getItem(index));
