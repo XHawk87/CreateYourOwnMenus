@@ -68,7 +68,6 @@ script-inserted: {0} was inserted before line {1} in the command list of this me
 script-replaced: {0} replaced line {1} in the command list of this menu item
 script-commands-shown: All commands on this menu item should now be visible
 item-title-set: The title of this menu item is now {0}
-starnode-warning: CreateYourOwnMenus has detected that you may have been granted every permission node. This is generally a bad idea because it means that you will also be granted permissions that you don't necessarily want, such as the 'cyom.slot.lock.*' permissions, which lock your inventory slots causing them to act like menus. If you wish to remove this warning, please remove the 'i.have.every.permission' node from yourself, or stop using the '*' node. It really isn't needed, all permissions default to Op unless the developer specifically set them otherwise
 error-no-delay: Error in menu script line (expected delay in ticks): {0}
 expected-integer-delay: Error in menu script line (delay must be a whole number of ticks): {0}
 vault-required: The /requirecurrency special command requires Vault to work
@@ -77,4 +76,3 @@ not-enough-currency: You must have at least {0} to do this
 error-number-currency: Error in menu script line (expected currency amount): {0}
 require-level-usage: Error in menu script line (expected /requirelevel ([player]) [level] ([fail message])): {0}
 error-integer-xp-level: Error in menu script line (expected positive experience level): {0}
-starnode-click-warning: Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node

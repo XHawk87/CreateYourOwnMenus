@@ -165,6 +165,6 @@ permissions:
       cyom.slot.lock.6: true
       cyom.slot.lock.7: true
       cyom.slot.lock.8: true
-  i.have.every.permission:
-    description: Displays a warning about slot locking to all server owners who recklessly grant players the '*' permission node
+  disable.slot.locking:
+    description: Slot locking will be completely disabled for anyone who has this permission, regardless of any other permissions that they have. This is not intended for actual use, just to protect people who use the '*' permission node from accidentally locking all of their slots
     default: false

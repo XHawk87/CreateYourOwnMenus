@@ -29,7 +29,6 @@ import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerPickupItemEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
@@ -82,10 +81,8 @@ public class MenuListener implements Listener {
             if (rawSlot >= numInTop) {
                 // The clicked slot is the player's inventory
                 int slot = event.getSlot();
-                if (player.hasPermission("cyom.slot.lock." + slot)) {
-                    if (player.hasPermission("i.have.every.permission")) {
-                        player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
-                    }
+                if (player.hasPermission("cyom.slot.lock." + slot)
+                        && !player.hasPermission("disable.slot.locking")) {
                     // Prevent any modification to the locked slot
                     event.setCancelled(true);
 
@@ -178,10 +175,8 @@ public class MenuListener implements Listener {
             for (int rawSlot : event.getRawSlots()) {
                 if (rawSlot >= numInTop) {
                     int slot = event.getView().convertSlot(rawSlot);
-                    if (player.hasPermission("cyom.slot.lock." + slot)) {
-                        if (player.hasPermission("i.have.every.permission")) {
-                            player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
-                        }
+                    if (player.hasPermission("cyom.slot.lock." + slot)
+                            && !player.hasPermission("disable.slot.locking")) {
                         event.setCancelled(true);
                         return;
                     }
@@ -218,10 +213,8 @@ public class MenuListener implements Listener {
                 || player.getItemOnCursor().getType() == Material.AIR) {
             PlayerInventory inv = player.getInventory();
             int slot = inv.getHeldItemSlot();
-            if (player.hasPermission("cyom.slot.lock." + slot)) {
-                if (player.hasPermission("i.have.every.permission")) {
-                    player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
-                }
+            if (player.hasPermission("cyom.slot.lock." + slot)
+                    && !player.hasPermission("disable.slot.locking")) {
                 // Replace the item back where it was
                 ItemStack item = event.getItemDrop().getItemStack();
                 ItemStack slotItem = inv.getItem(slot);
@@ -244,12 +237,12 @@ public class MenuListener implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onPickUpItemIntoLockedSlot(PlayerPickupItemEvent event) {
         Player player = event.getPlayer();
+        if (player.hasPermission("disable.slot.locking")) {
+            return;
+        }
         PlayerInventory inv = player.getInventory();
         ItemStack pickup = event.getItem().getItemStack();
         int toAdd = pickup.getAmount() - event.getRemaining();
-        if (player.hasPermission("i.have.every.permission")) {
-            player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
-        }
         for (int i = 0; i < inv.getSize(); i++) {
             ItemStack slot = inv.getItem(i);
             if (slot == null || slot.getType() == Material.AIR) {
@@ -422,14 +415,14 @@ public class MenuListener implements Listener {
         if (event.getEntity().getWorld().isGameRule("keepInventory")) {
             return;
         }
+        final Player player = event.getEntity();
+        if (player.hasPermission("disable.slot.locking")) {
+            return;
+        }
         List<ItemStack> drops = event.getDrops();
         drops.clear();
-        final Player player = event.getEntity();
         PlayerInventory inv = player.getInventory();
         final Map<Integer, ItemStack> toKeep = new TreeMap<>();
-        if (player.hasPermission("i.have.every.permission")) {
-            player.sendMessage(plugin.translate(player, "starnode-click-warning", "Warning: You may be using the '*' permission node to grant yourself all permissions. This includes the 'cyom.slot.lock.*' permissions which lock your inventory slots so that they act like menus. You must negate this permission '-cyom.slot.lock.*' if you insist on using the '*' node"));
-        }
         for (int index = 0; index < 40; index++) {
             if (player.hasPermission("cyom.slot.lock." + index)) {
                 toKeep.put(index, inv.getItem(index));
@@ -447,14 +440,6 @@ public class MenuListener implements Listener {
                     }
                 }
             }.runTask(plugin);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        Player player = event.getPlayer();
-        if (player.hasPermission("i.have.every.permission")) {
-            player.sendMessage(plugin.translate(player, "starnode-warning", "CreateYourOwnMenus has detected that you may have been granted every permission node. This is generally a bad idea because it means that you will also be granted permissions that you don't necessarily want, such as the 'cyom.slot.lock.*' permissions, which lock your inventory slots causing them to act like menus. If you wish to remove this warning, please remove the 'i.have.every.permission' node from yourself, or stop using the '*' node. It really isn't needed, all permissions default to Op unless the developer specifically set them otherwise"));
         }
     }
 }
