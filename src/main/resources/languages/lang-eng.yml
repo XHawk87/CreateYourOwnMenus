@@ -17,7 +17,7 @@ menu-edit-usage: /menu edit ([player]) [id] - Open an existing menu by its id fo
 menu-delete-usage: /menu delete [id] - Deletes an existing menu by its id
 menu-list-usage: /menu list - Lists all menus
 menu-open-usage: /menu open ([player]) [id] - Open an existing menu by its id for using. Optionally opens the menu for another player
-menu-script-usage: /menu script ([player]) [clear|show|hide|append|insert|replace|delete] [parameters...]
+menu-script-usage: /menu script ([player | menu#slot]) [clear|show|hide|append|insert|replace|delete] [parameters...]
 menu-reload-usage: /menu reload - Reloads all menus from disk
 menu-grab-usage: /menu grab ([player]) [menu id]. Gives copies of all items in the given menu to the specified player (or the sender if no player is given). This will attempt to place items in the same location in the player's inventory as in the menu, starting with the top row as the hotbar.
 menu-copy-usage: /menu copy [old menu id] [new menu id] [new title] - Create a new menu with the same size and contents as the given menu but with a new id and title
@@ -43,16 +43,16 @@ menu-open-usage-extended: /menu open ([player]) [id] - Opens the menu with the g
 no-menu-perms: You do not have permission to open this menu
 command-no-perms: You do not have permission to use this command
 menus-reloaded: Menus reloaded from disk
-menu-script-append-usage: /menu script ([player]) append [text] - Adds this text as the last line in the held item's lore
-menu-script-clear-usage: /menu script ([player]) clear - Removes all lore from the item in your hand
-menu-script-delete-usage: /menu script ([player]) delete [index] - Deletes the line with the given index (0 for first) in the held item's lore
-menu-script-export-usage: /menu script ([player]) export [filename] - Saves all lore in the held item to the given file. Ampersand (&) is used as an alternate colour code
-menu-script-hide-usage: /menu script ([player]) hide - Hides all commands for the menu item in your hand, and shows all comments
-menu-script-import-usage: /menu script ([player]) import [filename] - Replaces all lore in the held item with the text from the given file. Ampersand (&) can be used as an alternate colour code
-menu-script-insert-usage: /menu script ([player]) insert [index] [text] - Inserts the given text at line with the given index (0 for before first) in the held item's lore
-menu-script-replace-usage: /menu script ([player]) replace [index] [text] - Replaces the line with the given index (0 for first) with the given text in the held item's lore
-menu-script-show-usage: /menu script ([player]) show - Shows all hidden commands for the menu item in your hand, and hides all comments
-menu-script-title-usage: /menu script ([player]) title [text] - Sets the held item's display name to the given text. May include formatting codes (&)
+menu-script-append-usage: /menu script ([player | menu#slot]) append [text] - Adds this text as the last line in the held item's lore
+menu-script-clear-usage: /menu script ([player | menu#slot]) clear - Removes all lore from the item in your hand
+menu-script-delete-usage: /menu script ([player | menu#slot]) delete [index] - Deletes the line with the given index (0 for first) in the held item's lore
+menu-script-export-usage: /menu script ([player | menu#slot]) export [filename] - Saves all lore in the held item to the given file. Ampersand (&) is used as an alternate colour code
+menu-script-hide-usage: /menu script ([player | menu#slot]) hide - Hides all commands for the menu item in your hand, and shows all comments
+menu-script-import-usage: /menu script ([player | menu#slot]) import [filename] - Replaces all lore in the held item with the text from the given file. Ampersand (&) can be used as an alternate colour code
+menu-script-insert-usage: /menu script ([player | menu#slot]) insert [index] [text] - Inserts the given text at line with the given index (0 for before first) in the held item's lore
+menu-script-replace-usage: /menu script ([player | menu#slot]) replace [index] [text] - Replaces the line with the given index (0 for first) with the given text in the held item's lore
+menu-script-show-usage: /menu script ([player | menu#slot]) show - Shows all hidden commands for the menu item in your hand, and hides all comments
+menu-script-title-usage: /menu script ([player | menu#slot]) title [text] - Sets the held item's display name to the given text. May include formatting codes (&)
 error-no-item-in-hand: You must be holding a menu item
 script-appended: {0} was added to the command list of this menu item
 script-cleared: The command list for this menu item has been cleared
@@ -76,3 +76,10 @@ not-enough-currency: You must have at least {0} to do this
 error-number-currency: Error in menu script line (expected currency amount): {0}
 require-level-usage: Error in menu script line (expected /requirelevel ([player]) [level] ([fail message])): {0}
 error-integer-xp-level: Error in menu script line (expected positive experience level): {0}
+expected-integer-slot: The slot should be an integer number: {0}
+invalid-slot-number: The menu {0} has {1} slots numbered from 0 to {2}, so {3} is out of range
+menu-set-success: Slot {0} of {1} was set to item {2} in {3}
+menu-set-usage: /menu set [target menu id] [target slot] [to menu id] [to slot] - Set the target slot of the given menu to the menu item in the given slot of the specified menu
+menu-set-usage-extended: /menu set [target menu id] [target slot] [to menu id] [to slot] - Set the target slot of the given menu to the menu item in the given slot of the specified menu. This can be useful in making somewhat dynamic menus, changing individual items in a menu by command from a template menu. If there is an existing item it will be overwritten, if the slot it is to be set to is empty, any existing item will be removed.
+menu-slot-no-item: There is no item in slot {0} of the {1} menu
+unknown-subcommand: {0} has no {1} sub-command

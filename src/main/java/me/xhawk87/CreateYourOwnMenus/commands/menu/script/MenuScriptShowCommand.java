@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
 import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.commandStart;
 import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.hiddenCommand;
 import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.hiddenPlayerCommand;
@@ -18,7 +19,6 @@ import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.unpackHiddenTe
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -43,9 +43,9 @@ public class MenuScriptShowCommand extends IMenuScriptCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Player target, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, ItemStackRef itemStackRef, Command command, String label, String[] args) {
         // Check the player is holding the item
-        ItemStack held = target.getItemInHand();
+        ItemStack held = itemStackRef.get();
         if (held == null || held.getTypeId() == 0) {
             sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
@@ -72,8 +72,7 @@ public class MenuScriptShowCommand extends IMenuScriptCommand {
             loreStrings.addAll(lines.subList(0, lines.size() - 1));
         }
 
-        for (int i = 0; i < loreStrings.size(); i++) {
-            String loreString = loreStrings.get(i);
+        for (String loreString : loreStrings) {
             if (loreString.startsWith(commandStart)
                     || loreString.startsWith(playerCommand)) {
                 commands.add(loreString);

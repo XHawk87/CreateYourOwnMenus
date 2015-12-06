@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
 import me.xhawk87.CreateYourOwnMenus.utils.TextCallback;
 import me.xhawk87.CreateYourOwnMenus.utils.TextFileLoader;
 import org.bukkit.command.Command;
@@ -30,7 +31,7 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
 
     @Override
     public String getUsage() {
-        return "/menu script ([player]) import [filename] - Replaces all lore in the held item with the text from the given file. Ampersand (&) can be used as an alternate colour code";
+        return "/menu script ([player | menu#slot]) import [filename] - Replaces all lore in the held item with the text from the given file. Ampersand (&) can be used as an alternate colour code";
     }
 
     @Override
@@ -39,9 +40,9 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
     }
 
     @Override
-    public boolean onCommand(final CommandSender sender, final Player target, Command command, String label, String[] args) {
+    public boolean onCommand(final CommandSender sender, final ItemStackRef itemStackRef, Command command, String label, String[] args) {
         // Check the player is holding the item
-        ItemStack held = target.getItemInHand();
+        ItemStack held = itemStackRef.get();
         if (held == null || held.getTypeId() == 0) {
             sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
@@ -65,7 +66,7 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
         new TextFileLoader(plugin, scriptFile, new TextCallback() {
             @Override
             public void onLoad(List<String> lines) {
-                ItemStack held = target.getItemInHand();
+                ItemStack held = itemStackRef.get();
                 if (held == null || held.getTypeId() == 0) {
                     sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
                     return;
@@ -75,6 +76,7 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
                 meta.setLore(lines.subList(1, lines.size()));
                 held.setItemMeta(meta);
                 sender.sendMessage(plugin.translate(sender, "script-imported", "Import successful"));
+                itemStackRef.update();
             }
 
             @Override

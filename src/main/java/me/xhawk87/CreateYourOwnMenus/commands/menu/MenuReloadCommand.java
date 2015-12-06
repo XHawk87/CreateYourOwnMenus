@@ -5,6 +5,7 @@
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
+import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -23,14 +24,21 @@ public class MenuReloadCommand implements IMenuCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        // Expecting no parameters
-        if (args.length != 0) {
+        if (args.length == 0) {
+            plugin.reloadMenus();
+            sender.sendMessage(plugin.translate(sender, "menus-reloaded", "Menus reloaded from disk"));
+            return true;
+        } else if (args.length == 1) {
+            String menuId = args[0];
+            if (plugin.reloadMenu(menuId)) {
+                sender.sendMessage(plugin.translate(sender, "menu-reloaded", "Reloaded {0} menu from disk", menuId));
+            } else {
+                sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", menuId));
+            }
+            return true;
+        } else {
             return false;
         }
-
-        plugin.reloadMenus();
-        sender.sendMessage(plugin.translate(sender, "menus-reloaded", "Menus reloaded from disk"));
-        return true;
     }
 
     @Override

@@ -6,9 +6,9 @@ package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 
 /**
  *
@@ -27,7 +27,7 @@ public abstract class IMenuScriptCommand implements IMenuCommand {
         throw new UnsupportedOperationException("Not supported.");
     }
 
-    public abstract boolean onCommand(CommandSender sender, Player target, Command command, String label, String[] args);
+    public abstract boolean onCommand(CommandSender sender, ItemStackRef itemStackRef, Command command, String label, String[] args);
 
     protected int getIndex(String indexString, int maxIndex, CommandSender sender) {
         int index;

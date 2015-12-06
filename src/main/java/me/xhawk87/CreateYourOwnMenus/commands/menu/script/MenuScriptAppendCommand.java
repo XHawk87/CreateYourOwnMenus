@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -36,9 +36,9 @@ public class MenuScriptAppendCommand extends IMenuScriptCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Player target, Command command, String label, String[] args) {
+    public boolean onCommand(CommandSender sender, ItemStackRef itemStackRef, Command command, String label, String[] args) {
         // Check the player is holding the item
-        ItemStack held = target.getItemInHand();
+        ItemStack held = itemStackRef.get();
         if (held == null || held.getTypeId() == 0) {
             sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;

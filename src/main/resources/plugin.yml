@@ -29,6 +29,7 @@ permissions:
       cyom.commands.menu.script: true
       cyom.commands.menu.reload: true
       cyom.commands.menu.grab: true
+      cyom.commands.menu.set: true
   cyom.commands.menu.create:
     description: Allows creating of new menus
     default: op
@@ -66,6 +67,9 @@ permissions:
     default: op
   cyom.commands.menu.grab:
     description: Allows grabbing copies of items from a menu
+    default: op
+  cyom.commands.menu.set:
+    description: Allows setting specific items in a menu by command
     default: op
   cyom.commands.sudo:
     description: Allows use of the sudo command

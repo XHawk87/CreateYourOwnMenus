@@ -37,6 +37,7 @@ import org.bukkit.conversations.MessagePrompt;
 import org.bukkit.conversations.Prompt;
 import static org.bukkit.conversations.Prompt.END_OF_CONVERSATION;
 import org.bukkit.conversations.StringPrompt;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -116,6 +117,26 @@ public class Menu implements InventoryHolder {
     }
 
     /**
+     * Schedule an asynchronous reload fo this menu file from its .yml file
+     *
+     * This should only be used after the first load as it is intended to
+     * update a menu with minimal effect on player experience and not create
+     * new menus.
+     */
+    public void reload() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                // Only one thread must operate on the file at any one time to 
+                // prevent conflicts
+                synchronized (file) {
+                    readMenuFile("UTF8", true);
+                }
+            }
+        }.runTaskAsynchronously(plugin);
+    }
+
+    /**
      * Schedule an asynchronous load of this menu from its .yml file
      */
     public void load() {
@@ -125,7 +146,7 @@ public class Menu implements InventoryHolder {
                 // Only one thread must operate on the file at any one time to 
                 // prevent conflicts
                 synchronized (file) {
-                    readMenuFile("UTF8");
+                    readMenuFile("UTF8", false);
                 }
             }
         }.runTaskAsynchronously(plugin);
@@ -136,7 +157,7 @@ public class Menu implements InventoryHolder {
      *
      * @param encoding The text-encoding to use for reading the file
      */
-    private void readMenuFile(String encoding) {
+    private void readMenuFile(String encoding, final boolean reload) {
         final FileConfiguration data = new YamlConfiguration();
         try (BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(file), Charset.forName(encoding)))) {
             String line;
@@ -151,7 +172,11 @@ public class Menu implements InventoryHolder {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    onLoad(data);
+                    if (reload) {
+                        onReload(data);
+                    } else {
+                        onLoad(data);
+                    }
                 }
             }.runTask(plugin);
         } catch (FileNotFoundException ex) {
@@ -165,7 +190,7 @@ public class Menu implements InventoryHolder {
                     @Override
                     public void run() {
                         synchronized (file) {
-                            readMenuFile("Cp1252");
+                            readMenuFile("Cp1252", reload);
                         }
                     }
                 }.runTaskAsynchronously(plugin);
@@ -193,6 +218,42 @@ public class Menu implements InventoryHolder {
     }
 
     /**
+     * Called internally when the menu has been reloaded from file
+     *
+     * @param data The menu data
+     */
+    private void onReload(FileConfiguration data) {
+        String title = data.getString("title");
+        int size = data.getInt("size");
+        List<HumanEntity> viewers = inventory.getViewers();
+        
+        // Changing the size or title requires creating a new inventory
+        boolean recreate = !title.equals(inventory.getTitle()) || size != inventory.getSize();
+        if (recreate) {
+            inventory = plugin.getServer().createInventory(this, size, title);
+        }
+
+        inventory.clear();
+        ConfigurationSection contentsData = data.getConfigurationSection("contents");
+        for (String key : contentsData.getKeys(false)) {
+            int slot = Integer.parseInt(key);
+            ItemStack item = contentsData.getItemStack(key);
+            inventory.setItem(slot, item);
+        }
+
+        for (HumanEntity viewer : viewers) {
+            if (viewer instanceof Player) {
+                Player player = (Player) viewer;
+                if (recreate) {
+                    open(player);
+                } else {
+                    player.updateInventory();
+                }
+            }
+        }
+    }
+
+    /**
      * Deletes the menu file, and removes all references to the menu
      */
     public void delete() {
@@ -208,9 +269,9 @@ public class Menu implements InventoryHolder {
     }
 
     /**
-     * Opens this menu for using by the given player. If they click a menu item
-     * it will be activated. It should be impossible for them to modify the menu
-     * in any way
+     * Opens this menu for using by the given player. If they click a menu
+     * item it will be activated. It should be impossible for them to modify
+     * the menu in any way
      *
      * @param player The player to open this menu for
      */
@@ -234,8 +295,8 @@ public class Menu implements InventoryHolder {
 
     /**
      * Opens this menu for editing by the given player. Multiple players can
-     * modify a menu at the same time. Instead of activating on clicking, these
-     * players will be able to modify the menu.
+     * modify a menu at the same time. Instead of activating on clicking,
+     * these players will be able to modify the menu.
      *
      * @param player The player editing this menu
      */
@@ -245,8 +306,8 @@ public class Menu implements InventoryHolder {
     }
 
     /**
-     * When a player is done editing, they are removed from the editing list so
-     * they can use the menu again and any changes they made are saved.
+     * When a player is done editing, they are removed from the editing list
+     * so they can use the menu again and any changes they made are saved.
      *
      * @param player The player done editing
      */
@@ -307,8 +368,8 @@ public class Menu implements InventoryHolder {
      * @param menuItem The item being selected
      * @param targetPlayer The player being right-clicked with this menu item,
      * if any
-     * @param targetBlock The block being right-clicked with this menu item, if
-     * any
+     * @param targetBlock The block being right-clicked with this menu item,
+     * if any
      */
     private void select(Player player, ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         if (menuItem.hasItemMeta()) {
@@ -503,33 +564,33 @@ public class Menu implements InventoryHolder {
                 final StringBuilder parsedCommand = new StringBuilder();
                 player.beginConversation(
                         new Conversation(plugin, player,
-                        parseDynamicArgs(parsedCommand,
-                        parts.iterator(), player, new MessagePrompt() {
-                    @Override
-                    protected Prompt getNextPrompt(ConversationContext context) {
-                        final String command = parsedCommand.toString();
-                        new BukkitRunnable() {
-                            @Override
-                            public void run() {
-                                // Execute the command
-                                if (!plugin.getServer().dispatchCommand(sender,
-                                        command)) {
-                                    // If it fails to execute
-                                    player.sendMessage(plugin.translate(player, "error-unknown-command", "Error in menu script line (unknown command): {0}", command));
-                                } else {
-                                    // If it succeeds, continue with the script execution
-                                    parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
-                                }
-                            }
-                        }.runTask(plugin);
-                        return END_OF_CONVERSATION;
-                    }
+                                parseDynamicArgs(parsedCommand,
+                                        parts.iterator(), player, new MessagePrompt() {
+                                    @Override
+                                    protected Prompt getNextPrompt(ConversationContext context) {
+                                        final String command = parsedCommand.toString();
+                                        new BukkitRunnable() {
+                                            @Override
+                                            public void run() {
+                                                // Execute the command
+                                                if (!plugin.getServer().dispatchCommand(sender,
+                                                        command)) {
+                                                    // If it fails to execute
+                                                    player.sendMessage(plugin.translate(player, "error-unknown-command", "Error in menu script line (unknown command): {0}", command));
+                                                } else {
+                                                    // If it succeeds, continue with the script execution
+                                                    parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
+                                                }
+                                            }
+                                        }.runTask(plugin);
+                                        return END_OF_CONVERSATION;
+                                    }
 
-                    @Override
-                    public String getPromptText(ConversationContext context) {
-                        return "";
-                    }
-                })));
+                                    @Override
+                                    public String getPromptText(ConversationContext context) {
+                                        return "";
+                                    }
+                                })));
                 return false;
             } else {
                 if (!plugin.getServer().dispatchCommand(sender,

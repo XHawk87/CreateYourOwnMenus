@@ -31,7 +31,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 
 /**
- * A plugin to allow server owners to design and create their own menus in-game
+ * A plugin to allow server owners to design and create their own menus
+ * in-game
  *
  * @author XHawk87
  */
@@ -104,8 +105,8 @@ public class CreateYourOwnMenus extends JavaPlugin {
     }
 
     /**
-     * Create a new menu with the given id, display title and number of rows for
-     * the inventory.
+     * Create a new menu with the given id, display title and number of rows
+     * for the inventory.
      *
      * @param id A unique identifier for the menu
      * @param title The display title, may contain colour codes and spaces
@@ -126,8 +127,8 @@ public class CreateYourOwnMenus extends JavaPlugin {
         if (mgr.getPermission(permissionNode) == null) {
             mgr.addPermission(
                     new Permission(permissionNode,
-                    "Allows the given player to use the /menu open command for the "
-                    + id + " menu", PermissionDefault.FALSE));
+                            "Allows the given player to use the /menu open command for the "
+                            + id + " menu", PermissionDefault.FALSE));
         }
         return menu;
     }
@@ -207,9 +208,51 @@ public class CreateYourOwnMenus extends JavaPlugin {
             if (mgr.getPermission("cyom.menu." + id) == null) {
                 mgr.addPermission(
                         new Permission("cyom.menu." + id,
-                        "Allows the given player to use the /menu open command for the "
-                        + id + " menu", PermissionDefault.FALSE));
+                                "Allows the given player to use the /menu open command for the "
+                                + id + " menu", PermissionDefault.FALSE));
             }
+        }
+    }
+
+    public boolean reloadMenu(String menuId) {
+        // Check if menu and/or menu file exist
+        File menusFolder = new File(getDataFolder(), "menus");
+        File file = new File(menusFolder, menuId + ".yml");
+        if (file.exists()) {
+            Menu menu = getMenu(menuId);
+            if (menu == null) {
+                // Create this menu from file
+                menu = new Menu(this, menuId);
+                menu.load();
+                menus.put(menuId, menu);
+
+                // Register the specific-opening permission for the loaded menu
+                PluginManager mgr = getServer().getPluginManager();
+                if (mgr.getPermission("cyom.menu." + menuId) == null) {
+                    mgr.addPermission(
+                            new Permission("cyom.menu." + menuId,
+                                    "Allows the given player to use the /menu open command for the "
+                                    + menuId + " menu", PermissionDefault.FALSE));
+                }
+
+                return true;
+            } else {
+                // Update this menu from file
+                menu.reload();
+                return true;
+            }
+        } else {
+            // We should delete this menu if it exists
+            Menu menu = getMenu(menuId);
+            if (menu == null) {
+                return false;
+            }
+            // De-register the specific-opening permission for this menu
+            getServer().getPluginManager().removePermission("cyom.menus." + menu.getId());
+
+            // Delete this menu
+            menus.remove(menu.getId());
+            return true;
         }
     }
 
@@ -232,13 +275,13 @@ public class CreateYourOwnMenus extends JavaPlugin {
     }
 
     /**
-     * Checks the command blacklist and whitelist to see if this command can be
-     * used in a menu script.
+     * Checks the command blacklist and whitelist to see if this command can
+     * be used in a menu script.
      *
      * @param commandName The command name
-     * @return True, if the command is on the whitelist or there is no whitelist
-     * and it is not on the blacklist. False, if it is on the blacklist or if
-     * there is a whitelist and this command is not on it
+     * @return True, if the command is on the whitelist or there is no
+     * whitelist and it is not on the blacklist. False, if it is on the
+     * blacklist or if there is a whitelist and this command is not on it
      */
     public boolean isValidMenuScriptCommand(String commandName) {
         if (commandName.startsWith("/")) {

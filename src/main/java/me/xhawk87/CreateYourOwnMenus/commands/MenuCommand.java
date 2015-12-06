@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuSetCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -45,6 +46,7 @@ public class MenuCommand implements CommandExecutor {
         subCommands.put("reload", new MenuReloadCommand(plugin));
         subCommands.put("grab", new MenuGrabCommand(plugin));
         subCommands.put("copy", new MenuCopyCommand(plugin));
+        subCommands.put("set", new MenuSetCommand(plugin));
     }
 
     @Override
@@ -52,7 +54,7 @@ public class MenuCommand implements CommandExecutor {
         // It is assumed that entering the menu command without parameters is an
         // attempt to get information about it. So let's give it to them.
         if (args.length == 0) {
-            for (Map.Entry<String,IMenuCommand> entry : subCommands.entrySet()) {
+            for (Map.Entry<String, IMenuCommand> entry : subCommands.entrySet()) {
                 String name = entry.getKey();
                 IMenuCommand menuCommand = entry.getValue();
                 String permission = menuCommand.getPermission();
