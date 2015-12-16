@@ -79,7 +79,7 @@ error-integer-xp-level: Error in menu script line (expected positive experience 
 expected-integer-slot: The slot should be an integer number: {0}
 invalid-slot-number: The menu {0} has {1} slots numbered from 0 to {2}, so {3} is out of range
 menu-set-success: Slot {0} of {1} was set to item {2} in {3}
-menu-set-usage: /menu set [target menu id] [target slot] [to menu id] [to slot] - Set the target slot of the given menu to the menu item in the given slot of the specified menu
-menu-set-usage-extended: /menu set [target menu id] [target slot] [to menu id] [to slot] - Set the target slot of the given menu to the menu item in the given slot of the specified menu. This can be useful in making somewhat dynamic menus, changing individual items in a menu by command from a template menu. If there is an existing item it will be overwritten, if the slot it is to be set to is empty, any existing item will be removed.
+menu-set-usage: /menu set [target menu id] [target slot#] [source menu id] [source slot#] - Set the target slot of the given menu to the menu item in the given slot of the specified menu
+menu-set-usage-extended: /menu set [target menu id] [target slot#] [source menu id] [source slot#] - Set the target slot of the given menu to the menu item in the given slot of the specified menu. This can be useful in making somewhat dynamic menus, changing individual items in a menu by command from a template menu. If there is an existing item it will be overwritten, if the slot it is to be set to is empty, any existing item will be removed.
 menu-slot-no-item: There is no item in slot {0} of the {1} menu
 unknown-subcommand: {0} has no {1} sub-command

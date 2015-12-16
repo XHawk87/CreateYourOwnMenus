@@ -117,7 +117,7 @@ public class Menu implements InventoryHolder {
     }
 
     /**
-     * Schedule an asynchronous reload fo this menu file from its .yml file
+     * Schedule an asynchronous reload of this menu file from its .yml file
      *
      * This should only be used after the first load as it is intended to
      * update a menu with minimal effect on player experience and not create

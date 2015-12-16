@@ -31,7 +31,7 @@ public class MenuSetCommand implements IMenuCommand {
         // Entering a sub-command without parameters is assumed to be a request 
         // for information. So display some detailed help.
         if (args.length == 0) {
-            sender.sendMessage(plugin.translate(sender, "menu-set-usage-extended", "/menu set [target menu id] [target slot] [to menu id] [to slot] - Set the target slot of the given menu to the menu item in the given slot of the specified menu. This can be useful in making somewhat dynamic menus, changing individual items in a menu by command from a template menu. If there is an existing item it will be overwritten, if the slot it is to be set to is empty, any existing item will be removed."));
+            sender.sendMessage(plugin.translate(sender, "menu-set-usage-extended", "/menu set [target menu id] [target slot#] [source menu id] [source slot#] - Set the target slot of the given menu to the menu item in the given slot of the specified menu. This can be useful in making somewhat dynamic menus, changing individual items in a menu by command from a template menu. If there is an existing item it will be overwritten, if the slot it is to be set to is empty, any existing item will be removed."));
             return true;
         }
 
@@ -109,7 +109,7 @@ public class MenuSetCommand implements IMenuCommand {
 
     @Override
     public String getUsage() {
-        return "/menu set [target menu id] [target slot] [to menu id] [to slot] - Set the target slot of the given menu to the menu item in the given slot of the specified menu";
+        return "/menu set [target menu id] [target slot#] [source menu id] [source slot#] - Set the target slot of the given menu to the menu item in the given slot of the specified menu";
     }
 
     @Override

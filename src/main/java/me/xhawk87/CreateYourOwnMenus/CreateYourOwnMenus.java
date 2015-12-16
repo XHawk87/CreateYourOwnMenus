@@ -17,6 +17,7 @@ import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import me.xhawk87.CreateYourOwnMenus.script.CloseCommand;
 import me.xhawk87.CreateYourOwnMenus.script.ConsumeCommand;
 import me.xhawk87.CreateYourOwnMenus.script.DelayCommand;
+import me.xhawk87.CreateYourOwnMenus.script.ReloadCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequireCurrencyCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequireLevelCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequirePermissionCommand;
@@ -74,6 +75,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
         //scriptCommands.put("countchest", new CountChestCommand());
         scriptCommands.put("delay", new DelayCommand(this));
         //scriptCommands.put("givechest", new GiveChestCommand());
+        scriptCommands.put("reload", new ReloadCommand());
         scriptCommands.put("requirecurrency", new RequireCurrencyCommand(this));
         scriptCommands.put("requirelevel", new RequireLevelCommand(this));
         scriptCommands.put("requirepermission", new RequirePermissionCommand());
