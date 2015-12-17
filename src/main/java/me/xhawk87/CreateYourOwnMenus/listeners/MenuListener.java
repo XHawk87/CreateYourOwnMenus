@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.TreeMap;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
+import me.xhawk87.CreateYourOwnMenus.DummyMenu;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.GameMode;
@@ -49,7 +50,7 @@ public class MenuListener implements Listener {
     /**
      * A dummy menu to be used for in-inventory and in-hand menu item clicks
      */
-    private Menu defaultMenu;
+    private DummyMenu defaultMenu;
 
     /**
      * Register all events in this listener for the plugin
@@ -58,7 +59,7 @@ public class MenuListener implements Listener {
      */
     public void registerEvents(CreateYourOwnMenus plugin) {
         this.plugin = plugin;
-        defaultMenu = new Menu(plugin, "dummy");
+        defaultMenu = new DummyMenu(plugin);
         plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
 
@@ -198,8 +199,8 @@ public class MenuListener implements Listener {
     }
 
     /**
-     * Fired when a player drops an item using the drop item key, or by throwing
-     * items out of their inventory.
+     * Fired when a player drops an item using the drop item key, or by
+     * throwing items out of their inventory.
      *
      * We only want to cancel it if they are using the drop item key, as they
      * are already prevented from picking up locked items to throw out
@@ -290,7 +291,7 @@ public class MenuListener implements Listener {
                                 item.setItemStack(pickup);
                                 slot.setAmount(maxStackSize);
                                 inv.setItem(i, slot);
-                                continue;
+                                // continue;
                             } else {
                                 item.remove();
                                 slot.setAmount(slot.getAmount() + pickup.getAmount());
@@ -308,11 +309,11 @@ public class MenuListener implements Listener {
     }
 
     /**
-     * Fired when a player left or right clicks the air, or a block, or steps on
-     * an interactive block such as a pressure plate or redstone ore.
+     * Fired when a player left or right clicks the air, or a block, or steps
+     * on an interactive block such as a pressure plate or redstone ore.
      *
-     * Also note, the event defaults to cancelled when right-clicking the air so
-     * it is vital not to ignoreCancelled.
+     * Also note, the event defaults to cancelled when right-clicking the air
+     * so it is vital not to ignoreCancelled.
      *
      * @param event The interact event
      */
@@ -405,8 +406,8 @@ public class MenuListener implements Listener {
 
     /**
      * Fired when a player dies. Lowest priority so that we can redo the drop
-     * list, allowing only unlocked slots to drop, before any other plugins try
-     * to alter it.
+     * list, allowing only unlocked slots to drop, before any other plugins
+     * try to alter it.
      *
      * @param event
      */

@@ -226,7 +226,7 @@ public class Menu implements InventoryHolder {
         String title = data.getString("title");
         int size = data.getInt("size");
         List<HumanEntity> viewers = inventory.getViewers();
-        
+
         // Changing the size or title requires creating a new inventory
         boolean recreate = !title.equals(inventory.getTitle()) || size != inventory.getSize();
         if (recreate) {
@@ -438,6 +438,8 @@ public class Menu implements InventoryHolder {
                     command = command.replaceAll("@y", Integer.toString(loc.getBlockY()));
                     command = command.replaceAll("@z", Integer.toString(loc.getBlockZ()));
                 }
+                // Replace @m with the menu ID
+                command = command.replaceAll("@m", id);
 
                 if (command.contains("@a") || command.contains("@w")) {
                     int range = -1;
