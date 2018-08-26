@@ -115,7 +115,8 @@ public class MenuScriptUtils {
                             || loreString.startsWith(hiddenCommand)
                             || loreString.startsWith(hiddenPlayerCommand)) {
 
-                    if(CreateYourOwnMenus.getConfigFile().getString("only-playercommands").toLowerCase().equals("false"))
+                    String pc = CreateYourOwnMenus.getConfigFile().getString("only-playercommands");
+                    if(pc != null && pc.toLowerCase().equals("false"))
                         return true;
                     }
                 }
