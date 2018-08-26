@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
 import me.xhawk87.CreateYourOwnMenus.i18n.LanguageWrapper;
@@ -24,6 +26,7 @@ import me.xhawk87.CreateYourOwnMenus.script.RequirePermissionCommand;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
@@ -48,9 +51,18 @@ public class CreateYourOwnMenus extends JavaPlugin {
     private Map<String, ScriptCommand> scriptCommands = new HashMap<>();
     private LanguageWrapper language;
 
+    private static FileConfiguration config = null;
+
+
+    public static FileConfiguration getConfigFile() {
+        return config;
+    }
+
     @Override
     public void onEnable() {
         saveDefaultConfig();
+
+        this.config = getConfig();
 
         new BukkitRunnable() {
             @Override
@@ -229,7 +241,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
                 menus.put(menuId, menu);
 
                 // Register the specific-opening permission for the loaded menu
-                PluginManager mgr = getServer().getPluginManager();
+                org.bukkit.plugin.PluginManager mgr = getServer().getPluginManager();
                 if (mgr.getPermission("cyom.menu." + menuId) == null) {
                     mgr.addPermission(
                             new Permission("cyom.menu." + menuId,

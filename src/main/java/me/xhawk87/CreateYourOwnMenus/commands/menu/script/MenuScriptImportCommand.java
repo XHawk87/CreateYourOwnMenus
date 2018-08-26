@@ -43,7 +43,7 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
     public boolean onCommand(final CommandSender sender, final ItemStackRef itemStackRef, Command command, String label, String[] args) {
         // Check the player is holding the item
         ItemStack held = itemStackRef.get();
-        if (held == null || held.getTypeId() == 0) {
+        if (held == null || held.getType().getId() == 0) {
             sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }
@@ -67,7 +67,7 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
             @Override
             public void onLoad(List<String> lines) {
                 ItemStack held = itemStackRef.get();
-                if (held == null || held.getTypeId() == 0) {
+                if (held == null || held.getType().getId() == 0) {
                     sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
                     return;
                 }

@@ -39,7 +39,7 @@ public class MenuScriptAppendCommand extends IMenuScriptCommand {
     public boolean onCommand(CommandSender sender, ItemStackRef itemStackRef, Command command, String label, String[] args) {
         // Check the player is holding the item
         ItemStack held = itemStackRef.get();
-        if (held == null || held.getTypeId() == 0) {
+        if (held == null || held.getType().getId() == 0) {
             sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
             return true;
         }

@@ -13,35 +13,42 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+
     <repositories>
         <repository>
-            <id>bukkit-repo</id>
-            <url>http://repo.bukkit.org/content/groups/public/</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
         <repository>
             <id>vault-repo</id>
-            <url>http://ci.herocraftonline.com/plugin/repository/everything</url>
+            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
+        </repository>
+
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
     </repositories>
-  
+
     <dependencies>
-        <!-- Dependency information --> 
+
+        <!-- Dependency information -->
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <!-- Bukkit API Version, change if necessary -->
-            <version>1.7.2-R0.3</version>
+            <version>1.13-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
-            <artifactId>Vault</artifactId>
-            <version>1.2.27</version>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.6</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>me.xhawk87</groupId>
+            <groupId>com.github.Peda1996</groupId>
             <artifactId>LanguageAPI</artifactId>
-            <version>0.2</version>
+            <version>0.03</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -49,8 +56,9 @@
             <version>4.4</version>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
-    
+
     <!-- Build -->
     <build>
         <!-- Resources -->
@@ -77,7 +85,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.8.0</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>

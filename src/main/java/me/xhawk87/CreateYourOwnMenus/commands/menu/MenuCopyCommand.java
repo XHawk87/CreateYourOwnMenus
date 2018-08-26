@@ -72,7 +72,7 @@ public class MenuCopyCommand implements IMenuCommand {
         ItemStack[] contents = oldMenu.getInventory().getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
-            if (item != null && item.getTypeId() != 0) {
+            if (item != null && item.getType().getId() != 0) {
                 inv.setItem(i, item.clone());
             }
         }

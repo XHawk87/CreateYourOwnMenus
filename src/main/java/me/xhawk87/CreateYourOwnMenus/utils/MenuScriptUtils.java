@@ -6,6 +6,8 @@ package me.xhawk87.CreateYourOwnMenus.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -106,10 +108,14 @@ public class MenuScriptUtils {
                 loreStrings.addAll(unpackHiddenLines(loreStrings.get(0)));
 
                 for (String loreString : loreStrings) {
+                    if(loreString.startsWith(playerCommand)){
+                        return true;
+                    }
                     if (loreString.startsWith(commandStart)
-                            || loreString.startsWith(playerCommand)
                             || loreString.startsWith(hiddenCommand)
                             || loreString.startsWith(hiddenPlayerCommand)) {
+
+                    if(CreateYourOwnMenus.getConfigFile().getString("only-playercommands").toLowerCase().equals("false"))
                         return true;
                     }
                 }

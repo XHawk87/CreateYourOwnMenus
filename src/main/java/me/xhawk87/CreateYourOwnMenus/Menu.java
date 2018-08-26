@@ -621,7 +621,7 @@ public class Menu implements InventoryHolder {
         return new StringPrompt() {
             @Override
             public String getPromptText(ConversationContext context) {
-                return plugin.translate(player, "dynamic-arg-prompt", "Please enter {0}:", promptPart);
+                return plugin.translate(player, "dynamic-arg-prompt", "{0}", promptPart);
             }
 
             @Override

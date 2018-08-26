@@ -219,7 +219,7 @@ public class MenuListener implements Listener {
                 // Replace the item back where it was
                 ItemStack item = event.getItemDrop().getItemStack();
                 ItemStack slotItem = inv.getItem(slot);
-                if (slotItem == null || slotItem.getTypeId() == 0) {
+                if (slotItem == null || slotItem.getType().getId() == 0) {
                     inv.setItem(slot, item.clone());
                 } else {
                     slotItem.setAmount(slotItem.getAmount() + item.getAmount());
@@ -302,7 +302,7 @@ public class MenuListener implements Listener {
                     }
                 }
                 if (dosound) {
-                    player.playSound(item.getLocation(), Sound.ITEM_PICKUP, 0.2f, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                    player.playSound(item.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.2f, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 }
             }
         }.runTask(plugin);
