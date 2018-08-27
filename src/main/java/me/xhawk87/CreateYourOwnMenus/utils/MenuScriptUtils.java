@@ -94,6 +94,7 @@ public class MenuScriptUtils {
      * @return True if it is a valid menu item, otherwise false
      */
     public static boolean isValidMenuItem(ItemStack item) {
+        boolean isValid = false;
         if (item == null || item.getType() == Material.AIR) {
             return false;
         }
@@ -107,21 +108,23 @@ public class MenuScriptUtils {
                 }
                 loreStrings.addAll(unpackHiddenLines(loreStrings.get(0)));
 
+
+
                 for (String loreString : loreStrings) {
+                    String pc = CreateYourOwnMenus.getConfigFile().getString("only-playercommands");
+                    boolean allowServerCommands = pc != null? Boolean.parseBoolean(pc):false;
                     if(loreString.startsWith(playerCommand)){
-                        return true;
+                        isValid = true;
                     }
                     if (loreString.startsWith(commandStart)
-                            || loreString.startsWith(hiddenCommand)
-                            || loreString.startsWith(hiddenPlayerCommand)) {
+                            || loreString.startsWith(hiddenPlayerCommand)
+                            || loreString.startsWith(hiddenCommand)) { //hidden commands are not supported for now
 
-                    String pc = CreateYourOwnMenus.getConfigFile().getString("only-playercommands");
-                    if(pc != null && pc.toLowerCase().equals("false"))
-                        return true;
+                        return allowServerCommands? true: false;
                     }
                 }
             }
         }
-        return false;
+        return isValid;
     }
 }

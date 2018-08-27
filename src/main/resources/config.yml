@@ -9,5 +9,6 @@
 blacklist-commands:
   - op
 
-## servercommands can be seperately enabled with
-# only-playercommands: true
+## servercommands can be seperately enabled with, hidden playercommands also won't work with this fix
+## for possible hacking :P, uncomment next line
+# only-playercommands: false
