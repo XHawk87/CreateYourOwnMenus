@@ -108,19 +108,16 @@ public class MenuScriptUtils {
                 }
                 loreStrings.addAll(unpackHiddenLines(loreStrings.get(0)));
 
-
-
+                boolean onlyPlayerCommands = CreateYourOwnMenus.getConfigFile().getBoolean("only-playercommands");
                 for (String loreString : loreStrings) {
-                    String pc = CreateYourOwnMenus.getConfigFile().getString("only-playercommands");
-                    boolean allowServerCommands = pc != null? Boolean.parseBoolean(pc):false;
-                    if(loreString.startsWith(playerCommand)){
+                    if (loreString.startsWith(playerCommand)){
+                        if (!onlyPlayerCommands) return true; // Skip the excess loop
                         isValid = true;
                     }
                     if (loreString.startsWith(commandStart)
                             || loreString.startsWith(hiddenPlayerCommand)
                             || loreString.startsWith(hiddenCommand)) { //hidden commands are not supported for now
-
-                        return allowServerCommands? true: false;
+                        return !onlyPlayerCommands; // Non player command, obey setting to determine validity
                     }
                 }
             }
