@@ -110,14 +110,14 @@ public class MenuScriptUtils {
 
                 boolean onlyPlayerCommands = CreateYourOwnMenus.getConfigFile().getBoolean("only-playercommands");
                 for (String loreString : loreStrings) {
-                    if(loreString.startsWith(playerCommand)){
+                    if (loreString.startsWith(playerCommand)){
+                        if (!onlyPlayerCommands) return true; // Skip the excess loop
                         isValid = true;
                     }
                     if (loreString.startsWith(commandStart)
                             || loreString.startsWith(hiddenPlayerCommand)
                             || loreString.startsWith(hiddenCommand)) { //hidden commands are not supported for now
-                        if (onlyPlayerCommands) return false; // This isn't a player command, therefore it's invalid
-                        isValid = true;
+                        return !onlyPlayerCommands; // Non player command, obey setting to determine validity
                     }
                 }
             }
