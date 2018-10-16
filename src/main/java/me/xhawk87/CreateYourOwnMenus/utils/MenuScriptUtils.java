@@ -108,7 +108,8 @@ public class MenuScriptUtils {
                 }
                 loreStrings.addAll(unpackHiddenLines(loreStrings.get(0)));
 
-                boolean onlyPlayerCommands = CreateYourOwnMenus.getConfigFile().getBoolean("only-playercommands");
+                boolean onlyPlayerCommands =
+                        Boolean.parseBoolean(CreateYourOwnMenus.getPlugin(CreateYourOwnMenus.class).getConfig().getString("only-playercommands"));
                 for (String loreString : loreStrings) {
                     if (loreString.startsWith(playerCommand)){
                         if (!onlyPlayerCommands) return true; // Skip the excess loop

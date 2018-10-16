@@ -10,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Array;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
+
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
 import me.xhawk87.CreateYourOwnMenus.utils.ElevatedCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.FileUpdater;
@@ -127,7 +130,7 @@ public class Menu implements InventoryHolder {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // Only one thread must operate on the file at any one time to 
+                // Only one thread must operate on the file at any one time to
                 // prevent conflicts
                 synchronized (file) {
                     readMenuFile("UTF8", true);
@@ -143,7 +146,7 @@ public class Menu implements InventoryHolder {
         new BukkitRunnable() {
             @Override
             public void run() {
-                // Only one thread must operate on the file at any one time to 
+                // Only one thread must operate on the file at any one time to
                 // prevent conflicts
                 synchronized (file) {
                     readMenuFile("UTF8", false);
@@ -214,8 +217,12 @@ public class Menu implements InventoryHolder {
             int slot = Integer.parseInt(key);
             ItemStack item = contentsData.getItemStack(key);
             inventory.setItem(slot, item);
+
+            //check for placeholders
+            hasItemPlaceholders(slot,item);
         }
     }
+
 
     /**
      * Called internally when the menu has been reloaded from file
@@ -239,6 +246,9 @@ public class Menu implements InventoryHolder {
             int slot = Integer.parseInt(key);
             ItemStack item = contentsData.getItemStack(key);
             inventory.setItem(slot, item);
+
+            //check for placeholders
+            hasItemPlaceholders(slot,item);
         }
 
         for (HumanEntity viewer : viewers) {
@@ -250,6 +260,85 @@ public class Menu implements InventoryHolder {
                     player.updateInventory();
                 }
             }
+        }
+    }
+
+    /**
+     * Checks if there is a placeholder in the string
+     */
+    private void hasItemPlaceholders(int slot, ItemStack item){
+        //check if placeholders are enabled!
+        if(plugin.placeHoldersEnabled())
+            return;
+
+
+        Placeholder placeholder = new Placeholder(slot, item);
+
+        //check if title has an placeholder in it
+        boolean retVal = PlaceholderAPI.containsPlaceholders(item.getItemMeta().getDisplayName());
+        placeholder.title = retVal;
+
+        //check if placeholders can be found in a lore
+        int index = 0;
+        if(item.getItemMeta().getLore() != null)
+            for(String s : item.getItemMeta().getLore()){
+                if(PlaceholderAPI.containsPlaceholders(s)){
+                    placeholder.lorePlaceholderPositions.add(index);
+                    retVal = true;
+                }
+                index++;
+            }
+
+        //if we have found a placeholder lets add it
+        if(retVal){
+            placeholderList.add(placeholder);
+        }
+
+    }
+
+    /**
+     * Placeholder Data and simple inner class
+     */
+    private List<Placeholder> placeholderList = new ArrayList<Placeholder>();
+
+    private class Placeholder{
+        private Placeholder( int slot, ItemStack item){
+            this.slot = slot;
+            this.item = item;
+        }
+        private ItemStack item; //backing up the item
+        private int slot;
+        private boolean title;
+        private List<Integer> lorePlaceholderPositions = new ArrayList<>();
+    }
+
+
+    /**
+     * This function is called when a placeholder is used, therefore it changes every time the menu is opened
+     */
+    private void reArrangePlaceholders(final Player player){
+        if(placeholderList.isEmpty()) return;
+
+        for(Placeholder p : placeholderList){
+            //create a copy of our item, so we don't override something important
+            ItemStack item = p.item.clone();
+            ItemMeta meta = item.getItemMeta();
+
+            if(p.title){
+                String title = PlaceholderAPI.setPlaceholders(player,item.getItemMeta().getDisplayName());
+                meta.setDisplayName(title);
+            }
+
+            List<String> metaLore = meta.getLore();
+            if(!p.lorePlaceholderPositions.isEmpty()){
+                for(int i : p.lorePlaceholderPositions){
+                    String lore = PlaceholderAPI.setPlaceholders(player,item.getItemMeta().getLore().get(i));
+                    metaLore.set(i,lore);
+                }
+            }
+            meta.setLore(metaLore);
+            item.setItemMeta(meta);
+            inventory.setItem(p.slot, item);
         }
     }
 
@@ -279,8 +368,10 @@ public class Menu implements InventoryHolder {
         // Check if the player already has an inventory open
         Inventory current = player.getOpenInventory().getTopInventory();
         if (current == null) {
+            reArrangePlaceholders(player);
             player.openInventory(inventory);
         } else {
+            reArrangePlaceholders(player);
             // Switching directly from one inventory to another causes glitches
             player.closeInventory();
             // So close it and wait one tick
@@ -518,8 +609,8 @@ public class Menu implements InventoryHolder {
     }
 
     private boolean parseCommand(final CommandSender sender, final Player player,
-            String command, final Iterator<String> commands, final ItemStack menuItem,
-            final Player targetPlayer, final Block targetBlock) {
+                                 String command, final Iterator<String> commands, final ItemStack menuItem,
+                                 final Player targetPlayer, final Block targetBlock) {
         // Handle the special menu script commands
         String[] args = command.split(" ");
         String specialCommand = args[0];
@@ -568,31 +659,31 @@ public class Menu implements InventoryHolder {
                         new Conversation(plugin, player,
                                 parseDynamicArgs(parsedCommand,
                                         parts.iterator(), player, new MessagePrompt() {
-                                    @Override
-                                    protected Prompt getNextPrompt(ConversationContext context) {
-                                        final String command = parsedCommand.toString();
-                                        new BukkitRunnable() {
                                             @Override
-                                            public void run() {
-                                                // Execute the command
-                                                if (!plugin.getServer().dispatchCommand(sender,
-                                                        command)) {
-                                                    // If it fails to execute
-                                                    player.sendMessage(plugin.translate(player, "error-unknown-command", "Error in menu script line (unknown command): {0}", command));
-                                                } else {
-                                                    // If it succeeds, continue with the script execution
-                                                    parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
-                                                }
+                                            protected Prompt getNextPrompt(ConversationContext context) {
+                                                final String command = parsedCommand.toString();
+                                                new BukkitRunnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        // Execute the command
+                                                        if (!plugin.getServer().dispatchCommand(sender,
+                                                                command)) {
+                                                            // If it fails to execute
+                                                            player.sendMessage(plugin.translate(player, "error-unknown-command", "Error in menu script line (unknown command): {0}", command));
+                                                        } else {
+                                                            // If it succeeds, continue with the script execution
+                                                            parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
+                                                        }
+                                                    }
+                                                }.runTask(plugin);
+                                                return END_OF_CONVERSATION;
                                             }
-                                        }.runTask(plugin);
-                                        return END_OF_CONVERSATION;
-                                    }
 
-                                    @Override
-                                    public String getPromptText(ConversationContext context) {
-                                        return "";
-                                    }
-                                })));
+                                            @Override
+                                            public String getPromptText(ConversationContext context) {
+                                                return "";
+                                            }
+                                        })));
                 return false;
             } else {
                 if (!plugin.getServer().dispatchCommand(sender,
@@ -606,7 +697,7 @@ public class Menu implements InventoryHolder {
     }
 
     private Prompt parseDynamicArgs(final StringBuilder parsedCommand,
-            final Iterator<String> parts, final Player player, final Prompt message) {
+                                    final Iterator<String> parts, final Player player, final Prompt message) {
         if (!parts.hasNext()) {
             return message;
         }

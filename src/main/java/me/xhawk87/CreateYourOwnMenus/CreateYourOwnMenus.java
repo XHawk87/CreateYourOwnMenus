@@ -25,8 +25,10 @@ import me.xhawk87.CreateYourOwnMenus.script.RequireLevelCommand;
 import me.xhawk87.CreateYourOwnMenus.script.RequirePermissionCommand;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.PluginManager;
@@ -38,9 +40,9 @@ import org.bukkit.scheduler.BukkitRunnable;
  * A plugin to allow server owners to design and create their own menus
  * in-game
  *
- * @author XHawk87
+ * @author XHawk87, Peda1996
  */
-public class CreateYourOwnMenus extends JavaPlugin {
+public class CreateYourOwnMenus extends JavaPlugin implements Listener{
 
     // Store menus by their ID
     private Map<String, Menu> menus = new HashMap<>();
@@ -51,18 +53,14 @@ public class CreateYourOwnMenus extends JavaPlugin {
     private Map<String, ScriptCommand> scriptCommands = new HashMap<>();
     private LanguageWrapper language;
 
-    private static FileConfiguration config = null;
-
-
-    public static FileConfiguration getConfigFile() {
-        return config;
-    }
+    //maybe use other method? leave it that way this time
+    private static FileConfiguration fileConfiguration;
+    private boolean placeHoldersEnabled = false;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
-
-        this.config = getConfig();
+        fileConfiguration = getConfig();
 
         new BukkitRunnable() {
             @Override
@@ -101,6 +99,16 @@ public class CreateYourOwnMenus extends JavaPlugin {
 
         // Register LanguageAPI
         language = new LanguageWrapper(this, "eng");
+
+
+        // Use the PlaceHolderAPI
+        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+            Bukkit.getPluginManager().registerEvents(this, this);
+            placeHoldersEnabled = true; //no need for a config entry
+        } else {
+            placeHoldersEnabled = false;
+        }
+
     }
 
     private void setupEconomy() {
@@ -142,7 +150,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
             mgr.addPermission(
                     new Permission(permissionNode,
                             "Allows the given player to use the /menu open command for the "
-                            + id + " menu", PermissionDefault.FALSE));
+                                    + id + " menu", PermissionDefault.FALSE));
         }
         return menu;
     }
@@ -223,7 +231,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
                 mgr.addPermission(
                         new Permission("cyom.menu." + id,
                                 "Allows the given player to use the /menu open command for the "
-                                + id + " menu", PermissionDefault.FALSE));
+                                        + id + " menu", PermissionDefault.FALSE));
             }
         }
     }
@@ -246,7 +254,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
                     mgr.addPermission(
                             new Permission("cyom.menu." + menuId,
                                     "Allows the given player to use the /menu open command for the "
-                                    + menuId + " menu", PermissionDefault.FALSE));
+                                            + menuId + " menu", PermissionDefault.FALSE));
                 }
 
                 return true;
@@ -333,5 +341,13 @@ public class CreateYourOwnMenus extends JavaPlugin {
      */
     public String translate(CommandSender forWhom, String key, String template, Object... params) {
         return language.get(forWhom, key, template, params);
+    }
+
+    public static FileConfiguration getConfigFile() {
+        return fileConfiguration;
+    }
+
+    public boolean placeHoldersEnabled(){
+        return placeHoldersEnabled;
     }
 }
