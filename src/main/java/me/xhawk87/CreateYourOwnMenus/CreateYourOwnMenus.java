@@ -238,7 +238,7 @@ public class CreateYourOwnMenus extends JavaPlugin implements Listener{
                 menus.put(menuId, menu);
 
                 // Register the specific-opening permission for the loaded menu
-                org.bukkit.plugin.PluginManager mgr = getServer().getPluginManager();
+                PluginManager mgr = getServer().getPluginManager();
                 if (mgr.getPermission("cyom.menu." + menuId) == null) {
                     mgr.addPermission(
                             new Permission("cyom.menu." + menuId,
