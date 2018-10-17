@@ -354,6 +354,12 @@ public class Menu implements InventoryHolder {
     private void reArrangePlaceholders(final Player player){
         if(placeholderList.isEmpty()) return;
 
+        //when Player is editing, display the normal lore and title, therefore %asdf% is displayed
+        if(isEditing(player)){
+           restoreInvPlaceholders();
+           return;
+        }
+
         for(Placeholder p : placeholderList){
             //create a copy of our item, so we don't override something important
             ItemStack item = p.item;
