@@ -47,7 +47,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 /**
  * Handles menu file IO, editing and use of the menu
  *
- * @author XHawk87
  */
 public class Menu implements InventoryHolder {
 
@@ -105,6 +104,10 @@ public class Menu implements InventoryHolder {
         if(placeholderList.isEmpty()) return;
 
         for(Placeholder p : placeholderList){
+
+            //check if item still exists, needed when the edit command was used
+            if(inventory.getItem(p.slot) == null) continue;
+
             //create a copy of our item, so we don't override something important
             ItemStack item = p.item;
             ItemMeta meta = item.getItemMeta();
@@ -128,13 +131,12 @@ public class Menu implements InventoryHolder {
         }
     }
 
-
     /**
      * Schedules an asynchronous save of this menu to its .yml file
      */
-    public void save() {
-        //restoring Placeholders for saving
-        restoreInvPlaceholders();
+    public void saveEdit(){
+        //regenerate Placeholders!
+        placeholderList = new ArrayList<>();
 
         FileConfiguration data = new YamlConfiguration();
         data.set("title", inventory.getTitle());
@@ -143,10 +145,22 @@ public class Menu implements InventoryHolder {
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack item = inventory.getItem(i);
             if (item != null) {
+                hasItemPlaceholders(i,item);
                 contentsData.set(Integer.toString(i), item);
             }
         }
         fileUpdater.save(plugin, data.saveToString());
+    }
+
+    /**
+     * Schedules an asyncronous save of this menu, and also restores the placeholders!
+     */
+    public void save() {
+        //restore placeholders
+        restoreInvPlaceholders();
+
+        //normal Saving
+        saveEdit();
     }
 
     /**
@@ -333,6 +347,8 @@ public class Menu implements InventoryHolder {
     /**
      * Placeholder Data and simple inner class
      */
+
+
     private List<Placeholder> placeholderList = new ArrayList<Placeholder>();
 
     private class Placeholder{
@@ -345,6 +361,8 @@ public class Menu implements InventoryHolder {
         private String title;
         private Map<Integer,String> lorePlaceholderPositions = new TreeMap<>();
         //private List<Integer> lorePlaceholderPositions = new ArrayList<>();
+
+
     }
 
 
@@ -413,13 +431,13 @@ public class Menu implements InventoryHolder {
             reArrangePlaceholders(player);
             player.openInventory(inventory);
         } else {
-            reArrangePlaceholders(player);
             // Switching directly from one inventory to another causes glitches
             player.closeInventory();
             // So close it and wait one tick
             new BukkitRunnable() {
                 @Override
                 public void run() {
+                    reArrangePlaceholders(player);
                     player.openInventory(inventory);
                 }
             }.runTask(plugin);
@@ -448,7 +466,7 @@ public class Menu implements InventoryHolder {
         if (editing.remove(player.getName())) {
             // If the player was editing, make sure any changes they made were 
             // saved
-            save();
+            saveEdit();
         }
     }
 
