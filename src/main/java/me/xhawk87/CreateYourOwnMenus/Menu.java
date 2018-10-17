@@ -12,12 +12,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Array;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Level;
 
 import me.clip.placeholderapi.PlaceholderAPI;
@@ -26,6 +21,7 @@ import me.xhawk87.CreateYourOwnMenus.utils.ElevatedCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.FileUpdater;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -103,9 +99,43 @@ public class Menu implements InventoryHolder {
     }
 
     /**
+     *   Restore Placeholders for instance (%asdf%)
+     */
+    private void restoreInvPlaceholders(){
+        if(placeholderList.isEmpty()) return;
+
+        for(Placeholder p : placeholderList){
+            //create a copy of our item, so we don't override something important
+            ItemStack item = p.item;
+            ItemMeta meta = item.getItemMeta();
+
+            if(p.title != null){
+                meta.setDisplayName(p.title);
+            }
+
+            //get the whole Lorelist
+            List<String> metaLore = meta.getLore();
+            if(!p.lorePlaceholderPositions.isEmpty()){
+                for(Map.Entry<Integer, String> entry : p.lorePlaceholderPositions.entrySet()){
+                    Integer slot = entry.getKey();
+                    String lore = entry.getValue();
+                    metaLore.set(slot,lore);
+                }
+            }
+            meta.setLore(metaLore);
+            item.setItemMeta(meta);
+            inventory.setItem(p.slot, item);
+        }
+    }
+
+
+    /**
      * Schedules an asynchronous save of this menu to its .yml file
      */
     public void save() {
+        //restoring Placeholders for saving
+        restoreInvPlaceholders();
+
         FileConfiguration data = new YamlConfiguration();
         data.set("title", inventory.getTitle());
         data.set("size", inventory.getSize());
@@ -268,23 +298,27 @@ public class Menu implements InventoryHolder {
      */
     private void hasItemPlaceholders(int slot, ItemStack item){
         //check if placeholders are enabled!
-        if(plugin.placeHoldersEnabled())
+        if (!Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
             return;
 
 
         Placeholder placeholder = new Placeholder(slot, item);
+        boolean retVal = false;
 
         //check if title has an placeholder in it
-        boolean retVal = PlaceholderAPI.containsPlaceholders(item.getItemMeta().getDisplayName());
-        placeholder.title = retVal;
+        if(PlaceholderAPI.containsPlaceholders(item.getItemMeta().getDisplayName())) {
+            placeholder.title = item.getItemMeta().getDisplayName();
+            retVal = true;
+        }
 
         //check if placeholders can be found in a lore
         int index = 0;
         if(item.getItemMeta().getLore() != null)
             for(String s : item.getItemMeta().getLore()){
                 if(PlaceholderAPI.containsPlaceholders(s)){
-                    placeholder.lorePlaceholderPositions.add(index);
+                    placeholder.lorePlaceholderPositions.put(index,s);
                     retVal = true;
+
                 }
                 index++;
             }
@@ -308,8 +342,9 @@ public class Menu implements InventoryHolder {
         }
         private ItemStack item; //backing up the item
         private int slot;
-        private boolean title;
-        private List<Integer> lorePlaceholderPositions = new ArrayList<>();
+        private String title;
+        private Map<Integer,String> lorePlaceholderPositions = new TreeMap<>();
+        //private List<Integer> lorePlaceholderPositions = new ArrayList<>();
     }
 
 
@@ -321,19 +356,20 @@ public class Menu implements InventoryHolder {
 
         for(Placeholder p : placeholderList){
             //create a copy of our item, so we don't override something important
-            ItemStack item = p.item.clone();
+            ItemStack item = p.item;
             ItemMeta meta = item.getItemMeta();
 
-            if(p.title){
-                String title = PlaceholderAPI.setPlaceholders(player,item.getItemMeta().getDisplayName());
+            if(p.title != null){
+                String title = PlaceholderAPI.setPlaceholders(player,p.title);
                 meta.setDisplayName(title);
             }
 
             List<String> metaLore = meta.getLore();
             if(!p.lorePlaceholderPositions.isEmpty()){
-                for(int i : p.lorePlaceholderPositions){
-                    String lore = PlaceholderAPI.setPlaceholders(player,item.getItemMeta().getLore().get(i));
-                    metaLore.set(i,lore);
+                for(Map.Entry<Integer, String> entry : p.lorePlaceholderPositions.entrySet()){
+                    Integer slot = entry.getKey();
+                    String lore = entry.getValue();
+                    metaLore.set(slot,PlaceholderAPI.setPlaceholders(player,lore));
                 }
             }
             meta.setLore(metaLore);

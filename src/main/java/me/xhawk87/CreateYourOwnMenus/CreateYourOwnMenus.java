@@ -101,13 +101,6 @@ public class CreateYourOwnMenus extends JavaPlugin implements Listener{
         language = new LanguageWrapper(this, "eng");
 
 
-        // Use the PlaceHolderAPI
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            Bukkit.getPluginManager().registerEvents(this, this);
-            placeHoldersEnabled = true; //no need for a config entry
-        } else {
-            placeHoldersEnabled = false;
-        }
 
     }
 
