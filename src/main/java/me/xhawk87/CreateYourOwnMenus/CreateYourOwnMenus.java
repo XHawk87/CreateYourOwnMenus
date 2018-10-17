@@ -53,14 +53,10 @@ public class CreateYourOwnMenus extends JavaPlugin implements Listener{
     private Map<String, ScriptCommand> scriptCommands = new HashMap<>();
     private LanguageWrapper language;
 
-    //maybe use other method? leave it that way this time
-    private static FileConfiguration fileConfiguration;
-    private boolean placeHoldersEnabled = false;
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
-        fileConfiguration = getConfig();
 
         new BukkitRunnable() {
             @Override
@@ -334,13 +330,5 @@ public class CreateYourOwnMenus extends JavaPlugin implements Listener{
      */
     public String translate(CommandSender forWhom, String key, String template, Object... params) {
         return language.get(forWhom, key, template, params);
-    }
-
-    public static FileConfiguration getConfigFile() {
-        return fileConfiguration;
-    }
-
-    public boolean placeHoldersEnabled(){
-        return placeHoldersEnabled;
     }
 }
