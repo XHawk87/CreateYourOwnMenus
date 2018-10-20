@@ -35,10 +35,7 @@
         </repository>
     </repositories>
 
-
-
     <dependencies>
-
         <!-- Dependency information -->
         <dependency>
             <groupId>org.bukkit</groupId>
@@ -71,9 +68,6 @@
             <version>2.9.2</version>
             <scope>provided</scope>
         </dependency>
-
-
-
     </dependencies>
 
     <!-- Build -->

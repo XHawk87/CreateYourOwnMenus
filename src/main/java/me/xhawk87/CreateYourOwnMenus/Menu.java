@@ -4,24 +4,12 @@
  */
 package me.xhawk87.CreateYourOwnMenus;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Array;
-import java.nio.charset.Charset;
-import java.util.*;
-import java.util.logging.Level;
-
-import me.clip.placeholderapi.PlaceholderAPI;
+import me.xhawk87.CreateYourOwnMenus.PlaceholderApi.PlaceholderManager;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
 import me.xhawk87.CreateYourOwnMenus.utils.ElevatedCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.FileUpdater;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -30,12 +18,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationContext;
-import org.bukkit.conversations.MessagePrompt;
-import org.bukkit.conversations.Prompt;
-import static org.bukkit.conversations.Prompt.END_OF_CONVERSATION;
-import org.bukkit.conversations.StringPrompt;
+import org.bukkit.conversations.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -44,9 +27,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.logging.Level;
+
 /**
  * Handles menu file IO, editing and use of the menu
- *
  */
 public class Menu implements InventoryHolder {
 
@@ -56,14 +43,15 @@ public class Menu implements InventoryHolder {
     private Set<String> editing = new HashSet<>();
     private File file;
     private FileUpdater fileUpdater;
+    private PlaceholderManager placeholderManager;
 
     /**
      * Create a new menu with the given id, title and number of rows.
      *
      * @param plugin A reference to the plugin
-     * @param id The id of the menu
-     * @param title The display title of the menu inventory
-     * @param rows The number of rows for the menu inventory
+     * @param id     The id of the menu
+     * @param title  The display title of the menu inventory
+     * @param rows   The number of rows for the menu inventory
      */
     public Menu(CreateYourOwnMenus plugin, String id, String title, int rows) {
         this(plugin, id);
@@ -75,7 +63,7 @@ public class Menu implements InventoryHolder {
      * from the .yml file.
      *
      * @param plugin A reference to the plugin
-     * @param id The id of the menu
+     * @param id     The id of the menu
      */
     public Menu(CreateYourOwnMenus plugin, String id) {
         this.plugin = plugin;
@@ -83,6 +71,7 @@ public class Menu implements InventoryHolder {
         File menusFolder = new File(plugin.getDataFolder(), "menus");
         this.file = new File(menusFolder, id + ".yml");
         this.fileUpdater = new FileUpdater(file);
+        this.placeholderManager = new PlaceholderManager(this.inventory, this); //TODO where is the inventory there
     }
 
     /**
@@ -97,46 +86,14 @@ public class Menu implements InventoryHolder {
         return inventory;
     }
 
-    /**
-     *   Restore Placeholders for instance (%asdf%)
-     */
-    private void restoreInvPlaceholders(){
-        if(placeholderList.isEmpty()) return;
-
-        for(Placeholder p : placeholderList){
-
-            //check if item still exists, needed when the edit command was used
-            if(inventory.getItem(p.slot) == null) continue;
-
-            //create a copy of our item, so we don't override something important
-            ItemStack item = p.item;
-            ItemMeta meta = item.getItemMeta();
-
-            if(p.title != null){
-                meta.setDisplayName(p.title);
-            }
-
-            //get the whole Lorelist
-            List<String> metaLore = meta.getLore();
-            if(!p.lorePlaceholderPositions.isEmpty()){
-                for(Map.Entry<Integer, String> entry : p.lorePlaceholderPositions.entrySet()){
-                    Integer slot = entry.getKey();
-                    String lore = entry.getValue();
-                    metaLore.set(slot,lore);
-                }
-            }
-            meta.setLore(metaLore);
-            item.setItemMeta(meta);
-            inventory.setItem(p.slot, item);
-        }
-    }
 
     /**
      * Schedules an asynchronous save of this menu to its .yml file
+     * Directly called after an edit has been made
      */
-    public void saveEdit(){
+    public void saveEdit() {
         //regenerate Placeholders!
-        placeholderList = new ArrayList<>();
+        placeholderManager.generateNewPlaceholderList();
 
         FileConfiguration data = new YamlConfiguration();
         data.set("title", inventory.getTitle());
@@ -145,7 +102,7 @@ public class Menu implements InventoryHolder {
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack item = inventory.getItem(i);
             if (item != null) {
-                hasItemPlaceholders(i,item);
+                placeholderManager.addPlaceholdersToList(i, item);
                 contentsData.set(Integer.toString(i), item);
             }
         }
@@ -153,11 +110,14 @@ public class Menu implements InventoryHolder {
     }
 
     /**
-     * Schedules an asyncronous save of this menu, and also restores the placeholders!
+     * Schedules an asyncronous save of this menu, and also recovers the original names which where used:
+     * Therefore, if somebody opened the inventory, things where are placeholders are used, are changed.
+     * e.g. %server_online% is replaced by the current amount of players online when the menu is opened.
+     * This remains in the inventory variable, therefore we have to change it back to %server_online%.
      */
     public void save() {
         //restore placeholders
-        restoreInvPlaceholders();
+        placeholderManager.undoPlaceholders();
 
         //normal Saving
         saveEdit();
@@ -165,7 +125,7 @@ public class Menu implements InventoryHolder {
 
     /**
      * Schedule an asynchronous reload of this menu file from its .yml file
-     *
+     * <p>
      * This should only be used after the first load as it is intended to
      * update a menu with minimal effect on player experience and not create
      * new menus.
@@ -256,6 +216,8 @@ public class Menu implements InventoryHolder {
         String title = data.getString("title");
         int size = data.getInt("size");
         inventory = plugin.getServer().createInventory(this, size, title);
+        placeholderManager = new PlaceholderManager(inventory,this); //we have to recreate the placeholdermanager, due to the missing inventory reference
+
         ConfigurationSection contentsData = data.getConfigurationSection("contents");
         for (String key : contentsData.getKeys(false)) {
             int slot = Integer.parseInt(key);
@@ -263,10 +225,9 @@ public class Menu implements InventoryHolder {
             inventory.setItem(slot, item);
 
             //check for placeholders
-            hasItemPlaceholders(slot,item);
+            placeholderManager.addPlaceholdersToList(slot, item);
         }
     }
-
 
     /**
      * Called internally when the menu has been reloaded from file
@@ -291,8 +252,9 @@ public class Menu implements InventoryHolder {
             ItemStack item = contentsData.getItemStack(key);
             inventory.setItem(slot, item);
 
-            //check for placeholders
-            hasItemPlaceholders(slot,item);
+            //on reload, reload all placeholders
+            placeholderManager.generateNewPlaceholderList();;
+            placeholderManager.addPlaceholdersToList(slot, item);
         }
 
         for (HumanEntity viewer : viewers) {
@@ -304,101 +266,6 @@ public class Menu implements InventoryHolder {
                     player.updateInventory();
                 }
             }
-        }
-    }
-
-    /**
-     * Checks if there is a placeholder in the string
-     */
-    private void hasItemPlaceholders(int slot, ItemStack item){
-        //check if placeholders are enabled!
-        if (!Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI"))
-            return;
-
-
-        Placeholder placeholder = new Placeholder(slot, item);
-        boolean retVal = false;
-
-        //check if title has an placeholder in it
-        if(PlaceholderAPI.containsPlaceholders(item.getItemMeta().getDisplayName())) {
-            placeholder.title = item.getItemMeta().getDisplayName();
-            retVal = true;
-        }
-
-        //check if placeholders can be found in a lore
-        int index = 0;
-        if(item.getItemMeta().getLore() != null)
-            for(String s : item.getItemMeta().getLore()){
-                if(PlaceholderAPI.containsPlaceholders(s)){
-                    placeholder.lorePlaceholderPositions.put(index,s);
-                    retVal = true;
-
-                }
-                index++;
-            }
-
-        //if we have found a placeholder lets add it
-        if(retVal){
-            placeholderList.add(placeholder);
-        }
-
-    }
-
-    /**
-     * Placeholder Data and simple inner class
-     */
-
-
-    private List<Placeholder> placeholderList = new ArrayList<Placeholder>();
-
-    private class Placeholder{
-        private Placeholder( int slot, ItemStack item){
-            this.slot = slot;
-            this.item = item;
-        }
-        private ItemStack item; //backing up the item
-        private int slot;
-        private String title;
-        private Map<Integer,String> lorePlaceholderPositions = new TreeMap<>();
-        //private List<Integer> lorePlaceholderPositions = new ArrayList<>();
-
-
-    }
-
-
-    /**
-     * This function is called when a placeholder is used, therefore it changes every time the menu is opened
-     */
-    private void reArrangePlaceholders(final Player player){
-        if(placeholderList.isEmpty()) return;
-
-        //when Player is editing, display the normal lore and title, therefore %asdf% is displayed
-        if(isEditing(player)){
-           restoreInvPlaceholders();
-           return;
-        }
-
-        for(Placeholder p : placeholderList){
-            //create a copy of our item, so we don't override something important
-            ItemStack item = p.item;
-            ItemMeta meta = item.getItemMeta();
-
-            if(p.title != null){
-                String title = PlaceholderAPI.setPlaceholders(player,p.title);
-                meta.setDisplayName(title);
-            }
-
-            List<String> metaLore = meta.getLore();
-            if(!p.lorePlaceholderPositions.isEmpty()){
-                for(Map.Entry<Integer, String> entry : p.lorePlaceholderPositions.entrySet()){
-                    Integer slot = entry.getKey();
-                    String lore = entry.getValue();
-                    metaLore.set(slot,PlaceholderAPI.setPlaceholders(player,lore));
-                }
-            }
-            meta.setLore(metaLore);
-            item.setItemMeta(meta);
-            inventory.setItem(p.slot, item);
         }
     }
 
@@ -428,7 +295,7 @@ public class Menu implements InventoryHolder {
         // Check if the player already has an inventory open
         Inventory current = player.getOpenInventory().getTopInventory();
         if (current == null) {
-            reArrangePlaceholders(player);
+            placeholderManager.replacePlaceholders(player);
             player.openInventory(inventory);
         } else {
             // Switching directly from one inventory to another causes glitches
@@ -437,7 +304,7 @@ public class Menu implements InventoryHolder {
             new BukkitRunnable() {
                 @Override
                 public void run() {
-                    reArrangePlaceholders(player);
+                    placeholderManager.replacePlaceholders(player);
                     player.openInventory(inventory);
                 }
             }.runTask(plugin);
@@ -464,7 +331,7 @@ public class Menu implements InventoryHolder {
      */
     public void doneEditing(Player player) {
         if (editing.remove(player.getName())) {
-            // If the player was editing, make sure any changes they made were 
+            // If the player was editing, make sure any changes they made were
             // saved
             saveEdit();
         }
@@ -483,7 +350,7 @@ public class Menu implements InventoryHolder {
     /**
      * A player selects a menu item for this menu
      *
-     * @param player The player selecting the item
+     * @param player   The player selecting the item
      * @param menuItem The item being selected
      */
     public void select(Player player, ItemStack menuItem) {
@@ -493,8 +360,8 @@ public class Menu implements InventoryHolder {
     /**
      * A player selects a menu item for this menu
      *
-     * @param player The player selecting the item
-     * @param menuItem The item being selected
+     * @param player       The player selecting the item
+     * @param menuItem     The item being selected
      * @param targetPlayer The player being right-clicked with this menu item
      */
     public void select(Player player, ItemStack menuItem, Player targetPlayer) {
@@ -504,8 +371,8 @@ public class Menu implements InventoryHolder {
     /**
      * A player selects a menu item for this menu
      *
-     * @param player The player selecting the item
-     * @param menuItem The item being selected
+     * @param player      The player selecting the item
+     * @param menuItem    The item being selected
      * @param targetBlock The block being right-clicked with this menu item
      */
     public void select(Player player, ItemStack menuItem, Block targetBlock) {
@@ -515,12 +382,12 @@ public class Menu implements InventoryHolder {
     /**
      * A player selects a menu item for this menu
      *
-     * @param player The player selecting the item
-     * @param menuItem The item being selected
+     * @param player       The player selecting the item
+     * @param menuItem     The item being selected
      * @param targetPlayer The player being right-clicked with this menu item,
-     * if any
-     * @param targetBlock The block being right-clicked with this menu item,
-     * if any
+     *                     if any
+     * @param targetBlock  The block being right-clicked with this menu item,
+     *                     if any
      */
     private void select(Player player, ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         if (menuItem.hasItemMeta()) {
@@ -683,7 +550,7 @@ public class Menu implements InventoryHolder {
         if (scriptCommand != null) {
             return scriptCommand.execute(this, player, Arrays.copyOfRange(args, 1, args.length), command, menuItem, commands, targetPlayer, targetBlock);
         } else {
-            // Otherwise, parse it as a normal command. 
+            // Otherwise, parse it as a normal command.
 
             if (command.contains("{")) {
                 // Parse for {dynamic arguments}
