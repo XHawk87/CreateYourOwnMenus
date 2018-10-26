@@ -14,12 +14,10 @@ import java.util.Map;
 
 public class PlaceholderManager {
 
-    public PlaceholderManager(final Inventory inventory, final Menu menu){
-        this.inventory = inventory;
+    public PlaceholderManager(final Menu menu){
         this.menu = menu;
     }
 
-    private final Inventory inventory;
     private final Menu menu;
     private List<Placeholder> placeholderList = new ArrayList<>();
 
@@ -34,7 +32,7 @@ public class PlaceholderManager {
         for (Placeholder p : placeholderList) {
 
             //check if item still exists, needed when the edit command was used
-            if (inventory.getItem(p.getSlot()) == null) continue;
+            if (menu.getInventory().getItem(p.getSlot()) == null) continue;
 
             //create a copy of our item, so we don't override something important
             ItemStack item = p.getItem();
@@ -57,7 +55,7 @@ public class PlaceholderManager {
             //setting meta, and lore
             meta.setLore(metaLore);
             item.setItemMeta(meta);
-            inventory.setItem(p.getSlot(), item);
+            menu.getInventory().setItem(p.getSlot(), item);
         }
     }
 
@@ -131,7 +129,7 @@ public class PlaceholderManager {
             }
             meta.setLore(metaLore);
             item.setItemMeta(meta);
-            inventory.setItem(p.getSlot(), item);
+            menu.getInventory().setItem(p.getSlot(), item);
         }
     }
 

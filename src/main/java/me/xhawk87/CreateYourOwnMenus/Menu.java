@@ -71,7 +71,7 @@ public class Menu implements InventoryHolder {
         File menusFolder = new File(plugin.getDataFolder(), "menus");
         this.file = new File(menusFolder, id + ".yml");
         this.fileUpdater = new FileUpdater(file);
-        this.placeholderManager = new PlaceholderManager(this.inventory, this); //TODO where is the inventory there
+        this.placeholderManager = new PlaceholderManager(this); //TODO where is the inventory there
     }
 
     /**
@@ -216,7 +216,6 @@ public class Menu implements InventoryHolder {
         String title = data.getString("title");
         int size = data.getInt("size");
         inventory = plugin.getServer().createInventory(this, size, title);
-        placeholderManager = new PlaceholderManager(inventory,this); //we have to recreate the placeholdermanager, due to the missing inventory reference
 
         ConfigurationSection contentsData = data.getConfigurationSection("contents");
         for (String key : contentsData.getKeys(false)) {
@@ -247,13 +246,14 @@ public class Menu implements InventoryHolder {
 
         inventory.clear();
         ConfigurationSection contentsData = data.getConfigurationSection("contents");
+
+        //on reload, reload all placeholders
+        placeholderManager.generateNewPlaceholderList();
+
         for (String key : contentsData.getKeys(false)) {
             int slot = Integer.parseInt(key);
             ItemStack item = contentsData.getItemStack(key);
             inventory.setItem(slot, item);
-
-            //on reload, reload all placeholders
-            placeholderManager.generateNewPlaceholderList();;
             placeholderManager.addPlaceholdersToList(slot, item);
         }
 
