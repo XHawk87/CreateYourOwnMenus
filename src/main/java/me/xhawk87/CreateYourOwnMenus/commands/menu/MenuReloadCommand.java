@@ -5,13 +5,11 @@
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
-import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 /**
- *
  * @author XHawk87
  */
 public class MenuReloadCommand implements IMenuCommand {

@@ -4,18 +4,18 @@
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.logging.Level;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitTask;
 
 /**
- *
  * @author XHawk87
  */
 public class FileUpdater {
@@ -38,7 +38,7 @@ public class FileUpdater {
 
     /**
      * Overwrites the file with the given text record
-     *
+     * <p>
      * This is performed asynchronously, waiting at least the specified interval
      * between saves, and avoiding saving when there is new data already ready
      * to save

@@ -4,15 +4,17 @@
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
-import java.util.ArrayList;
-import java.util.List;
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- *
  * @author XHawk87
  */
 public class MenuScriptUtils {
@@ -116,5 +118,64 @@ public class MenuScriptUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * @param commandString The line to add to the lore
+     * @param loreStrings   The lore lines
+     */
+    public static void appendToLore(String commandString, List<String> loreStrings) {
+        if (loreStrings.size() == 1) {
+            // Handle first-line special case
+            String firstLine = loreStrings.get(0);
+            int lastPartIndex = firstLine.lastIndexOf("\r") + 1;
+            String lastPart = firstLine.substring(lastPartIndex);
+            if (lastPart.isEmpty()) {
+                loreStrings.set(0, firstLine.substring(0, lastPartIndex) + commandString);
+            } else {
+                loreStrings.add(commandString);
+            }
+        } else {
+            loreStrings.add(commandString);
+        }
+    }
+
+    /**
+     * @param itemStackRef The item in the sender's hand
+     * @param sender       The command sender
+     * @param plugin       This plugin
+     * @return True if the sender's hand is empty, otherwise false
+     */
+    public static boolean isEmptyHand(ItemStackRef itemStackRef, CommandSender sender, CreateYourOwnMenus plugin) {
+        ItemStack held = itemStackRef.get();
+        if (held == null || held.getType() == Material.AIR) {
+            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Support for colour codes in non-commands
+     *
+     * @param commandString The command string
+     * @return If a text line, replace '&' with the chat colour character, otherwise the same string
+     */
+    public static String replaceColorSymbol(String commandString) {
+        return commandString.startsWith("/") ? commandString : commandString.replace('&', ChatColor.COLOR_CHAR);
+    }
+
+    /**
+     * Expand all hidden commands from the first line
+     *
+     * @param loreStrings Lines of text from the item lore
+     */
+    public static void unpackHiddenLinesFromLore(List<String> loreStrings) {
+        if (!loreStrings.isEmpty()) {
+            String firstLine = loreStrings.get(0);
+            List<String> lines = unpackHiddenLines(firstLine);
+            loreStrings.set(0, lines.get(lines.size() - 1));
+            loreStrings.addAll(lines.subList(0, lines.size() - 1));
+        }
     }
 }

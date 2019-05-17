@@ -4,17 +4,11 @@
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Level;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
 import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -22,8 +16,15 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Level;
+
 /**
- *
  * @author XHawk87
  */
 public class MenuScriptExportCommand extends IMenuScriptCommand {
@@ -44,24 +45,13 @@ public class MenuScriptExportCommand extends IMenuScriptCommand {
 
     @Override
     public boolean onCommand(final CommandSender sender, ItemStackRef itemStackRef, Command command, String label, String[] args) {
-        // Check the player is holding the item
         ItemStack held = itemStackRef.get();
-        if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
-            return true;
-        }
-
         ItemMeta meta = held.getItemMeta();
-        if (!meta.hasLore()) {
+        if (!meta.hasLore() || meta.getLore().isEmpty()) {
             sender.sendMessage(plugin.translate(sender, "export-no-lore", "This item has no lore to export"));
             return true;
         }
-
         List<String> lore = meta.getLore();
-        if (lore.isEmpty()) {
-            sender.sendMessage(plugin.translate(sender, "export-no-lore", "This item has no lore to export"));
-            return true;
-        }
         final List<String> lines = new ArrayList<>();
         lines.add(meta.hasDisplayName() ? meta.getDisplayName() : "");
         lines.addAll(MenuScriptUtils.unpackHiddenLines(lore.get(0)));
@@ -71,15 +61,7 @@ public class MenuScriptExportCommand extends IMenuScriptCommand {
             return false;
         }
 
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            sb.append(args[i]);
-            if (i + 1 < args.length) {
-                sb.append(' ');
-            }
-        }
-        sb.append(".txt");
-        String filename = sb.toString();
+        String filename = StringUtils.join(args, " ") + ".txt";
         final File scriptsFolder = new File(plugin.getDataFolder(), "scripts");
         final File scriptFile = new File(scriptsFolder, filename);
         new BukkitRunnable() {

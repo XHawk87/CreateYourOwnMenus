@@ -4,22 +4,21 @@
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
-import java.util.ArrayList;
-import java.util.List;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
-import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
-import org.bukkit.ChatColor;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptIndexedModifyLoreCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.List;
+
 /**
- *
  * @author XHawk87
  */
-public class MenuScriptReplaceCommand extends IMenuScriptCommand {
+public class MenuScriptReplaceCommand extends IMenuScriptIndexedModifyLoreCommand {
 
     public MenuScriptReplaceCommand(CreateYourOwnMenus plugin) {
         super(plugin);
@@ -36,45 +35,11 @@ public class MenuScriptReplaceCommand extends IMenuScriptCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, ItemStackRef itemStackRef, Command command, String label, String[] args) {
-        // Check the player is holding the item
-        ItemStack held = itemStackRef.get();
-        if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
-            return true;
-        }
-
-        // Get or create the lore
-        ItemMeta meta = held.getItemMeta();
-        List<String> loreStrings;
-        if (meta.hasLore()) {
-            loreStrings = meta.getLore();
-        } else {
-            loreStrings = new ArrayList<>();
-        }
-
-        if (args.length < 2) {
-            return false;
-        }
-
-        String indexString = args[0];
-        int index = getIndex(indexString, loreStrings.size(), sender);
-        if (index == -1) {
-            return true;
-        }
-
+    public boolean onCommand(CommandSender sender, ItemStack held, ItemMeta meta, List<String> loreStrings, int index,
+                             Command command, String label, String[] args) {
         // Expecting one or more parameters that make up the command or comment to add
-        StringBuilder sb = new StringBuilder(args[1]);
-        for (int i = 2; i < args.length; i++) {
-            sb.append(" ").append(args[i]);
-        }
-        String commandString = sb.toString();
-
-        // Replace the given line in the lore
-        if (!commandString.startsWith("/")) {
-            // Support for colour codes in non-commands
-            commandString = commandString.replace('&', ChatColor.COLOR_CHAR);
-        }
+        String commandString = StringUtils.join(args, " ", 1, args.length);
+        commandString = MenuScriptUtils.replaceColorSymbol(commandString);
 
         if (index == 0) {
             // Handle first-line special case

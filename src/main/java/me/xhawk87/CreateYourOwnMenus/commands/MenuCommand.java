@@ -4,23 +4,15 @@
  */
 package me.xhawk87.CreateYourOwnMenus.commands;
 
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuScriptCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuReloadCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuOpenCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuListCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuGrabCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuEditCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuDeleteCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuCreateCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuCopyCommand;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.MenuSetCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The base for all menu commands

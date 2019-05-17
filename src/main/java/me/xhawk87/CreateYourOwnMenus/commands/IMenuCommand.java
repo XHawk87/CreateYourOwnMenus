@@ -16,11 +16,11 @@ public interface IMenuCommand extends CommandExecutor {
     /**
      * @return The usage message for this subcommand
      */
-    public String getUsage();
+    String getUsage();
 
     /**
      * @return The permission-node required to use this subcommand, or null if
      * none is required
      */
-    public String getPermission();
+    String getPermission();
 }

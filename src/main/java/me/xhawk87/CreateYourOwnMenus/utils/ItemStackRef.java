@@ -8,12 +8,11 @@ package me.xhawk87.CreateYourOwnMenus.utils;
 import org.bukkit.inventory.ItemStack;
 
 /**
- *
  * @author XHawk87
  */
 public interface ItemStackRef {
 
-    public ItemStack get();
+    ItemStack get();
 
-    public void update();
+    void update();
 }

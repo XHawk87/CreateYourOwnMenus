@@ -4,7 +4,6 @@
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
-import java.util.Set;
 import org.bukkit.Server;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.conversations.Conversation;
@@ -15,8 +14,9 @@ import org.bukkit.permissions.PermissionAttachment;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 import org.bukkit.plugin.Plugin;
 
+import java.util.Set;
+
 /**
- *
  * @author XHawk87
  */
 public class ElevatedCommandSender implements ConsoleCommandSender {

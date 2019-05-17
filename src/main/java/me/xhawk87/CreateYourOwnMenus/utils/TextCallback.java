@@ -7,12 +7,11 @@ package me.xhawk87.CreateYourOwnMenus.utils;
 import java.util.List;
 
 /**
- *
  * @author XHawk87
  */
 public interface TextCallback {
 
-    public void onLoad(List<String> lines);
+    void onLoad(List<String> lines);
 
-    public void fail(Exception ex);
+    void fail(Exception ex);
 }

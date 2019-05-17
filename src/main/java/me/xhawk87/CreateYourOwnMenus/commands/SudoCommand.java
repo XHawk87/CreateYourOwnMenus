@@ -5,13 +5,13 @@
 package me.xhawk87.CreateYourOwnMenus.commands;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author XHawk87
  */
 public class SudoCommand implements CommandExecutor {
@@ -44,15 +44,7 @@ public class SudoCommand implements CommandExecutor {
             return true;
         }
 
-        StringBuilder sb = new StringBuilder("/");
-        for (int i = 1; i < args.length; i++) {
-            sb.append(args[i]);
-            if (i < args.length) {
-                sb.append(" ");
-            }
-        }
-
-        target.chat(sb.toString());
+        target.chat(StringUtils.join(args, " "));
         return true;
     }
 }

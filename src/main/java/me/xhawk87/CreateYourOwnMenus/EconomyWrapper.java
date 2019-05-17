@@ -7,7 +7,6 @@ package me.xhawk87.CreateYourOwnMenus;
 import net.milkbowl.vault.economy.Economy;
 
 /**
- *
  * @author XHawk87
  */
 public class EconomyWrapper {
@@ -17,7 +16,7 @@ public class EconomyWrapper {
     public EconomyWrapper(Economy economy) {
         this.economy = economy;
     }
-    
+
     public double getBalance(String playerName) {
         return economy.getBalance(playerName);
     }

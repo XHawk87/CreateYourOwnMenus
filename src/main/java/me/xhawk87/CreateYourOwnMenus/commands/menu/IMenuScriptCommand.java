@@ -11,7 +11,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 /**
- *
  * @author XHawk87
  */
 public abstract class IMenuScriptCommand implements IMenuCommand {

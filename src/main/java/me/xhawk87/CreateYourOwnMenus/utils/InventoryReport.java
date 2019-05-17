@@ -4,15 +4,15 @@
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
- *
  * @author XHawk87
  */
 public class InventoryReport {

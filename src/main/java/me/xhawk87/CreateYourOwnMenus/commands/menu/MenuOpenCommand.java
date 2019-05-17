@@ -12,7 +12,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 /**
- *
  * @author XHawk87
  */
 public class MenuOpenCommand implements IMenuCommand {

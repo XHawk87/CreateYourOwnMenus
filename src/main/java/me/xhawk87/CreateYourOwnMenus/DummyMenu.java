@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
 /**
- *
  * @author XHawk87
  */
 public class DummyMenu extends Menu {

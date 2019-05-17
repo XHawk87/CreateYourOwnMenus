@@ -4,10 +4,6 @@
  */
 package me.xhawk87.CreateYourOwnMenus.listeners;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.TreeMap;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.DummyMenu;
 import me.xhawk87.CreateYourOwnMenus.Menu;
@@ -27,16 +23,17 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerPickupItemEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.TreeMap;
 
 /**
  * Listener for menu-related events
@@ -201,7 +198,7 @@ public class MenuListener implements Listener {
     /**
      * Fired when a player drops an item using the drop item key, or by
      * throwing items out of their inventory.
-     *
+     * <p>
      * We only want to cancel it if they are using the drop item key, as they
      * are already prevented from picking up locked items to throw out
      *
@@ -219,7 +216,7 @@ public class MenuListener implements Listener {
                 // Replace the item back where it was
                 ItemStack item = event.getItemDrop().getItemStack();
                 ItemStack slotItem = inv.getItem(slot);
-                if (slotItem == null || slotItem.getTypeId() == 0) {
+                if (slotItem == null || slotItem.getType() == Material.AIR) {
                     inv.setItem(slot, item.clone());
                 } else {
                     slotItem.setAmount(slotItem.getAmount() + item.getAmount());
@@ -302,7 +299,7 @@ public class MenuListener implements Listener {
                     }
                 }
                 if (dosound) {
-                    player.playSound(item.getLocation(), Sound.ITEM_PICKUP, 0.2f, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+                    player.playSound(item.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.2f, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F);
                 }
             }
         }.runTask(plugin);
@@ -311,7 +308,7 @@ public class MenuListener implements Listener {
     /**
      * Fired when a player left or right clicks the air, or a block, or steps
      * on an interactive block such as a pressure plate or redstone ore.
-     *
+     * <p>
      * Also note, the event defaults to cancelled when right-clicking the air
      * so it is vital not to ignoreCancelled.
      *

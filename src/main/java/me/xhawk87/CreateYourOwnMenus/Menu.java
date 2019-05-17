@@ -4,20 +4,6 @@
  */
 package me.xhawk87.CreateYourOwnMenus;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.logging.Level;
 import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
 import me.xhawk87.CreateYourOwnMenus.utils.ElevatedCommandSender;
 import me.xhawk87.CreateYourOwnMenus.utils.FileUpdater;
@@ -31,12 +17,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.conversations.Conversation;
-import org.bukkit.conversations.ConversationContext;
-import org.bukkit.conversations.MessagePrompt;
-import org.bukkit.conversations.Prompt;
-import static org.bukkit.conversations.Prompt.END_OF_CONVERSATION;
-import org.bukkit.conversations.StringPrompt;
+import org.bukkit.conversations.*;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -44,6 +25,11 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.*;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.logging.Level;
 
 /**
  * Handles menu file IO, editing and use of the menu
@@ -56,16 +42,16 @@ public class Menu implements InventoryHolder {
     private String id;
     private Inventory inventory;
     private Set<String> editing = new HashSet<>();
-    private File file;
+    private final File file;
     private FileUpdater fileUpdater;
 
     /**
      * Create a new menu with the given id, title and number of rows.
      *
      * @param plugin A reference to the plugin
-     * @param id The id of the menu
-     * @param title The display title of the menu inventory
-     * @param rows The number of rows for the menu inventory
+     * @param id     The id of the menu
+     * @param title  The display title of the menu inventory
+     * @param rows   The number of rows for the menu inventory
      */
     public Menu(CreateYourOwnMenus plugin, String id, String title, int rows) {
         this(plugin, id);
@@ -77,7 +63,7 @@ public class Menu implements InventoryHolder {
      * from the .yml file.
      *
      * @param plugin A reference to the plugin
-     * @param id The id of the menu
+     * @param id     The id of the menu
      */
     public Menu(CreateYourOwnMenus plugin, String id) {
         this.plugin = plugin;
@@ -118,7 +104,7 @@ public class Menu implements InventoryHolder {
 
     /**
      * Schedule an asynchronous reload of this menu file from its .yml file
-     *
+     * <p>
      * This should only be used after the first load as it is intended to
      * update a menu with minimal effect on player experience and not create
      * new menus.
@@ -332,7 +318,7 @@ public class Menu implements InventoryHolder {
     /**
      * A player selects a menu item for this menu
      *
-     * @param player The player selecting the item
+     * @param player   The player selecting the item
      * @param menuItem The item being selected
      */
     public void select(Player player, ItemStack menuItem) {
@@ -342,8 +328,8 @@ public class Menu implements InventoryHolder {
     /**
      * A player selects a menu item for this menu
      *
-     * @param player The player selecting the item
-     * @param menuItem The item being selected
+     * @param player       The player selecting the item
+     * @param menuItem     The item being selected
      * @param targetPlayer The player being right-clicked with this menu item
      */
     public void select(Player player, ItemStack menuItem, Player targetPlayer) {
@@ -353,8 +339,8 @@ public class Menu implements InventoryHolder {
     /**
      * A player selects a menu item for this menu
      *
-     * @param player The player selecting the item
-     * @param menuItem The item being selected
+     * @param player      The player selecting the item
+     * @param menuItem    The item being selected
      * @param targetBlock The block being right-clicked with this menu item
      */
     public void select(Player player, ItemStack menuItem, Block targetBlock) {
@@ -364,12 +350,12 @@ public class Menu implements InventoryHolder {
     /**
      * A player selects a menu item for this menu
      *
-     * @param player The player selecting the item
-     * @param menuItem The item being selected
+     * @param player       The player selecting the item
+     * @param menuItem     The item being selected
      * @param targetPlayer The player being right-clicked with this menu item,
-     * if any
-     * @param targetBlock The block being right-clicked with this menu item,
-     * if any
+     *                     if any
+     * @param targetBlock  The block being right-clicked with this menu item,
+     *                     if any
      */
     private void select(Player player, ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         if (menuItem.hasItemMeta()) {
@@ -518,8 +504,8 @@ public class Menu implements InventoryHolder {
     }
 
     private boolean parseCommand(final CommandSender sender, final Player player,
-            String command, final Iterator<String> commands, final ItemStack menuItem,
-            final Player targetPlayer, final Block targetBlock) {
+                                 String command, final Iterator<String> commands, final ItemStack menuItem,
+                                 final Player targetPlayer, final Block targetBlock) {
         // Handle the special menu script commands
         String[] args = command.split(" ");
         String specialCommand = args[0];
@@ -568,31 +554,31 @@ public class Menu implements InventoryHolder {
                         new Conversation(plugin, player,
                                 parseDynamicArgs(parsedCommand,
                                         parts.iterator(), player, new MessagePrompt() {
-                                    @Override
-                                    protected Prompt getNextPrompt(ConversationContext context) {
-                                        final String command = parsedCommand.toString();
-                                        new BukkitRunnable() {
                                             @Override
-                                            public void run() {
-                                                // Execute the command
-                                                if (!plugin.getServer().dispatchCommand(sender,
-                                                        command)) {
-                                                    // If it fails to execute
-                                                    player.sendMessage(plugin.translate(player, "error-unknown-command", "Error in menu script line (unknown command): {0}", command));
-                                                } else {
-                                                    // If it succeeds, continue with the script execution
-                                                    parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
-                                                }
+                                            protected Prompt getNextPrompt(ConversationContext context) {
+                                                final String command = parsedCommand.toString();
+                                                new BukkitRunnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        // Execute the command
+                                                        if (!plugin.getServer().dispatchCommand(sender,
+                                                                command)) {
+                                                            // If it fails to execute
+                                                            player.sendMessage(plugin.translate(player, "error-unknown-command", "Error in menu script line (unknown command): {0}", command));
+                                                        } else {
+                                                            // If it succeeds, continue with the script execution
+                                                            parseCommands(commands, player, menuItem, targetPlayer, targetBlock);
+                                                        }
+                                                    }
+                                                }.runTask(plugin);
+                                                return END_OF_CONVERSATION;
                                             }
-                                        }.runTask(plugin);
-                                        return END_OF_CONVERSATION;
-                                    }
 
-                                    @Override
-                                    public String getPromptText(ConversationContext context) {
-                                        return "";
-                                    }
-                                })));
+                                            @Override
+                                            public String getPromptText(ConversationContext context) {
+                                                return "";
+                                            }
+                                        })));
                 return false;
             } else {
                 if (!plugin.getServer().dispatchCommand(sender,
@@ -606,7 +592,7 @@ public class Menu implements InventoryHolder {
     }
 
     private Prompt parseDynamicArgs(final StringBuilder parsedCommand,
-            final Iterator<String> parts, final Player player, final Prompt message) {
+                                    final Iterator<String> parts, final Player player, final Prompt message) {
         if (!parts.hasNext()) {
             return message;
         }

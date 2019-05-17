@@ -4,23 +4,24 @@
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
+import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
+import me.xhawk87.CreateYourOwnMenus.utils.TextCallback;
+import me.xhawk87.CreateYourOwnMenus.utils.TextFileLoader;
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.logging.Level;
-import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
-import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
-import me.xhawk87.CreateYourOwnMenus.utils.TextCallback;
-import me.xhawk87.CreateYourOwnMenus.utils.TextFileLoader;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 /**
- *
  * @author XHawk87
  */
 public class MenuScriptImportCommand extends IMenuScriptCommand {
@@ -41,36 +42,19 @@ public class MenuScriptImportCommand extends IMenuScriptCommand {
 
     @Override
     public boolean onCommand(final CommandSender sender, final ItemStackRef itemStackRef, Command command, String label, String[] args) {
-        // Check the player is holding the item
-        ItemStack held = itemStackRef.get();
-        if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
-            return true;
-        }
-
         if (args.length < 1) {
             return false;
         }
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < args.length; i++) {
-            sb.append(args[i]);
-            if (i + 1 < args.length) {
-                sb.append(' ');
-            }
-        }
-        sb.append(".txt");
-        String filename = sb.toString();
+        String filename = StringUtils.join(args, " ") + ".txt";
         File scriptsFolder = new File(plugin.getDataFolder(), "scripts");
         final File scriptFile = new File(scriptsFolder, filename);
         new TextFileLoader(plugin, scriptFile, new TextCallback() {
             @Override
             public void onLoad(List<String> lines) {
-                ItemStack held = itemStackRef.get();
-                if (held == null || held.getTypeId() == 0) {
-                    sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
+                if (MenuScriptUtils.isEmptyHand(itemStackRef, sender, plugin)) {
                     return;
                 }
+                ItemStack held = itemStackRef.get();
                 ItemMeta meta = held.getItemMeta();
                 meta.setDisplayName(lines.get(0));
                 meta.setLore(lines.subList(1, lines.size()));

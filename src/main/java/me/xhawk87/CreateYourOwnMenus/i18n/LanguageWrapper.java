@@ -8,7 +8,7 @@ import org.bukkit.plugin.Plugin;
 
 /**
  * LanguageWrapper
- *
+ * <p>
  * This can be used in exactly the same way as the Language class from the
  * LanguageAPI plugin, however it will still work (in the default language only)
  * if the LanguageAPI.jar is not installed.
@@ -17,10 +17,6 @@ import org.bukkit.plugin.Plugin;
  */
 public class LanguageWrapper {
 
-    /**
-     * Your plugin
-     */
-    private Plugin plugin;
     /**
      * A generalised object for holding the PluginLanguageLibrary if it exists
      */
@@ -32,7 +28,6 @@ public class LanguageWrapper {
      * @param plugin Your plugin
      */
     public LanguageWrapper(Plugin plugin, String code) {
-        this.plugin = plugin;
         if (Bukkit.getPluginManager().getPlugin("LanguageAPI") != null) {
             plugin.saveResource("languages/lang-eng.yml", false);
             langObj = new PluginLanguageLibrary(plugin, ISOCode.findMatch(code));
@@ -44,10 +39,10 @@ public class LanguageWrapper {
      * LanguageAPI is installed, and if it is not, returns the default string
      * instead.
      *
-     * @param forWhom The intended recipient to translate for
-     * @param key The template key
+     * @param forWhom  The intended recipient to translate for
+     * @param key      The template key
      * @param template The default template for the plugin
-     * @param params The parameters to be inserted
+     * @param params   The parameters to be inserted
      * @return The formatted string
      */
     public String get(CommandSender forWhom, String key, String template, Object... params) {
@@ -65,9 +60,9 @@ public class LanguageWrapper {
      * instead.
      *
      * @param preferredLocale The preferred language ISO code to translate to
-     * @param key The template key
-     * @param template The default template for the plugin
-     * @param params The parameters to be inserted
+     * @param key             The template key
+     * @param template        The default template for the plugin
+     * @param params          The parameters to be inserted
      * @return The formatted string
      */
     public String get(ISOCode preferredLocale, String key, String template, Object... params) {
@@ -82,15 +77,15 @@ public class LanguageWrapper {
     /**
      * Taken directly from the PluginLanguageLibrary class of the LanguageAPI
      * plugin.
-     *
+     * <p>
      * Inserts the given parameters into the template at the correct locations
      * and returns the formatted string
      *
      * @param template The string template
-     * @param params The dynamic data to be inserted
+     * @param params   The dynamic data to be inserted
      * @return The formatted string
      * @throws IllegalArgumentException If template tries to reference a
-     * parameter index that does not exist
+     *                                  parameter index that does not exist
      */
     private static String compile(String template, Object[] params) throws IllegalArgumentException {
         if (params.length == 0) {

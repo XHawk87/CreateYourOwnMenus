@@ -4,31 +4,23 @@
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptAppendCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptClearCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptDeleteCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptExportCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptHideCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptImportCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptInsertCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptReplaceCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptShowCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptTitleCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.*;
 import me.xhawk87.CreateYourOwnMenus.utils.HeldItemStackRef;
 import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuSlotItemStackRef;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- *
  * @author XHawk87
  */
 public class MenuScriptCommand implements IMenuCommand {
@@ -153,6 +145,9 @@ public class MenuScriptCommand implements IMenuCommand {
             return true;
         }
         // Remove the sub-command from the args list and pass along the rest
+        if (MenuScriptUtils.isEmptyHand(itemStackRef, sender, plugin)) {
+            return true;
+        }
         if (!menuScriptCommand.onCommand(sender, itemStackRef, command, label, Arrays.copyOfRange(args, index, args.length))) {
             // A sub-command returning false should display the usage information for that sub-command
             sender.sendMessage(plugin.translate(sender, "menu-script-" + subCommandName + "-usage", menuScriptCommand.getUsage()));

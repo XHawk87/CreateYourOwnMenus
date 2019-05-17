@@ -4,8 +4,6 @@
  */
 package me.xhawk87.CreateYourOwnMenus.script;
 
-import java.util.Iterator;
-import java.util.List;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.utils.InventoryReport;
 import me.xhawk87.CreateYourOwnMenus.utils.ValidationUtils;
@@ -15,8 +13,10 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Iterator;
+import java.util.List;
+
 /**
- *
  * @author XHawk87
  */
 @Deprecated

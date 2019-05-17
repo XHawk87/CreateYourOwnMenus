@@ -44,7 +44,7 @@ public class MenuCreateCommand implements IMenuCommand {
         try {
             rows = Integer.parseInt(args[1]);
         } catch (NumberFormatException ex) {
-            sender.sendMessage(plugin.translate(sender, "expected-integer-rows", "The number of rows must be a whole number: {0}" , args[1]));
+            sender.sendMessage(plugin.translate(sender, "expected-integer-rows", "The number of rows must be a whole number: {0}", args[1]));
             return true;
         }
 

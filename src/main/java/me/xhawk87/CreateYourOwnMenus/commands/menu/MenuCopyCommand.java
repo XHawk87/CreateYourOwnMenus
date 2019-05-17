@@ -8,6 +8,7 @@ import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import org.bukkit.ChatColor;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.Inventory;
@@ -72,7 +73,7 @@ public class MenuCopyCommand implements IMenuCommand {
         ItemStack[] contents = oldMenu.getInventory().getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
-            if (item != null && item.getTypeId() != 0) {
+            if (item != null && item.getType() != Material.AIR) {
                 inv.setItem(i, item.clone());
             }
         }

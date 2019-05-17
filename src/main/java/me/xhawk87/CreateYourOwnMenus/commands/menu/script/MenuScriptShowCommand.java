@@ -4,29 +4,24 @@
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
-import java.util.ArrayList;
-import java.util.List;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptCommand;
-import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
-import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.commandStart;
-import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.hiddenCommand;
-import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.hiddenPlayerCommand;
-import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.packHiddenText;
-import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.playerCommand;
-import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.unpackHiddenLines;
-import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.unpackHiddenText;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.IMenuScriptModifyLoreCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.*;
+
 /**
- *
  * @author XHawk87
  */
-public class MenuScriptShowCommand extends IMenuScriptCommand {
+public class MenuScriptShowCommand extends IMenuScriptModifyLoreCommand {
 
     public MenuScriptShowCommand(CreateYourOwnMenus plugin) {
         super(plugin);
@@ -43,34 +38,11 @@ public class MenuScriptShowCommand extends IMenuScriptCommand {
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, ItemStackRef itemStackRef, Command command, String label, String[] args) {
-        // Check the player is holding the item
-        ItemStack held = itemStackRef.get();
-        if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
-            return true;
-        }
-
-        // Get or create the lore
-        ItemMeta meta = held.getItemMeta();
-        List<String> loreStrings;
-        if (meta.hasLore()) {
-            loreStrings = meta.getLore();
-        } else {
-            loreStrings = new ArrayList<>();
-        }
-
+    public boolean onCommand(CommandSender sender, ItemStack held, ItemMeta meta, List<String> loreStrings, Command command, String label, String[] args) {
         // Show the hidden commands
         StringBuilder comments = new StringBuilder();
         List<String> commands = new ArrayList<>();
-
-        // Expand all hidden commands from the first line
-        if (!loreStrings.isEmpty()) {
-            String firstLine = loreStrings.get(0);
-            List<String> lines = unpackHiddenLines(firstLine);
-            loreStrings.set(0, lines.get(lines.size() - 1));
-            loreStrings.addAll(lines.subList(0, lines.size() - 1));
-        }
+        MenuScriptUtils.unpackHiddenLinesFromLore(loreStrings);
 
         for (String loreString : loreStrings) {
             if (loreString.startsWith(commandStart)

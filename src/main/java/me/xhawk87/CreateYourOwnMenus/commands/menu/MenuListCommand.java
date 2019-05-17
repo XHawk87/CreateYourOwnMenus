@@ -10,7 +10,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 /**
- *
  * @author XHawk87
  */
 public class MenuListCommand implements IMenuCommand {

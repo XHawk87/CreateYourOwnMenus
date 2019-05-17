@@ -4,24 +4,11 @@
  */
 package me.xhawk87.CreateYourOwnMenus;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
 import me.xhawk87.CreateYourOwnMenus.i18n.LanguageWrapper;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
-import me.xhawk87.CreateYourOwnMenus.script.CloseCommand;
-import me.xhawk87.CreateYourOwnMenus.script.ConsumeCommand;
-import me.xhawk87.CreateYourOwnMenus.script.DelayCommand;
-import me.xhawk87.CreateYourOwnMenus.script.ReloadCommand;
-import me.xhawk87.CreateYourOwnMenus.script.RequireCurrencyCommand;
-import me.xhawk87.CreateYourOwnMenus.script.RequireLevelCommand;
-import me.xhawk87.CreateYourOwnMenus.script.RequirePermissionCommand;
-import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
+import me.xhawk87.CreateYourOwnMenus.script.*;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -30,6 +17,13 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
+
+import java.io.File;
+import java.io.FileFilter;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A plugin to allow server owners to design and create their own menus
@@ -110,9 +104,9 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * Create a new menu with the given id, display title and number of rows
      * for the inventory.
      *
-     * @param id A unique identifier for the menu
+     * @param id    A unique identifier for the menu
      * @param title The display title, may contain colour codes and spaces
-     * @param rows The number of rows for the inventory
+     * @param rows  The number of rows for the inventory
      * @return The menu created
      */
     public Menu createMenu(String id, String title, int rows) {
@@ -130,7 +124,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
             mgr.addPermission(
                     new Permission(permissionNode,
                             "Allows the given player to use the /menu open command for the "
-                            + id + " menu", PermissionDefault.FALSE));
+                                    + id + " menu", PermissionDefault.FALSE));
         }
         return menu;
     }
@@ -211,7 +205,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
                 mgr.addPermission(
                         new Permission("cyom.menu." + id,
                                 "Allows the given player to use the /menu open command for the "
-                                + id + " menu", PermissionDefault.FALSE));
+                                        + id + " menu", PermissionDefault.FALSE));
             }
         }
     }
@@ -234,7 +228,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
                     mgr.addPermission(
                             new Permission("cyom.menu." + menuId,
                                     "Allows the given player to use the /menu open command for the "
-                                    + menuId + " menu", PermissionDefault.FALSE));
+                                            + menuId + " menu", PermissionDefault.FALSE));
                 }
 
                 return true;
@@ -313,10 +307,10 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * Translate this message into the specified language of the sender using
      * the language files for this plugin.
      *
-     * @param forWhom The player/console to translate for
-     * @param key The language key
+     * @param forWhom  The player/console to translate for
+     * @param key      The language key
      * @param template The message template
-     * @param params The dynamic parameters
+     * @param params   The dynamic parameters
      * @return The translated message
      */
     public String translate(CommandSender forWhom, String key, String template, Object... params) {

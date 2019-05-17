@@ -32,8 +32,7 @@ public class MenuEditCommand implements IMenuCommand {
             return true;
         }
 
-        // Expecting exactly one parameter, the id
-        if (args.length < 1 || args.length > 2) {
+        if (args.length > 2) {
             return false;
         }
 

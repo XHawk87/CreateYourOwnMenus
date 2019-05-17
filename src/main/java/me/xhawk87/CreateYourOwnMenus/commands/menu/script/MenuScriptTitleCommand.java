@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
 /**
- *
  * @author XHawk87
  */
 public class MenuScriptTitleCommand extends IMenuScriptCommand {
@@ -35,14 +34,7 @@ public class MenuScriptTitleCommand extends IMenuScriptCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, ItemStackRef itemStackRef, Command command, String label, String[] args) {
-        // Check the player is holding the item
         ItemStack held = itemStackRef.get();
-        if (held == null || held.getTypeId() == 0) {
-            sender.sendMessage(plugin.translate(sender, "error-no-item-in-hand", "You must be holding a menu item"));
-            return true;
-        }
-
-        // Get the item meta
         ItemMeta meta = held.getItemMeta();
 
         // Expecting one or more parameters that make up new title

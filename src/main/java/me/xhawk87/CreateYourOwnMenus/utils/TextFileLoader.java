@@ -4,6 +4,9 @@
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
+import org.bukkit.ChatColor;
+import org.bukkit.plugin.Plugin;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -13,11 +16,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.bukkit.ChatColor;
-import org.bukkit.plugin.Plugin;
 
 /**
- *
  * @author XHawk87
  */
 public class TextFileLoader implements Runnable {

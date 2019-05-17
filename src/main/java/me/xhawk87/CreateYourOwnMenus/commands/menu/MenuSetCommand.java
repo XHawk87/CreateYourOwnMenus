@@ -15,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
- *
  * @author XHawk87
  */
 public class MenuSetCommand implements IMenuCommand {

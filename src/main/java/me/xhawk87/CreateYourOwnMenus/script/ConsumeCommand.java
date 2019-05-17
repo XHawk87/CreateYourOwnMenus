@@ -4,15 +4,15 @@
  */
 package me.xhawk87.CreateYourOwnMenus.script;
 
-import java.util.Iterator;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.Iterator;
+
 /**
- *
  * @author XHawk87
  */
 public class ConsumeCommand implements ScriptCommand {

@@ -27,21 +27,16 @@ import org.bukkit.inventory.PlayerInventory;
  */
 public class MenuGrabCommand implements IMenuCommand {
 
-    private static final Set<Material> boots = EnumSet.of(
-            Material.LEATHER_BOOTS, Material.CHAINMAIL_BOOTS,
-            Material.IRON_BOOTS, Material.GOLD_BOOTS, Material.DIAMOND_BOOTS);
-    private static final Set<Material> leggings = EnumSet.of(
-            Material.LEATHER_LEGGINGS, Material.CHAINMAIL_LEGGINGS,
-            Material.IRON_LEGGINGS, Material.GOLD_LEGGINGS,
-            Material.DIAMOND_LEGGINGS);
-    private static final Set<Material> chestplates = EnumSet.of(
-            Material.LEATHER_CHESTPLATE, Material.CHAINMAIL_CHESTPLATE,
-            Material.IRON_CHESTPLATE, Material.GOLD_CHESTPLATE,
+    private static final Set<Material> boots = EnumSet.of(Material.LEATHER_BOOTS, Material.CHAINMAIL_BOOTS,
+            Material.IRON_BOOTS, Material.GOLDEN_BOOTS, Material.DIAMOND_BOOTS);
+    private static final Set<Material> leggings = EnumSet.of(Material.LEATHER_LEGGINGS, Material.CHAINMAIL_LEGGINGS,
+            Material.IRON_LEGGINGS, Material.GOLDEN_LEGGINGS, Material.DIAMOND_LEGGINGS);
+    private static final Set<Material> chestplates = EnumSet.of(Material.LEATHER_CHESTPLATE,
+            Material.CHAINMAIL_CHESTPLATE, Material.IRON_CHESTPLATE, Material.GOLDEN_CHESTPLATE,
             Material.DIAMOND_CHESTPLATE);
-    private static final Set<Material> helmets = EnumSet.of(
-            Material.LEATHER_HELMET, Material.CHAINMAIL_HELMET,
-            Material.IRON_HELMET, Material.GOLD_HELMET,
-            Material.DIAMOND_HELMET, Material.PUMPKIN, Material.SKULL_ITEM);
+    private static final Set<Material> helmets = EnumSet.of(Material.LEATHER_HELMET, Material.CHAINMAIL_HELMET,
+            Material.IRON_HELMET, Material.GOLDEN_HELMET, Material.DIAMOND_HELMET, Material.PUMPKIN,
+            Material.SKELETON_SKULL, Material.WITHER_SKELETON_SKULL);
     private CreateYourOwnMenus plugin;
 
     public MenuGrabCommand(CreateYourOwnMenus plugin) {
@@ -91,14 +86,14 @@ public class MenuGrabCommand implements IMenuCommand {
         ItemStack[] contents = menu.getInventory().getContents();
         for (int i = 0; i < contents.length; i++) {
             ItemStack item = contents[i];
-            if (item != null && item.getTypeId() != 0) {
+            if (item != null && item.getType() != Material.AIR) {
                 if (i < inv.getSize()
                         || (i == 36 && isBoots(item))
                         || (i == 37 && isLeggings(item))
                         || (i == 38 && isChestplate(item))
                         || (i == 39 && isHelmet(item))) {
                     ItemStack replaced = inv.getItem(i);
-                    if (replaced != null && replaced.getTypeId() != 0) {
+                    if (replaced != null && replaced.getType() != Material.AIR) {
                         toAdd.add(replaced);
                     }
                     inv.setItem(i, item.clone());
