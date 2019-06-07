@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.listeners;
 
@@ -13,17 +25,22 @@ import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.player.*;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -133,6 +150,7 @@ public class MenuListener implements Listener {
                     new BukkitRunnable() {
                         @Override
                         public void run() {
+                            //noinspection deprecation
                             player.updateInventory();
                         }
                     }.runTask(plugin);
@@ -207,8 +225,7 @@ public class MenuListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onDropFromLockedSlot(PlayerDropItemEvent event) {
         Player player = event.getPlayer();
-        if (player.getItemOnCursor() == null
-                || player.getItemOnCursor().getType() == Material.AIR) {
+        if (player.getItemOnCursor().getType() == Material.AIR) {
             PlayerInventory inv = player.getInventory();
             int slot = inv.getHeldItemSlot();
             if (player.hasPermission("cyom.slot.lock." + slot)
@@ -227,14 +244,19 @@ public class MenuListener implements Listener {
                 event.getItemDrop().remove();
 
                 // Make sure player sees everything as normal
+                //noinspection deprecation
                 player.updateInventory();
             }
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onPickUpItemIntoLockedSlot(PlayerPickupItemEvent event) {
-        Player player = event.getPlayer();
+    public void onPickUpItemIntoLockedSlot(EntityPickupItemEvent event) {
+        LivingEntity entity = event.getEntity();
+        if (!(entity instanceof Player)) {
+            return;
+        }
+        Player player = (Player) event.getEntity();
         if (player.hasPermission("disable.slot.locking")) {
             return;
         }
@@ -314,7 +336,7 @@ public class MenuListener implements Listener {
      *
      * @param event The interact event
      */
-    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = false)
+    @EventHandler(priority = EventPriority.HIGH)
     public void onRightClickHeldMenuItem(PlayerInteractEvent event) {
         if (event.getAction() == Action.RIGHT_CLICK_AIR
                 || event.getAction() == Action.RIGHT_CLICK_BLOCK) {
@@ -347,7 +369,7 @@ public class MenuListener implements Listener {
         if (event.getRightClicked() instanceof Player) {
             final Player player = event.getPlayer();
             final Player target = (Player) event.getRightClicked();
-            final ItemStack item = player.getItemInHand();
+            final ItemStack item = player.getInventory().getItemInMainHand();
             if (MenuScriptUtils.isValidMenuItem(item)) {
                 // Schedule it for the next tick to avoid conflicts with the event action
                 new BukkitRunnable() {
@@ -390,14 +412,12 @@ public class MenuListener implements Listener {
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
         Inventory inventory = player.getOpenInventory().getTopInventory();
-        if (inventory != null) {
-            if (inventory.getHolder() instanceof Menu) {
-                Menu menu = (Menu) inventory.getHolder();
+        if (inventory.getHolder() instanceof Menu) {
+            Menu menu = (Menu) inventory.getHolder();
 
-                // Just to be sure that changes are saved if a player quits 
-                // while they are editing a menu
-                menu.doneEditing(player);
-            }
+            // Just to be sure that changes are saved if a player quits
+            // while they are editing a menu
+            menu.doneEditing(player);
         }
     }
 
@@ -405,8 +425,6 @@ public class MenuListener implements Listener {
      * Fired when a player dies. Lowest priority so that we can redo the drop
      * list, allowing only unlocked slots to drop, before any other plugins
      * try to alter it.
-     *
-     * @param event
      */
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onDropLockedItemOnDeath(PlayerDeathEvent event) {

@@ -1,7 +1,18 @@
 /*
- * Copyright 2015 XHawk87.
+ * Copyright (C) 2013-2019 XHawk87
  *
- * All Rights Reserved.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
@@ -9,30 +20,43 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.UUID;
+
 /**
  * @author XHawk87
  */
-public class HeldItemStackRef implements ItemStackRef {
+public class HeldItemStackRef extends ItemStackRef {
 
-    private String playerName;
+    private UUID playerUUID;
 
-    public HeldItemStackRef(String playerName) {
-        this.playerName = playerName;
+    public HeldItemStackRef(UUID playerUUID) {
+        this.playerUUID = playerUUID;
     }
 
     @Override
     public ItemStack get() {
-        Player player = Bukkit.getPlayerExact(playerName);
+        Player player = Bukkit.getPlayer(playerUUID);
         if (player == null) {
             return null;
         }
-        return player.getItemInHand();
+        return player.getInventory().getItemInMainHand();
+    }
+
+    @Override
+    boolean set(ItemStack itemStack) {
+        Player player = Bukkit.getPlayer(playerUUID);
+        if (player == null) {
+            return false;
+        }
+        player.getInventory().setItemInMainHand(itemStack);
+        return true;
     }
 
     @Override
     public void update() {
-        Player player = Bukkit.getPlayerExact(playerName);
+        Player player = Bukkit.getPlayer(playerUUID);
         if (player != null) {
+            //noinspection deprecation
             player.updateInventory();
         }
     }

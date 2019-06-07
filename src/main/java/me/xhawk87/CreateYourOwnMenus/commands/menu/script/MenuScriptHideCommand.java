@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu.script;
 
@@ -16,7 +28,11 @@ import org.bukkit.inventory.meta.ItemMeta;
 import java.util.ArrayList;
 import java.util.List;
 
-import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.*;
+import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.commandStart;
+import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.hiddenCommand;
+import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.hiddenPlayerCommand;
+import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.packHiddenText;
+import static me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils.playerCommand;
 
 /**
  * @author XHawk87

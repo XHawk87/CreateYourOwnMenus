@@ -1,17 +1,37 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
-import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.menu.script.*;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptAppendCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptClearCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptDeleteCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptExportCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptHideCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptImportCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptInsertCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptReplaceCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptShowCommand;
+import me.xhawk87.CreateYourOwnMenus.commands.menu.script.MenuScriptTitleCommand;
 import me.xhawk87.CreateYourOwnMenus.utils.HeldItemStackRef;
 import me.xhawk87.CreateYourOwnMenus.utils.ItemStackRef;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandUtils;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuScriptUtils;
-import me.xhawk87.CreateYourOwnMenus.utils.MenuSlotItemStackRef;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -83,39 +103,20 @@ public class MenuScriptCommand implements IMenuCommand {
             String menuId = subCommandName.substring(0, splitter);
             String slotStr = subCommandName.substring(splitter + 1);
 
-            // Check menu exists
-            Menu menu = plugin.getMenu(menuId);
-            if (menu == null) {
-                sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", menuId));
-                return true;
-            }
-
-            // Check slot is valid
-            int slot;
-            try {
-                slot = Integer.parseInt(slotStr);
-            } catch (NumberFormatException ex) {
-                sender.sendMessage(plugin.translate(sender, "expected-integer-slot", "The slot should be an integer number: {0}", slotStr));
-                return true;
-            }
-
-            int size = menu.getInventory().getSize();
-            if (slot < 0 || slot >= size) {
-                sender.sendMessage(plugin.translate(sender, "invalid-slot-number", "The menu {0} has {1} slots numbered from 0 to {2}, so {3} is out of range", menuId, size, size - 1, slotStr));
-                return true;
-            }
-
             // Check there is an item in that slot
-            itemStackRef = new MenuSlotItemStackRef(menu, slot);
+            itemStackRef = MenuCommandUtils.getMenuSlotItemStack(plugin, sender, menuId, slotStr);
+            if (itemStackRef == null) {
+                return true;
+            }
             if (itemStackRef.get() == null) {
-                sender.sendMessage(plugin.translate(sender, "menu-slot-no-item", "There is no item in slot {0} of the {1} menu", slot, menuId));
+                sender.sendMessage(plugin.translate(sender, "menu-slot-no-item", "There is no item in slot {0} of the {1} menu", slotStr, menuId));
                 return true;
             }
 
             // Take the next arg as the sub command
             subCommandName = args[index++].toLowerCase();
         } else {
-            Player target = plugin.getServer().getPlayerExact(subCommandName);
+            Player target = MenuCommandUtils.getPlayerByName(plugin, subCommandName);
             if (target != null) {
                 subCommandName = args[index++].toLowerCase();
             } else {
@@ -126,7 +127,7 @@ public class MenuScriptCommand implements IMenuCommand {
                     return false;
                 }
             }
-            itemStackRef = new HeldItemStackRef(target.getName());
+            itemStackRef = new HeldItemStackRef(target.getUniqueId());
         }
 
         IMenuScriptCommand menuScriptCommand = subCommands.get(subCommandName);

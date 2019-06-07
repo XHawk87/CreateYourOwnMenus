@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus;
 
@@ -17,7 +29,11 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.conversations.*;
+import org.bukkit.conversations.Conversation;
+import org.bukkit.conversations.ConversationContext;
+import org.bukkit.conversations.MessagePrompt;
+import org.bukkit.conversations.Prompt;
+import org.bukkit.conversations.StringPrompt;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -26,9 +42,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -90,7 +117,7 @@ public class Menu implements InventoryHolder {
      */
     public void save() {
         FileConfiguration data = new YamlConfiguration();
-        data.set("title", inventory.getTitle());
+        data.set("title", inventory.getType().getDefaultTitle());
         data.set("size", inventory.getSize());
         ConfigurationSection contentsData = data.createSection("contents");
         for (int i = 0; i < inventory.getSize(); i++) {
@@ -192,15 +219,10 @@ public class Menu implements InventoryHolder {
      * @param data The menu data
      */
     private void onLoad(FileConfiguration data) {
-        String title = data.getString("title");
+        String title = Objects.requireNonNull(data.getString("title"), "title is missing");
         int size = data.getInt("size");
         inventory = plugin.getServer().createInventory(this, size, title);
-        ConfigurationSection contentsData = data.getConfigurationSection("contents");
-        for (String key : contentsData.getKeys(false)) {
-            int slot = Integer.parseInt(key);
-            ItemStack item = contentsData.getItemStack(key);
-            inventory.setItem(slot, item);
-        }
+        updateInventoryContents(data);
     }
 
     /**
@@ -209,23 +231,18 @@ public class Menu implements InventoryHolder {
      * @param data The menu data
      */
     private void onReload(FileConfiguration data) {
-        String title = data.getString("title");
+        String title = Objects.requireNonNull(data.getString("title"), "title is missing");
         int size = data.getInt("size");
         List<HumanEntity> viewers = inventory.getViewers();
 
         // Changing the size or title requires creating a new inventory
-        boolean recreate = !title.equals(inventory.getTitle()) || size != inventory.getSize();
+        boolean recreate = !title.equals(inventory.getType().getDefaultTitle()) || size != inventory.getSize();
         if (recreate) {
             inventory = plugin.getServer().createInventory(this, size, title);
         }
 
         inventory.clear();
-        ConfigurationSection contentsData = data.getConfigurationSection("contents");
-        for (String key : contentsData.getKeys(false)) {
-            int slot = Integer.parseInt(key);
-            ItemStack item = contentsData.getItemStack(key);
-            inventory.setItem(slot, item);
-        }
+        updateInventoryContents(data);
 
         for (HumanEntity viewer : viewers) {
             if (viewer instanceof Player) {
@@ -233,8 +250,20 @@ public class Menu implements InventoryHolder {
                 if (recreate) {
                     open(player);
                 } else {
+                    //noinspection deprecation
                     player.updateInventory();
                 }
+            }
+        }
+    }
+
+    private void updateInventoryContents(FileConfiguration data) {
+        ConfigurationSection contentsData = data.getConfigurationSection("contents");
+        if (contentsData != null) {
+            for (String key : contentsData.getKeys(false)) {
+                int slot = Integer.parseInt(key);
+                ItemStack item = contentsData.getItemStack(key);
+                inventory.setItem(slot, item);
             }
         }
     }
@@ -247,7 +276,9 @@ public class Menu implements InventoryHolder {
             @Override
             public void run() {
                 synchronized (file) {
-                    file.delete();
+                    if (!file.delete()) {
+                        throw new RuntimeException("Failed to delete file " + file.getPath());
+                    }
                 }
             }
         }.runTaskAsynchronously(plugin);
@@ -262,21 +293,15 @@ public class Menu implements InventoryHolder {
      * @param player The player to open this menu for
      */
     public void open(final Player player) {
-        // Check if the player already has an inventory open
-        Inventory current = player.getOpenInventory().getTopInventory();
-        if (current == null) {
-            player.openInventory(inventory);
-        } else {
-            // Switching directly from one inventory to another causes glitches
-            player.closeInventory();
-            // So close it and wait one tick
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    player.openInventory(inventory);
-                }
-            }.runTask(plugin);
-        }
+        // Switching directly from one inventory to another causes glitches
+        player.closeInventory();
+        // So close it and wait one tick
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                player.openInventory(inventory);
+            }
+        }.runTask(plugin);
     }
 
     /**
@@ -360,10 +385,9 @@ public class Menu implements InventoryHolder {
     private void select(Player player, ItemStack menuItem, Player targetPlayer, Block targetBlock) {
         if (menuItem.hasItemMeta()) {
             ItemMeta meta = menuItem.getItemMeta();
-
-            if (meta.hasLore()) {
+            if (meta != null) {
                 List<String> lore = meta.getLore();
-                if (!lore.isEmpty()) {
+                if (lore != null && !lore.isEmpty()) {
                     List<String> commands = new ArrayList<>();
                     // Unpack any hidden commands
                     String firstLine = lore.get(0);
@@ -546,9 +570,7 @@ public class Menu implements InventoryHolder {
                     player.sendMessage(plugin.translate(player, "error-incomplete-dynamic-arg", "Error in menu script line (incomplete dynamic argument): {0}", command));
                     return false;
                 }
-                if (commandString != null) {
-                    parts.add(commandString.toString());
-                }
+                parts.add(commandString.toString());
                 final StringBuilder parsedCommand = new StringBuilder();
                 player.beginConversation(
                         new Conversation(plugin, player,
@@ -623,7 +645,7 @@ public class Menu implements InventoryHolder {
      * @throws NullPointerException if the menu has not yet been loaded
      */
     public String getTitle() {
-        return inventory.getTitle();
+        return inventory.getType().getDefaultTitle();
     }
 
     public String translate(CommandSender forWhom, String key, String template, Object... params) {

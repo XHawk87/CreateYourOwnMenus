@@ -1,7 +1,18 @@
 /*
- * Copyright 2015 XHawk87.
+ * Copyright (C) 2013-2019 XHawk87
  *
- * All Rights Reserved.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
@@ -9,16 +20,17 @@ import me.xhawk87.CreateYourOwnMenus.Menu;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * @author XHawk87
  */
-public class MenuSlotItemStackRef implements ItemStackRef {
+public class MenuSlotItemStackRef extends ItemStackRef {
 
     private final Menu menu;
     private final int slot;
 
-    public MenuSlotItemStackRef(Menu menu, int slot) {
+    MenuSlotItemStackRef(Menu menu, int slot) {
         this.menu = menu;
         this.slot = slot;
     }
@@ -29,12 +41,25 @@ public class MenuSlotItemStackRef implements ItemStackRef {
     }
 
     @Override
+    public ItemMeta getItemMeta() {
+        return null;
+    }
+
+    @Override
+    public boolean set(ItemStack itemStack) {
+        menu.getInventory().setItem(slot, itemStack);
+        return true;
+    }
+
+    @Override
     public void update() {
         for (HumanEntity viewer : menu.getInventory().getViewers()) {
             if (viewer instanceof Player) {
                 Player player = (Player) viewer;
+                //noinspection deprecation
                 player.updateInventory();
             }
         }
+        menu.save();
     }
 }

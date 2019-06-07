@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.utils;
 
@@ -13,7 +25,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,12 +57,13 @@ public class TextFileLoader implements Runnable {
                 }
             });
         }
-        final List<String> lines = new ArrayList<>();
+        final List<String> lines;
 
         try {
             byte[] encoded = Files.readAllBytes(file.toPath());
             String contents = Charset.forName("UTF8").decode(ByteBuffer.wrap(encoded)).toString();
-            lines.addAll(Arrays.asList(contents.replace('&', ChatColor.COLOR_CHAR).replace("\r\n", "\n").split("\n")));
+            lines = Arrays.asList(contents.replace('&', ChatColor.COLOR_CHAR)
+                    .replace("\r\n", "\n").split("\n"));
         } catch (final IOException ex) {
             plugin.getServer().getScheduler().runTask(plugin, new Runnable() {
                 @Override

@@ -1,6 +1,18 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus;
 
@@ -8,7 +20,14 @@ import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
 import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
 import me.xhawk87.CreateYourOwnMenus.i18n.LanguageWrapper;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
-import me.xhawk87.CreateYourOwnMenus.script.*;
+import me.xhawk87.CreateYourOwnMenus.script.CloseCommand;
+import me.xhawk87.CreateYourOwnMenus.script.ConsumeCommand;
+import me.xhawk87.CreateYourOwnMenus.script.DelayCommand;
+import me.xhawk87.CreateYourOwnMenus.script.ReloadCommand;
+import me.xhawk87.CreateYourOwnMenus.script.RequireCurrencyCommand;
+import me.xhawk87.CreateYourOwnMenus.script.RequireLevelCommand;
+import me.xhawk87.CreateYourOwnMenus.script.RequirePermissionCommand;
+import me.xhawk87.CreateYourOwnMenus.script.ScriptCommand;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.Permission;
@@ -23,6 +42,7 @@ import java.io.FileFilter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -57,8 +77,8 @@ public class CreateYourOwnMenus extends JavaPlugin {
         reloadMenus();
 
         // Register commands
-        getCommand("menu").setExecutor(new MenuCommand(this));
-        getCommand("sudo").setExecutor(new SudoCommand(this));
+        Objects.requireNonNull(getCommand("menu")).setExecutor(new MenuCommand(this));
+        Objects.requireNonNull(getCommand("sudo")).setExecutor(new SudoCommand(this));
 
         // Register listeners
         new MenuListener().registerEvents(this);
@@ -66,14 +86,11 @@ public class CreateYourOwnMenus extends JavaPlugin {
         // Register script commands
         scriptCommands.put("close", new CloseCommand());
         scriptCommands.put("consume", new ConsumeCommand());
-        //scriptCommands.put("countchest", new CountChestCommand());
         scriptCommands.put("delay", new DelayCommand(this));
-        //scriptCommands.put("givechest", new GiveChestCommand());
         scriptCommands.put("reload", new ReloadCommand());
         scriptCommands.put("requirecurrency", new RequireCurrencyCommand(this));
         scriptCommands.put("requirelevel", new RequireLevelCommand(this));
         scriptCommands.put("requirepermission", new RequirePermissionCommand());
-        //scriptCommands.put("takechest", new TakeChestCommand());
 
         // Register permissions
         PluginManager mgr = getServer().getPluginManager();
@@ -111,6 +128,9 @@ public class CreateYourOwnMenus extends JavaPlugin {
      */
     public Menu createMenu(String id, String title, int rows) {
         id = id.toLowerCase();
+        if (menus.containsKey(id)) {
+            throw new IllegalArgumentException("Menu IDs must be unique");
+        }
         if (title.length() > 32) {
             throw new IllegalArgumentException("Titles are limited to 32 characters (including colours)");
         }
@@ -146,7 +166,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
      *
      * @param menu The menu to delete
      */
-    protected void deleteMenu(Menu menu) {
+    void deleteMenu(Menu menu) {
         menus.remove(menu.getId());
         // De-register the specific-opening permission for the deleted menu
         getServer().getPluginManager().removePermission("cyom.menus." + menu.getId());
@@ -184,17 +204,19 @@ public class CreateYourOwnMenus extends JavaPlugin {
         // Ensure that the plugin folder has been created
         File menusFolder = new File(getDataFolder(), "menus");
         if (!menusFolder.exists()) {
-            menusFolder.mkdirs();
+            if (!menusFolder.mkdirs()) {
+                throw new RuntimeException("Failed to create directory " + menusFolder.getPath());
+            }
         }
 
         // Load all .yml files in the plugin folder as menus
         // This may need to change if a config.yml is added
-        for (File file : menusFolder.listFiles(new FileFilter() {
+        for (File file : Objects.requireNonNull(menusFolder.listFiles(new FileFilter() {
             @Override
             public boolean accept(File pathname) {
                 return pathname.getName().toLowerCase().endsWith(".yml");
             }
-        })) {
+        }))) {
             String id = file.getName().substring(0, file.getName().length() - ".yml".length()).toLowerCase();
             Menu menu = new Menu(this, id);
             menu.load();
@@ -279,7 +301,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * whitelist and it is not on the blacklist. False, if it is on the
      * blacklist or if there is a whitelist and this command is not on it
      */
-    public boolean isValidMenuScriptCommand(String commandName) {
+    boolean isValidMenuScriptCommand(String commandName) {
         if (commandName.startsWith("/")) {
             commandName = commandName.substring(1);
         }
@@ -296,7 +318,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
      * @param commandString The command name
      * @return The script command
      */
-    public ScriptCommand getScriptCommand(String commandString) {
+    ScriptCommand getScriptCommand(String commandString) {
         if (commandString.startsWith("/")) {
             commandString = commandString.substring(1);
         }

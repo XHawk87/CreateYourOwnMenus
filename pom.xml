@@ -4,7 +4,7 @@
 
     <groupId>me.xhawk87</groupId>
     <artifactId>CreateYourOwnMenus</artifactId>
-    <version>0.5.11</version>
+    <version>0.5.12</version>
     <packaging>jar</packaging>
 
     <name>CreateYourOwnMenus</name>
@@ -34,12 +34,12 @@
         <dependency>
             <groupId>org.bukkit</groupId>
             <artifactId>bukkit</artifactId>
-            <version>1.13.1-R0.1-SNAPSHOT</version>
+            <version>1.14.2-R0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.6</version>
+            <version>1.7</version>
         </dependency>
         <dependency>
             <groupId>com.github.XHawk87</groupId>

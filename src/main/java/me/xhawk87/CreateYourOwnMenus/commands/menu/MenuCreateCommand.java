@@ -1,15 +1,31 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandUtils;
+import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+
+import java.util.Arrays;
 
 /**
  * Sub-command to create a new menu
@@ -49,13 +65,9 @@ public class MenuCreateCommand implements IMenuCommand {
         }
 
         // Build the title
-        StringBuilder sb = new StringBuilder(args[2].replace('&', ChatColor.COLOR_CHAR));
-        for (int i = 3; i < args.length; i++) {
-            sb.append(" ").append(args[i].replace('&', ChatColor.COLOR_CHAR));
-        }
-        String title = sb.toString();
-        if (title.length() > 32) {
-            sender.sendMessage(plugin.translate(sender, "title-char-limit", "Titles are limited to 32 characters (including colours)"));
+        String title = StringUtils.join(Arrays.asList(args).subList(2, args.length), " ")
+                .replace('&', ChatColor.COLOR_CHAR);
+        if (!MenuCommandUtils.isValidTitle(plugin, sender, title)) {
             return true;
         }
 

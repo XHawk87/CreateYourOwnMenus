@@ -1,17 +1,29 @@
 /*
- * Copyright 2015 XHawk87.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
-import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
 import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandSender;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandUtils;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuSlotItemStackRef;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -43,65 +55,27 @@ public class MenuSetCommand implements IMenuCommand {
         String toMenuId = args[2];
         String toSlotStr = args[3];
 
-        Menu targetMenu = plugin.getMenu(targetMenuId);
-        if (targetMenu == null) {
-            sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", targetMenuId));
+        MenuSlotItemStackRef targetRef = MenuCommandUtils.getMenuSlotItemStack(plugin, sender, targetMenuId, targetSlotStr);
+        if (targetRef == null) {
             return true;
         }
-
-        int targetSlot;
-        try {
-            targetSlot = Integer.parseInt(targetSlotStr);
-        } catch (NumberFormatException ex) {
-            sender.sendMessage(plugin.translate(sender, "expected-integer-slot", "The slot should be an integer number: {0}", targetSlotStr));
+        MenuSlotItemStackRef toRef = MenuCommandUtils.getMenuSlotItemStack(plugin, sender, toMenuId, toSlotStr);
+        if (toRef == null) {
             return true;
         }
-
-        int size = targetMenu.getInventory().getSize();
-        if (targetSlot < 0 || targetSlot >= size) {
-            sender.sendMessage(plugin.translate(sender, "invalid-slot-number", "The menu {0} has {1} slots numbered from 0 to {2}, so {3} is out of range", targetMenuId, size, size - 1, targetSlotStr));
-            return true;
-        }
-
-        Menu toMenu = plugin.getMenu(toMenuId);
-        if (toMenu == null) {
-            sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", toMenuId));
-            return true;
-        }
-
-        int toSlot;
-        try {
-            toSlot = Integer.parseInt(toSlotStr);
-        } catch (NumberFormatException ex) {
-            sender.sendMessage(plugin.translate(sender, "expected-integer-slot", "The slot should be an integer number: {0}", toSlotStr));
-            return true;
-        }
-
-        size = toMenu.getInventory().getSize();
-        if (toSlot < 0 || toSlot >= size) {
-            sender.sendMessage(plugin.translate(sender, "invalid-slot-number", "The menu {0} has {1} slots numbered from 0 to {2}, so {3} is out of range", toMenuId, size, size - 1, toSlotStr));
-            return true;
-        }
-
-        ItemStack to = toMenu.getInventory().getItem(toSlot);
+        ItemStack to = toRef.get();
         if (to == null || to.getType() == Material.AIR) {
-            targetMenu.getInventory().clear(targetSlot);
+            targetRef.set(null);
         } else {
-            targetMenu.getInventory().setItem(targetSlot, to.clone());
+            targetRef.set(to.clone());
         }
-        targetMenu.save();
-        for (HumanEntity viewer : targetMenu.getInventory().getViewers()) {
-            if (viewer instanceof Player) {
-                Player player = (Player) viewer;
-                player.updateInventory();
-            }
-        }
-
+        targetRef.update();
         if (sender instanceof MenuCommandSender) {
             // If this is running in a menu, it is assumed that the clicking player does not want to receive this message
-            plugin.getServer().getConsoleSender().sendMessage(plugin.translate(sender, "menu-set-success", "Slot {0} of {1} was set to item {2} in {3}", targetSlot, targetMenuId, toSlot, toMenuId));
+            plugin.getServer().getConsoleSender().sendMessage(plugin.translate(sender, "menu-set-success",
+                    "Slot {0} of {1} was set to item {2} in {3}", targetSlotStr, targetMenuId, toSlotStr, toMenuId));
         } else {
-            sender.sendMessage(plugin.translate(sender, "menu-set-success", "Slot {0} of {1} was set to item {2} in {3}", targetSlot, targetMenuId, toSlot, toMenuId));
+            sender.sendMessage(plugin.translate(sender, "menu-set-success", "Slot {0} of {1} was set to item {2} in {3}", targetSlotStr, targetMenuId, toSlotStr, toMenuId));
         }
         return true;
     }

@@ -1,17 +1,25 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2013-2019 XHawk87
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package me.xhawk87.CreateYourOwnMenus.commands.menu;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
 import me.xhawk87.CreateYourOwnMenus.commands.IMenuCommand;
+import me.xhawk87.CreateYourOwnMenus.utils.MenuCommandUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -21,8 +29,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 /**
- *
  * @author XHawk87
  */
 public class MenuGrabCommand implements IMenuCommand {
@@ -55,27 +68,35 @@ public class MenuGrabCommand implements IMenuCommand {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length < 1 || args.length > 2) {
-            return false;
-        }
-        Player target;
-        int index = 0;
         if (args.length == 1) {
-            if (sender instanceof Player) {
-                target = (Player) sender;
-            } else {
-                sender.sendMessage(plugin.translate(sender, "console-no-target", "The console must specify a player"));
-                return true;
-            }
-        } else {
-            String playerName = args[index++];
-            target = plugin.getServer().getPlayer(playerName);
-            if (target == null) {
-                sender.sendMessage(plugin.translate(sender, "player-not-online", "{0} is not online", playerName));
-                return true;
-            }
+            return onCommand(sender, args[0]);
         }
-        String menuId = args[index++];
+        if (args.length == 2) {
+            return onCommand(sender, args[0], args[1]);
+        }
+        return false;
+    }
+
+    private boolean onCommand(CommandSender sender, String menuId) {
+        if (sender instanceof Player) {
+            return onCommand(sender, (Player) sender, menuId);
+        } else {
+            sender.sendMessage(plugin.translate(sender, "console-no-target", "The console must specify a player"));
+            return true;
+        }
+    }
+
+    private boolean onCommand(CommandSender sender, String playerName, String menuId) {
+        Player target = MenuCommandUtils.getPlayerByName(plugin, playerName);
+        if (target != null) {
+            return onCommand(sender, target, menuId);
+        } else {
+            sender.sendMessage(plugin.translate(sender, "player-not-online", "{0} is not online", playerName));
+            return true;
+        }
+    }
+
+    private boolean onCommand(CommandSender sender, Player target, String menuId) {
         Menu menu = plugin.getMenu(menuId);
         if (menu == null) {
             sender.sendMessage(plugin.translate(sender, "unknown-menu-id", "There is no menu with id {0}", menuId));
@@ -102,7 +123,7 @@ public class MenuGrabCommand implements IMenuCommand {
                 }
             }
         }
-        HashMap<Integer, ItemStack> toDrop = inv.addItem(toAdd.toArray(new ItemStack[toAdd.size()]));
+        Map<Integer, ItemStack> toDrop = inv.addItem(toAdd.toArray(new ItemStack[0]));
         World world = target.getWorld();
         Location location = target.getLocation();
         for (ItemStack drop : toDrop.values()) {
@@ -111,6 +132,7 @@ public class MenuGrabCommand implements IMenuCommand {
         sender.sendMessage(plugin.translate(sender, "menu-grabbed-for-player", "{0} was grabbed for {1}", menu.getTitle(), target.getDisplayName()));
 
         // Force inventory to update
+        //noinspection deprecation
         target.updateInventory();
         return true;
     }
