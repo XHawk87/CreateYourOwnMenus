@@ -4,7 +4,7 @@
 
     <groupId>me.xhawk87</groupId>
     <artifactId>CreateYourOwnMenus</artifactId>
-    <version>0.5.12</version>
+    <version>0.6.0</version>
     <packaging>jar</packaging>
 
     <name>CreateYourOwnMenus</name>
