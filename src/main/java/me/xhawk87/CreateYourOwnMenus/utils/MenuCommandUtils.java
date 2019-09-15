@@ -18,6 +18,7 @@ package me.xhawk87.CreateYourOwnMenus.utils;
 
 import me.xhawk87.CreateYourOwnMenus.CreateYourOwnMenus;
 import me.xhawk87.CreateYourOwnMenus.Menu;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -58,8 +59,8 @@ public class MenuCommandUtils {
         return true;
     }
 
-    public static Player getPlayerByName(Plugin plugin, String playerName) {
+    public static Player getPlayerByName(String playerName) {
         //noinspection deprecation
-        return plugin.getServer().getPlayer(playerName);
+        return Bukkit.getPlayer(playerName);
     }
 }

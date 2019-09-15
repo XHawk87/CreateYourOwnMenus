@@ -46,7 +46,7 @@ public class RequireLevelCommand implements ScriptCommand {
         Player target;
         if (args.length > 1) {
             String playerName = args[index++];
-            target = MenuCommandUtils.getPlayerByName(plugin, playerName);
+            target = MenuCommandUtils.getPlayerByName(playerName);
             if (target == null) {
                 target = player;
                 index--;

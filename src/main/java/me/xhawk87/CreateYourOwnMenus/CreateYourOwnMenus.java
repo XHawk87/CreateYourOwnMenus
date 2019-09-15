@@ -17,7 +17,7 @@
 package me.xhawk87.CreateYourOwnMenus;
 
 import me.xhawk87.CreateYourOwnMenus.commands.MenuCommand;
-import me.xhawk87.CreateYourOwnMenus.commands.SudoCommand;
+import me.xhawk87.CreateYourOwnMenus.script.SudoCommand;
 import me.xhawk87.CreateYourOwnMenus.i18n.LanguageWrapper;
 import me.xhawk87.CreateYourOwnMenus.listeners.MenuListener;
 import me.xhawk87.CreateYourOwnMenus.script.CloseCommand;
@@ -78,7 +78,6 @@ public class CreateYourOwnMenus extends JavaPlugin {
 
         // Register commands
         Objects.requireNonNull(getCommand("menu")).setExecutor(new MenuCommand(this));
-        Objects.requireNonNull(getCommand("sudo")).setExecutor(new SudoCommand(this));
 
         // Register listeners
         new MenuListener().registerEvents(this);
@@ -91,6 +90,7 @@ public class CreateYourOwnMenus extends JavaPlugin {
         scriptCommands.put("requirecurrency", new RequireCurrencyCommand(this));
         scriptCommands.put("requirelevel", new RequireLevelCommand(this));
         scriptCommands.put("requirepermission", new RequirePermissionCommand());
+        scriptCommands.put("sudo", new SudoCommand());
 
         // Register permissions
         PluginManager mgr = getServer().getPluginManager();

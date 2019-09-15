@@ -87,7 +87,7 @@ public class MenuGrabCommand implements IMenuCommand {
     }
 
     private boolean onCommand(CommandSender sender, String playerName, String menuId) {
-        Player target = MenuCommandUtils.getPlayerByName(plugin, playerName);
+        Player target = MenuCommandUtils.getPlayerByName(playerName);
         if (target != null) {
             return onCommand(sender, target, menuId);
         } else {

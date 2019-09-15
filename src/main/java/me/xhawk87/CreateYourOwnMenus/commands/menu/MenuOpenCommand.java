@@ -75,7 +75,7 @@ public class MenuOpenCommand implements IMenuCommand {
 
             // Player is provided, so target the named player
             String targetName = args[i++];
-            target = MenuCommandUtils.getPlayerByName(plugin, targetName);
+            target = MenuCommandUtils.getPlayerByName(targetName);
             if (target == null) {
                 sender.sendMessage(plugin.translate(sender, "player-not-online", "{0} is not online", targetName));
                 return true;

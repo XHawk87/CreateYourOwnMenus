@@ -116,7 +116,7 @@ public class MenuScriptCommand implements IMenuCommand {
             // Take the next arg as the sub command
             subCommandName = args[index++].toLowerCase();
         } else {
-            Player target = MenuCommandUtils.getPlayerByName(plugin, subCommandName);
+            Player target = MenuCommandUtils.getPlayerByName(subCommandName);
             if (target != null) {
                 subCommandName = args[index++].toLowerCase();
             } else {

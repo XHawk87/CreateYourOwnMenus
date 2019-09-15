@@ -23,6 +23,8 @@ menu-grab-usage: /menu grab ([player]) [menu id]. Gives copies of all items in t
 menu-copy-usage: /menu copy [old menu id] [new menu id] [new title] - Create a new menu with the same size and contents as the given menu but with a new id and title
 command-no-perms: You do not have permission to use this command
 sudo-usage: /sudo [player] [command...]. Send a command as the specified player. This can be used in place of @p/ in menu scripts e.g. '/sudo @p kill' in place of '@p/kill'
+sudo-no-target: Error in menu script line (No target player was specified): {0}
+sudo-no-command: Error in menu script line (No command was specified to run as player): {0}
 player-not-online: {0} is not online
 error-negative-index: The index must be at least 0: {0}
 error-index-too-high: The index must be less than the number of lines in the lore ({0}): {1}

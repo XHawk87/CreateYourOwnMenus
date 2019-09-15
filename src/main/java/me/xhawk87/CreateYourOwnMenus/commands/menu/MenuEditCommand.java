@@ -52,7 +52,7 @@ public class MenuEditCommand implements IMenuCommand {
         Player target;
         String id;
         if (args.length == 2) {
-            target = MenuCommandUtils.getPlayerByName(plugin, args[0]);
+            target = MenuCommandUtils.getPlayerByName(args[0]);
             if (target == null) {
                 sender.sendMessage(plugin.translate(sender, "player-not-online", "{0} is not online", args[0]));
                 return true;
