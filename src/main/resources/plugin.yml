@@ -11,10 +11,6 @@ commands:
     usage: /menu [create|edit|delete|list|open|script|reload|grab|copy] [parameters...]
     aliases: [m]
     permissions: cyom.commands.menu
-  sudo:
-    description: Allows you to execute a command as another player
-    usage: /sudo [player] [command]
-    permissions: cyom.commands.sudo
 
 permissions:
   cyom.commands.menu:
