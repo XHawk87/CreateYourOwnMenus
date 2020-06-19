@@ -67,6 +67,7 @@ public class Menu implements InventoryHolder {
 
     private CreateYourOwnMenus plugin;
     private String id;
+    private String title;
     private Inventory inventory;
     private Set<String> editing = new HashSet<>();
     private final File file;
@@ -83,6 +84,7 @@ public class Menu implements InventoryHolder {
     public Menu(CreateYourOwnMenus plugin, String id, String title, int rows) {
         this(plugin, id);
         this.inventory = plugin.getServer().createInventory(this, rows * 9, title);
+        this.title = title;
     }
 
     /**
@@ -117,7 +119,7 @@ public class Menu implements InventoryHolder {
      */
     public void save() {
         FileConfiguration data = new YamlConfiguration();
-        data.set("title", inventory.getType().getDefaultTitle());
+        data.set("title", title);
         data.set("size", inventory.getSize());
         ConfigurationSection contentsData = data.createSection("contents");
         for (int i = 0; i < inventory.getSize(); i++) {
@@ -219,7 +221,7 @@ public class Menu implements InventoryHolder {
      * @param data The menu data
      */
     private void onLoad(FileConfiguration data) {
-        String title = Objects.requireNonNull(data.getString("title"), "title is missing");
+        title = Objects.requireNonNull(data.getString("title"), "title is missing");
         int size = data.getInt("size");
         inventory = plugin.getServer().createInventory(this, size, title);
         updateInventoryContents(data);
@@ -231,14 +233,15 @@ public class Menu implements InventoryHolder {
      * @param data The menu data
      */
     private void onReload(FileConfiguration data) {
-        String title = Objects.requireNonNull(data.getString("title"), "title is missing");
+        String newTitle = Objects.requireNonNull(data.getString("title"), "title is missing");
         int size = data.getInt("size");
         List<HumanEntity> viewers = inventory.getViewers();
 
         // Changing the size or title requires creating a new inventory
-        boolean recreate = !title.equals(inventory.getType().getDefaultTitle()) || size != inventory.getSize();
+        boolean recreate = !newTitle.equals(title) || size != inventory.getSize();
         if (recreate) {
-            inventory = plugin.getServer().createInventory(this, size, title);
+            inventory = plugin.getServer().createInventory(this, size, newTitle);
+            title = newTitle;
         }
 
         inventory.clear();
@@ -645,7 +648,7 @@ public class Menu implements InventoryHolder {
      * @throws NullPointerException if the menu has not yet been loaded
      */
     public String getTitle() {
-        return inventory.getType().getDefaultTitle();
+        return title;
     }
 
     public String translate(CommandSender forWhom, String key, String template, Object... params) {
