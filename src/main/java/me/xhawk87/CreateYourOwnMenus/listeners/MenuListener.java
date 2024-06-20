@@ -93,7 +93,7 @@ public class MenuListener implements Listener {
             // First check if the clicked slot is a locked inventory slot
             int rawSlot = event.getRawSlot();
             int numInTop = event.getView().getTopInventory().getSize();
-            if ((rawSlot >= numInTop) && rawSlot != 45) { {
+            if ((rawSlot >= numInTop) && rawSlot != 45) {
                 // The clicked slot is the player's inventory
                 int slot = event.getSlot();
                 if (player.hasPermission("cyom.slot.lock." + slot)
