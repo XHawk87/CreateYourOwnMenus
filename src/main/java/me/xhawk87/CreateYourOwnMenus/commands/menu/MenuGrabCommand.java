@@ -34,22 +34,72 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.lang.reflect.Field;
 
 /**
  * @author XHawk87
  */
 public class MenuGrabCommand implements IMenuCommand {
 
-    private static final Set<Material> boots = EnumSet.of(Material.LEATHER_BOOTS, Material.CHAINMAIL_BOOTS,
-            Material.IRON_BOOTS, Material.GOLDEN_BOOTS, Material.DIAMOND_BOOTS);
-    private static final Set<Material> leggings = EnumSet.of(Material.LEATHER_LEGGINGS, Material.CHAINMAIL_LEGGINGS,
-            Material.IRON_LEGGINGS, Material.GOLDEN_LEGGINGS, Material.DIAMOND_LEGGINGS);
-    private static final Set<Material> chestplates = EnumSet.of(Material.LEATHER_CHESTPLATE,
-            Material.CHAINMAIL_CHESTPLATE, Material.IRON_CHESTPLATE, Material.GOLDEN_CHESTPLATE,
-            Material.DIAMOND_CHESTPLATE);
-    private static final Set<Material> helmets = EnumSet.of(Material.LEATHER_HELMET, Material.CHAINMAIL_HELMET,
-            Material.IRON_HELMET, Material.GOLDEN_HELMET, Material.DIAMOND_HELMET, Material.PUMPKIN,
-            Material.SKELETON_SKULL, Material.WITHER_SKELETON_SKULL);
+
+    private static Material getMaterial(String... names) {
+        for (String name : names) {
+            try {
+                Field field = Material.class.getField(name);
+                return (Material) field.get(null);
+            } catch (NoSuchFieldException | IllegalAccessException ignored) {
+            }
+        }
+        return null;
+    }
+
+    private static Set<Material> createMaterialSet(Material... materials) {
+        Set<Material> materialSet = EnumSet.noneOf(Material.class);
+        for (Material material : materials) {
+            if (material != null) {
+                materialSet.add(material);
+            }
+        }
+        return materialSet;
+    }
+
+    private static final Set<Material> boots = createMaterialSet(
+            Material.LEATHER_BOOTS,
+            Material.CHAINMAIL_BOOTS,
+            Material.IRON_BOOTS,
+            getMaterial("GOLD_BOOTS", "GOLDEN_BOOTS"),
+            Material.DIAMOND_BOOTS
+    );
+
+    private static final Set<Material> leggings = createMaterialSet(
+            Material.LEATHER_LEGGINGS,
+            Material.CHAINMAIL_LEGGINGS,
+            Material.IRON_LEGGINGS,
+            getMaterial("GOLD_LEGGINGS", "GOLDEN_LEGGINGS"),
+            Material.DIAMOND_LEGGINGS
+    );
+
+    private static final Set<Material> chestplates = createMaterialSet(
+            Material.LEATHER_CHESTPLATE,
+            Material.CHAINMAIL_CHESTPLATE,
+            Material.IRON_CHESTPLATE,
+            getMaterial("GOLD_CHESTPLATE", "GOLDEN_CHESTPLATE"),
+            Material.DIAMOND_CHESTPLATE
+    );
+
+    private static final Set<Material> helmets = createMaterialSet(
+            Material.LEATHER_HELMET,
+            Material.CHAINMAIL_HELMET,
+            Material.IRON_HELMET,
+            getMaterial("GOLD_HELMET", "GOLDEN_HELMET"),
+            Material.DIAMOND_HELMET,
+            Material.PUMPKIN,
+            getMaterial("SKULL_ITEM", "SKELETON_SKULL"),
+            getMaterial("WITHER_SKULL", "WITHER_SKELETON_SKULL")
+    );
+
+
+
     private CreateYourOwnMenus plugin;
 
     public MenuGrabCommand(CreateYourOwnMenus plugin) {
